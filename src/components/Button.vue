@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { scrambleFromEvent } from '../lib/textScramble'
+
 interface Props {
   label?: string
   disabled?: boolean
@@ -10,22 +13,32 @@ const props = withDefaults(defineProps<Props>(), {
   label: '',
   disabled: false,
   padding: 'var(--spacing-md)',
-  borderRadius: 'var(--radius-md) 0',
+  borderRadius: 'var(--radius-lg) 0',
 })
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
+const buttonRef = ref<HTMLElement>()
+const displayLabel = ref(props.label)
+
 const handleClick = (event: MouseEvent) => {
   if (!props.disabled) {
     emit('click', event)
+  }
+}
+
+const handleMouseEnter = (e: Event) => {
+  if (props.label && buttonRef.value) {
+    scrambleFromEvent(e, props.label, { duration: 1000, fps: 10 })
   }
 }
 </script>
 
 <template>
   <button
+    ref="buttonRef"
     :class="{ 'btn--disabled': disabled }"
     :style="{
       padding: padding,
@@ -33,8 +46,9 @@ const handleClick = (event: MouseEvent) => {
     }"
     :disabled="disabled"
     @click="handleClick"
+    @mouseenter="handleMouseEnter"
   >
-    <slot>{{ label }}</slot>
+    <slot>{{ displayLabel }}</slot>
   </button>
 </template>
 
@@ -47,6 +61,7 @@ button {
   cursor: pointer;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
+  letter-spacing: 0.1em;
   transition: all 0.3s ease;
   &:hover {
     background: var(--glass-hover);
