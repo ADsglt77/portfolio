@@ -48,4 +48,3 @@ export const timelineData: TimelineItem[] = [
     description: 'Site vitrine + dashboard, NuxtJS/Vue/TypeScript/Prisma',
   },
 ]
-
