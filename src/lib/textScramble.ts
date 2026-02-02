@@ -7,7 +7,11 @@ interface ScrambleOptions {
 const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const animations = new WeakMap<HTMLElement, number>()
 
-export function scrambleText(el: HTMLElement, finalText: string, options: ScrambleOptions = {}): void {
+export function scrambleText(
+  el: HTMLElement,
+  finalText: string,
+  options: ScrambleOptions = {},
+): void {
   const prev = animations.get(el)
   if (prev) cancelAnimationFrame(prev)
 
@@ -49,6 +53,10 @@ export function scrambleText(el: HTMLElement, finalText: string, options: Scramb
   animate()
 }
 
-export function scrambleFromEvent(e: Event, finalText: string, options: ScrambleOptions = {}): void {
+export function scrambleFromEvent(
+  e: Event,
+  finalText: string,
+  options: ScrambleOptions = {},
+): void {
   scrambleText(e.currentTarget as HTMLElement, finalText, options)
 }
