@@ -17,24 +17,29 @@ defineProps<Props>()
   <div class="timeline">
     <div class="timeline-container">
       <div class="timeline-line"></div>
-        <div
-          v-for="(item, index) in items"
-          :key="index"
-          :class="[
-            'timeline-item',
-            index % 2 === 0 ? 'timeline-item--left' : 'timeline-item--right',
-          ]"
-        >
-          <div class="timeline-marker">
-            <div class="timeline-marker-inner"></div>
+      <div
+        v-for="(item, index) in items"
+        :key="index"
+        :class="['timeline-item', index % 2 === 0 ? 'timeline-item--left' : 'timeline-item--right']"
+      >
+        <div class="timeline-marker">
+          <div class="timeline-marker-inner"></div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-date">
+            <p>{{ item.date }}</p>
           </div>
-          <div class="timeline-content">
-            <div class="timeline-date"><p>{{ item.date }}</p></div>
-            <div class="timeline-organization"><h2>{{ item.organization }}</h2></div>
-            <div v-if="item.role" class="timeline-role"><h4>{{ item.role }}</h4></div>
-            <div v-if="item.description" class="timeline-description"><h4>{{ item.description }}</h4></div>
+          <div class="timeline-organization">
+            <h4>{{ item.organization }}</h4>
+          </div>
+          <div v-if="item.role" class="timeline-role">
+            <h5>{{ item.role }}</h5>
+          </div>
+          <div v-if="item.description" class="timeline-description">
+            <p>{{ item.description }}</p>
           </div>
         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -122,16 +127,15 @@ defineProps<Props>()
   text-transform: uppercase;
 }
 
-.timeline-organization {
-  font-family: var(--font-title);
+.timeline-organization h3 {
   color: var(--text);
 }
 
-.timeline-role {
+.timeline-role h5 {
   color: var(--muted);
 }
 
-.timeline-description {
+.timeline-description p {
   color: var(--text);
 }
 
