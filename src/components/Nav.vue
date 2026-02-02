@@ -18,7 +18,7 @@ const toggleMute = () => {
 }
 
 const handleScramble = (e: Event, text: string) => {
-  const target = (e.currentTarget as HTMLElement)?.querySelector('p')
+  const target = (e.currentTarget as HTMLElement)?.querySelector('span')
   if (target) {
     scrambleText(target, text, { duration: 1000, fps: 10 })
   }
@@ -28,16 +28,16 @@ const handleScramble = (e: Event, text: string) => {
 <template>
   <nav>
     <a href="#about" class="nav-link" @mouseenter="handleScramble($event, 'ABOUT')">
-      <p>ABOUT</p>
+      <span>ABOUT</span>
     </a>
     <a href="#experience" class="nav-link" @mouseenter="handleScramble($event, 'WORK')">
-      <p>WORK</p>
+      <span>WORK</span>
     </a>
     <a href="#projects" class="nav-link" @mouseenter="handleScramble($event, 'PROJECTS')">
-      <p>PROJECTS</p>
+      <span>PROJECTS</span>
     </a>
     <a href="#contact" class="nav-link" @mouseenter="handleScramble($event, 'CONTACT')">
-      <p>CONTACT</p>
+      <span>CONTACT</span>
     </a>
     <Button padding="0.6rem" borderRadius="50%" @click="toggleMute">
       <Icon :icon="soundIcon" :width="16" :height="16" :stroke-width="3" />
