@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Gluten:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --bg: #011b04;
-  --text: #ffffff;
+  --bg: #151e16;
+  --text: #ecffee;
   --muted: #808080;
   --glass-bg: rgb(255, 255, 255, 0.1);
   --glass-hover: rgb(255, 255, 255, 0.2);
@@ -56,23 +56,4 @@ body {
   font-family: var(--font-mono);
   color: var(--text);
   background: var(--bg);
-}
-
-h1 {
-  font-size: 2.5em;
-  font-weight: 700;
-}
-
-h2 {
-  font-size: 2em;
-  font-weight: 600;
-}
-
-h3 {
-  font-size: 1.5em;
-  font-weight: 600;
-}
-
-p {
-  margin: 1em 0;
 }
