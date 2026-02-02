@@ -3,6 +3,28 @@ import { onMounted, onUnmounted, ref, provide, watch, nextTick } from 'vue'
 import { Icon } from '@iconify/vue'
 import Button from './components/Button.vue'
 import Nav from './components/Nav.vue'
+import Timeline from './components/Timeline.vue'
+import ProjectCard from './components/ProjectCard.vue'
+import { projects } from './data/projects'
+import { timelineData } from './data/timeline'
+import {
+  iconVue,
+  iconSymfony,
+  iconNuxt,
+  iconPhp,
+  iconCss,
+  iconLinux,
+  iconTypeScript,
+  iconPhotoshop,
+  iconBdd,
+  iconCursor,
+  iconDocker,
+  iconPython,
+  iconGithub,
+  iconFlutter,
+  iconFastArrowDown,
+} from './data/icons'
+import type { Technology } from './data/projects'
 import logo from './assets/img/logo.svg'
 import audioFile from './assets/sound/Flickering-Flames.mp3'
 import aboutImg from './assets/img/about-silhouette-in-forest.jpg'
@@ -17,6 +39,25 @@ const currentTime = ref('')
 const loadingStatusContainerRef = ref<HTMLElement>()
 const loadingStatusHeight = ref(0)
 let timeIntervalId: number | undefined
+
+const technologies: Technology[] = [
+  { icon: iconVue, label: 'VueJS' },
+  { icon: iconSymfony, label: 'Symfony' },
+  { icon: iconNuxt, label: 'NuxtJS' },
+  { icon: iconPhp, label: 'PHP' },
+  { icon: iconCss, label: 'CSS' },
+  { icon: iconLinux, label: 'Linux' },
+  { icon: iconTypeScript, label: 'TypeScript' },
+  { icon: iconPhotoshop, label: 'Photoshop' },
+  { icon: iconBdd, label: 'BDD' },
+  { icon: iconCursor, label: 'Cursor' },
+  { icon: iconDocker, label: 'Docker' },
+  { icon: iconPython, label: 'Python' },
+  { icon: iconGithub, label: 'GitHub' },
+  { icon: iconFlutter, label: 'Flutter' },
+]
+
+const technologiesReversed = [...technologies].reverse()
 
 provide('audioRef', audioRef)
 
@@ -110,7 +151,7 @@ onUnmounted(() => {
       </div>
       <div class="loading-status-container scroll">
         <h4>Scroll to explore</h4>
-        <Icon icon="iconoir:fast-arrow-down" :width="20" :height="20" />
+        <Icon :icon="iconFastArrowDown" :width="20" :height="20" />
       </div>
       <h5 class="meta day">{{ currentDay }}</h5>
       <h5 class="meta time">{{ currentTime }}</h5>
@@ -133,13 +174,38 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Section Expérience
-      <section id="experience" class="section experience">
-        <h2>Expérience</h2>
-        <p>Mon parcours professionnel...</p>
-      </section>
+    <!-- Section Technologies -->
+    <section id="tech" class="section technologies">
+      <div class="technology-item-a">
+        <div v-for="tech in technologies" :key="tech.label">
+          <Icon :icon="tech.icon" :width="24" :height="24" />
+          <span class="label">{{ tech.label }}</span>
+        </div>
+      </div>
+      <div class="technology-item-b">
+        <div v-for="tech in technologiesReversed" :key="tech.label">
+          <Icon :icon="tech.icon" :width="24" :height="24" />
+          <span class="label">{{ tech.label }}</span>
+        </div>
+      </div>
+    </section>
 
-        Section Projects
+    <!-- Section Timeline -->
+    <section id="timeline" class="section timeline">
+      <Timeline :items="timelineData" />
+    </section>
+
+    <!-- Section Projects -->
+    <section id="projects" class="section projects">
+      <div class="projects-container">
+        <ProjectCard v-for="project in projects.slice(0, 6)" :key="project.id" :project="project" />
+      </div>
+      <div v-if="projects.length > 6" class="projects-more">
+        <Button label="Voir tous les projets" />
+      </div>
+    </section>
+
+    <!-- Section Projects
       <section id="projects" class="section projects">
         <h2>Projects</h2>
         <p>Mes projets...</p>
@@ -362,6 +428,93 @@ main .home-bg {
   .section.about .subtitle {
     max-width: 100%;
   }
+}
+
+/* -------------------------------- */
+/*          Section Technologies     */
+/* -------------------------------- */
+
+.section.technologies {
+  height: 100%;
+  margin: 100px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+}
+
+.section.technologies > div {
+  width: 100%;
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.section.technologies > div > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background-color: color-mix(in srgb, var(--text) 10%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  flex-shrink: 0;
+  white-space: nowrap;
+  width: 180px;
+  min-width: 180px;
+}
+
+.section.technologies > div:nth-child(2) {
+  flex-direction: row-reverse;
+}
+
+.section.technologies > div > div svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* -------------------------------- */
+/*          Section Projects         */
+/* -------------------------------- */
+
+.section.projects {
+  height: 100%;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  min-height: auto;
+}
+
+.projects-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--spacing-3xl);
+}
+
+.projects-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-3xl);
+}
+
+@media (max-width: 768px) {
+  .projects-container {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2xl);
+  }
+}
+
+/* -------------------------------- */
+/*          Section Timeline         */
+/* -------------------------------- */
+
+.section.timeline {
+  height: 100%;
+  padding: var(--spacing-3xl) var(--spacing-xl);
 }
 
 /* -------------------------------- */
