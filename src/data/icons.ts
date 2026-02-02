@@ -1,6 +1,5 @@
 // Technologies (devicon)
 export const iconVue = 'devicon:vuejs'
-export const iconSymfony = 'devicon:symfony'
 export const iconNuxt = 'devicon:nuxt'
 export const iconPhp = 'devicon:php'
 export const iconCss = 'devicon:css3'
@@ -11,7 +10,6 @@ export const iconBdd = 'devicon:azuresqldatabase'
 export const iconCursor = 'devicon:cursor'
 export const iconDocker = 'devicon:docker'
 export const iconPython = 'devicon:python'
-export const iconGithub = 'devicon:github'
 export const iconFlutter = 'devicon:flutter'
 export const iconPrisma = 'devicon:prisma'
 export const iconCloudflare = 'devicon:cloudflare'
@@ -27,3 +25,6 @@ export const iconPlay = 'iconoir:play'
 export const iconFastArrowDown = 'iconoir:fast-arrow-down'
 export const iconSoundOff = 'iconoir:sound-off'
 export const iconSoundHigh = 'iconoir:sound-high'
+
+// Autres
+export const iconSymfony = 'mdi:symfony'
