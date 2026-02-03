@@ -143,18 +143,22 @@ onUnmounted(() => {
     <!-- Section Home -->
     <section id="home" class="section home">
       <div class="home-bg-overlay" aria-hidden="true"></div>
-      <div class="home-bg" aria-hidden="true"></div>
-      <img :src="logo" alt="Logo" />
-      <Nav />
-      <div class="hero-title">
-        <h1 class="after" :style="{ width: `${progress}%` }">{{ title }}</h1>
+      <div class="home-bg" data-anim="home-bg" aria-hidden="true"></div>
+      <img :src="logo" alt="Logo" data-anim="home-logo" />
+      <div data-anim="home-nav">
+        <Nav />
       </div>
-      <div class="loading-status-container scroll">
+      <div class="hero-title">
+        <h1 class="after" data-anim="home-title" :style="{ width: `${progress}%` }">
+          {{ title }}
+        </h1>
+      </div>
+      <div class="loading-status-container scroll" data-anim="home-scrollhint">
         <h5>Scroll to explore</h5>
         <Icon :icon="iconFastArrowDown" :width="20" :height="20" />
       </div>
-      <h5 class="meta day">{{ currentDay }}</h5>
-      <h5 class="meta time">{{ currentTime }}</h5>
+      <h5 class="meta day" data-anim="home-meta-day">{{ currentDay }}</h5>
+      <h5 class="meta time" data-anim="home-meta-time">{{ currentTime }}</h5>
     </section>
 
     <!-- Section About -->
@@ -174,18 +178,46 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Section Technologies -->
+    <!-- Section Technologies : scroll infini, pause au hover -->
     <section id="tech" class="section technologies">
-      <div>
-        <div v-for="tech in technologies" :key="tech.label">
-          <Icon :icon="tech.icon" :width="34" :height="34" />
-          <h3>{{ tech.label }}</h3>
+      <div class="tech-row tech-row--left">
+        <div class="tech-row-inner">
+          <div
+            v-for="tech in technologies"
+            :key="'l1-' + tech.label"
+            class="tech-item"
+          >
+            <Icon :icon="tech.icon" :width="40" :height="40" />
+            <h3>{{ tech.label }}</h3>
+          </div>
+          <div
+            v-for="tech in technologies"
+            :key="'l2-' + tech.label"
+            class="tech-item"
+          >
+            <Icon :icon="tech.icon" :width="40" :height="40" />
+            <h3>{{ tech.label }}</h3>
+          </div>
         </div>
       </div>
-      <div>
-        <div v-for="tech in technologiesReversed" :key="tech.label">
+      <div class="tech-row tech-row--right">
+        <div class="tech-row-inner">
+          <div
+            v-for="tech in technologiesReversed"
+            :key="'r1-' + tech.label"
+            class="tech-item"
+          >
+            <Icon :icon="tech.icon" :width="40" :height="40" />
+            <h3>{{ tech.label }}</h3>
+          </div>
+          <div
+            v-for="tech in technologiesReversed"
+            :key="'r2-' + tech.label"
+            class="tech-item"
+          >
             <Icon :icon="tech.icon" :width="34" :height="34" />
             <h3>{{ tech.label }}</h3>
+          </div>
         </div>
       </div>
     </section>
@@ -425,6 +457,9 @@ main .home-bg {
 /* -------------------------------- */
 
 .section.technologies {
+  min-height: 0;
+  height: 50vh;
+  max-height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -432,25 +467,55 @@ main .home-bg {
   gap: var(--spacing-3xl);
 }
 
-.section.technologies > div {
+.tech-row {
   width: 100%;
+  overflow: hidden;
+}
+
+.tech-row-inner {
   display: flex;
+  width: max-content;
   gap: var(--spacing-md);
-  overflow-x: auto;
   text-transform: uppercase;
 }
 
-.section.technologies > div > div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
+.tech-row--left .tech-row-inner {
+  animation: tech-scroll-left 45s linear infinite;
 }
 
+.tech-row--right .tech-row-inner {
+  animation: tech-scroll-right 45s linear infinite;
+}
 
-.section.technologies > div:nth-child(2) {
-  flex-direction: row-reverse;
+.tech-row--left:has(.tech-item:hover) .tech-row-inner {
+  animation-play-state: paused;
+}
+
+.tech-row--right:has(.tech-item:hover) .tech-row-inner {
+  animation-play-state: paused;
+}
+
+.tech-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+
+.tech-item:hover {
+  color: var(--text);
+}
+
+@keyframes tech-scroll-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes tech-scroll-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
 }
 
 /* -------------------------------- */
