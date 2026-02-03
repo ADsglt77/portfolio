@@ -30,8 +30,8 @@ const handleScramble = (e: Event, text: string) => {
     <a href="#about" class="nav-link" @mouseenter="handleScramble($event, 'ABOUT')">
       <span>ABOUT</span>
     </a>
-    <a href="#experience" class="nav-link" @mouseenter="handleScramble($event, 'WORK')">
-      <span>WORK</span>
+    <a href="#timeline" class="nav-link" @mouseenter="handleScramble($event, 'EXPERIENCE')">
+      <span>EXPERIENCE</span>
     </a>
     <a href="#projects" class="nav-link" @mouseenter="handleScramble($event, 'PROJECTS')">
       <span>PROJECTS</span>
