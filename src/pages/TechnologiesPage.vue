@@ -42,19 +42,11 @@ const technologiesReversed = [...technologies].reverse()
   <section id="tech" class="section technologies">
     <div class="tech-row tech-row--left">
       <div class="tech-row-inner">
-        <div
-          v-for="tech in technologies"
-          :key="'l1-' + tech.label"
-          class="tech-item"
-        >
+        <div v-for="tech in technologies" :key="'l1-' + tech.label" class="tech-item">
           <Icon :icon="tech.icon" :width="40" :height="40" />
           <h3>{{ tech.label }}</h3>
         </div>
-        <div
-          v-for="tech in technologies"
-          :key="'l2-' + tech.label"
-          class="tech-item"
-        >
+        <div v-for="tech in technologies" :key="'l2-' + tech.label" class="tech-item">
           <Icon :icon="tech.icon" :width="40" :height="40" />
           <h3>{{ tech.label }}</h3>
         </div>
@@ -62,19 +54,11 @@ const technologiesReversed = [...technologies].reverse()
     </div>
     <div class="tech-row tech-row--right">
       <div class="tech-row-inner">
-        <div
-          v-for="tech in technologiesReversed"
-          :key="'r1-' + tech.label"
-          class="tech-item"
-        >
+        <div v-for="tech in technologiesReversed" :key="'r1-' + tech.label" class="tech-item">
           <Icon :icon="tech.icon" :width="40" :height="40" />
           <h3>{{ tech.label }}</h3>
         </div>
-        <div
-          v-for="tech in technologiesReversed"
-          :key="'r2-' + tech.label"
-          class="tech-item"
-        >
+        <div v-for="tech in technologiesReversed" :key="'r2-' + tech.label" class="tech-item">
           <Icon :icon="tech.icon" :width="34" :height="34" />
           <h3>{{ tech.label }}</h3>
         </div>
@@ -137,12 +121,20 @@ const technologiesReversed = [...technologies].reverse()
 }
 
 @keyframes tech-scroll-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes tech-scroll-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 </style>
