@@ -24,7 +24,7 @@ const loadingStatusHeight = ref(0)
 // - duration: durée de l'animation en secondes
 // - wheelMultiplier: vitesse de la molette (1 = normal, 2 = 2x plus rapide)
 // - touchMultiplier: vitesse sur mobile (2 = normal, 4 = 2x plus rapide)
-const { start: startLenis, stop: stopLenis } = useLenis({
+const { start: startLenis, stop: stopLenis, getInstance: getLenisInstance } = useLenis({
   lerp: 0.5, // Vitesse de lissage (défaut: 0.06)
   duration: 3, // Durée de l'animation (défaut: 1.2s)
   wheelMultiplier: 0.5, // Vitesse molette (défaut: 1)
@@ -33,6 +33,7 @@ const { start: startLenis, stop: stopLenis } = useLenis({
 
 provide('audioRef', audioRef)
 provide('entered', entered)
+provide('lenis', getLenisInstance)
 
 onMounted(() => {
   const startTime = Date.now()
