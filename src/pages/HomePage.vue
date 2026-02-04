@@ -73,8 +73,8 @@ onUnmounted(() => {
 <template>
   <section id="home" class="section home">
     <div :class="{ 'overlay--fade': entered }" class="overlay" aria-hidden="true"></div>
-    <div class="bg" aria-hidden="true"></div>
-    <img :class="{ 'visible': showElements }" :src="logo" alt="Logo" />
+    <div class="bg immersive-bg" aria-hidden="true"></div>
+    <img :class="{ visible: showElements }" :src="logo" alt="Logo" />
     <div :class="{ visible: showElements }"><Nav /></div>
     <h1>{{ title }}</h1>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
@@ -97,8 +97,6 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-
-
 .overlay {
   position: absolute;
   inset: 0;
@@ -113,7 +111,7 @@ onUnmounted(() => {
   inset: 0;
   z-index: -1;
   background-image: v-bind('bgImage');
-  background-size: cover;
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   opacity: 1;
@@ -171,111 +169,5 @@ h1 {
 .meta.time {
   right: var(--spacing-3xl);
   transform: translateX(30px);
-}
-
-/* Animations */
-
-.overlay--fade {
-  animation: fade-out 3s ease-out forwards;
-}
-
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-.visible {
-  animation: fade-in 0.5s ease-out forwards;
-  animation-delay: 1s;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.slide-up {
-  animation: slide-up 1.5s ease-out forwards;
-  animation-delay: 1s;
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.slide-down {
-  animation: slide-down 1.5s ease-out forwards;
-  animation-delay: 1s;
-}
-
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.slide-left {
-  animation: slide-left 1.5s ease-out forwards;
-  animation-delay: 1s;
-}
-
-@keyframes slide-left {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.slide-right {
-  animation: slide-right 1.5s ease-out forwards;
-  animation-delay: 1s;
-}
-
-@keyframes slide-right {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.scroll-icon {
-  animation: bounce 1.5s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(10px);
-  }
 }
 </style>
