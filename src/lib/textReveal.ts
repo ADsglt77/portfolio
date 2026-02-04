@@ -13,7 +13,6 @@ export function textReveal(
   const chars = text.split('')
   const spans: HTMLSpanElement[] = []
 
-  // Créer tous les spans
   chars.forEach((char) => {
     const span = document.createElement('span')
     span.textContent = char === ' ' ? '\u00A0' : char
@@ -24,22 +23,16 @@ export function textReveal(
     spans.push(span)
   })
 
-  // Mélanger les indices une seule fois (Fisher-Yates shuffle)
+  // Fisher-Yates shuffle
   const indices = Array.from({ length: spans.length }, (_, i) => i)
   for (let i = indices.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    const temp = indices[i]!
-    indices[i] = indices[j]!
-    indices[j] = temp
+    ;[indices[i], indices[j]] = [indices[j]!, indices[i]!]
   }
 
-  // Révéler dans l'ordre mélangé
   indices.forEach((index, i) => {
-    const span = spans[index]
-    if (span) {
-      setTimeout(() => {
-        span.style.opacity = '1'
-      }, i * delay)
-    }
+    setTimeout(() => {
+      spans[index]!.style.opacity = '1'
+    }, i * delay)
   })
 }
