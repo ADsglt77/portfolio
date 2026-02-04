@@ -21,6 +21,8 @@ export function scrambleText(
   const totalFrames = Math.ceil(duration / frameTime)
   let frame = 0
 
+  const getRandomChar = () => customCharset[Math.floor(Math.random() * customCharset.length)] ?? 'A'
+
   const animate = () => {
     if (frame >= totalFrames) {
       el.textContent = finalText
@@ -32,18 +34,16 @@ export function scrambleText(
 
     for (let i = 0; i < finalText.length; i++) {
       if (progress < 0.8) {
-        text += customCharset[Math.floor(Math.random() * customCharset.length)] ?? 'A'
+        text += getRandomChar()
       } else {
         const reveal = Math.floor(((progress - 0.8) / 0.2) * finalText.length)
-        text += i <= reveal ? finalText[i] : customCharset[Math.floor(Math.random() * customCharset.length)] ?? 'A'
+        text += i <= reveal ? finalText[i] : getRandomChar()
       }
     }
+
     el.textContent = text
     frame++
-
-    setTimeout(() => {
-      requestAnimationFrame(animate)
-    }, frameTime)
+    setTimeout(() => requestAnimationFrame(animate), frameTime)
   }
 
   animate()
