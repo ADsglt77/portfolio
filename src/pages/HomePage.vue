@@ -111,7 +111,7 @@ onUnmounted(() => {
   inset: 0;
   z-index: -1;
   background-image: v-bind('bgImage');
-  background-size: 100%;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   opacity: 1;
