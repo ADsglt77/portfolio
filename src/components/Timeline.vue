@@ -1,16 +1,63 @@
 <script setup lang="ts">
+import { ref, inject, onMounted, onUnmounted, nextTick, type Ref } from 'vue'
+import { Icon } from '@iconify/vue'
+import { fadeIn } from '../lib/fadeIn'
+
 interface TimelineItem {
   date: string
   organization: string
   role?: string
   description?: string
+  type: 'formation' | 'work'
 }
 
 interface Props {
   items: TimelineItem[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+const entered = inject<Ref<boolean>>('entered')!
+const contentRefs = ref<(HTMLElement | null)[]>([])
+let observer: IntersectionObserver | null = null
+
+onMounted(async () => {
+  if (!entered.value) return
+  await nextTick()
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!(entry.target instanceof HTMLElement)) return
+        
+        const index = parseInt(entry.target.dataset.index || '0', 10)
+        
+        if (entry.isIntersecting) {
+          fadeIn(entry.target, {
+            duration: 800,
+            delay: index * 100,
+            translateY: 30,
+          })
+        } else {
+          entry.target.style.opacity = '0'
+          entry.target.style.transform = 'translateY(30px)'
+        }
+      })
+    },
+    { threshold: 0.2 },
+  )
+
+  contentRefs.value.forEach((ref) => {
+    if (ref) {
+      ref.style.opacity = '0'
+      ref.style.transform = 'translateY(30px)'
+      observer?.observe(ref)
+    }
+  })
+})
+
+onUnmounted(() => {
+  observer?.disconnect()
+})
 </script>
 
 <template>
@@ -25,11 +72,19 @@ defineProps<Props>()
         <div class="timeline-marker">
           <div class="timeline-marker-inner"></div>
         </div>
-        <div class="timeline-content">
+        <div
+          :ref="(el) => { if (el) contentRefs[index] = el as HTMLElement }"
+          :data-index="index"
+          class="timeline-content"
+        >
           <div class="timeline-date">
             <p>{{ item.date }}</p>
           </div>
           <div class="timeline-organization">
+            <Icon
+              :icon="item.type === 'formation' ? 'iconoir:graduation-cap' : 'iconoir:community'"
+              class="timeline-icon"
+            />
             <h4>{{ item.organization }}</h4>
           </div>
           <div v-if="item.role" class="timeline-role">
@@ -127,16 +182,19 @@ defineProps<Props>()
   text-transform: uppercase;
 }
 
-.timeline-organization h3 {
-  color: var(--text);
+.timeline-organization {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.timeline-icon {
+  width: 40px;
+  height: 40px;
 }
 
 .timeline-role h5 {
   color: var(--muted);
-}
-
-.timeline-description p {
-  color: var(--text);
 }
 
 @media (max-width: 768px) {
