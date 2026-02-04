@@ -5,7 +5,6 @@ import type { TextRevealOptions } from '../lib/textReveal'
 type UseTextRevealOptions = {
   active?: Ref<boolean> // ex: entered injecté depuis App
   threshold?: number // seuil IntersectionObserver (ex: 0.3)
-  rootMargin?: string // marge pour l'observer (ex: '0px' ou '100px')
 } & TextRevealOptions
 
 export function useTextReveal(
@@ -13,17 +12,11 @@ export function useTextReveal(
   text: string,
   options: UseTextRevealOptions = {},
 ) {
-  const {
-    active,
-    threshold = 0.3,
-    rootMargin = '0px',
-    delay = 50,
-  } = options
+  const { active, threshold = 0.3, delay = 50 } = options
 
   let hasRevealed = false
   let observer: IntersectionObserver | null = null
 
-  // IntersectionObserver pour déclencher textReveal automatiquement
   const setupObserver = () => {
     if (!elementRef.value || !active?.value) return
 
@@ -33,25 +26,22 @@ export function useTextReveal(
           if (entry.isIntersecting && !hasRevealed && active.value) {
             hasRevealed = true
             if (elementRef.value) {
-              textReveal(elementRef.value, text, {
-                delay,
-              })
+              textReveal(elementRef.value, text, { delay })
             }
-            // Désactiver l'observer après la première révélation
-            if (observer) {
-              observer.disconnect()
-              observer = null
+          } else if (!entry.isIntersecting && hasRevealed) {
+            hasRevealed = false
+            if (elementRef.value) {
+              elementRef.value.innerHTML = ''
             }
           }
         })
       },
-      { threshold, rootMargin },
+      { threshold },
     )
 
     observer.observe(elementRef.value)
   }
 
-  // Start when active becomes true (or immediately if no active ref)
   watch(
     active ?? ({ value: true } as Ref<boolean>),
     async (isActive) => {
@@ -73,9 +63,7 @@ export function useTextReveal(
     reveal: () => {
       if (elementRef.value && !hasRevealed) {
         hasRevealed = true
-        textReveal(elementRef.value, text, {
-          delay,
-        })
+        textReveal(elementRef.value, text, { delay })
       }
     },
   }
