@@ -31,12 +31,12 @@ onMounted(() => {
     const elapsed = Date.now() - startTime
     const newProgress = Math.min((elapsed / duration) * 100, 100)
 
-    progress.value = newProgress
-
-    if (newProgress < 100) {
-      requestAnimationFrame(updateProgress)
-    } else {
+    if (newProgress >= 100) {
+      progress.value = 100
       ready.value = true
+    } else {
+      progress.value = Math.ceil(newProgress)
+      requestAnimationFrame(updateProgress)
     }
   }
 
@@ -53,10 +53,12 @@ watch(ready, () => {
 })
 
 const handleEnter = () => {
-  entered.value = true
   isButtonFading.value = true
   audioRef.value?.play().catch(() => {})
-  startLenis()
+  setTimeout(() => {
+    entered.value = true
+    startLenis()
+  }, 1000)
 }
 
 // Scroll lock : bloquer le scroll avant ENTER, libérer après
@@ -85,13 +87,18 @@ onUnmounted(() => {
     </h1>
     <!-- Div séparée en dessous pour loading et bouton -->
     <div ref="loadingStatusContainerRef" class="loading-status-container">
-      <p v-show="!ready" role="status" aria-live="polite">Loading... {{ Math.round(progress) }}%</p>
-      <Button
-        v-show="ready"
-        :class="{ 'button--fade': isButtonFading }"
-        label="ENTER WEBSITE"
-        @click="handleEnter"
-      />
+      <Transition name="fade" mode="out-in">
+        <p v-if="!ready" key="loading" role="status" aria-live="polite">
+          Loading... {{ progress }}%
+        </p>
+        <Button
+          v-else
+          key="button"
+          :class="{ 'button--fade': isButtonFading }"
+          label="ENTER WEBSITE"
+          @click="handleEnter"
+        />
+      </Transition>
     </div>
   </div>
 
@@ -131,17 +138,14 @@ h1 {
   gap: var(--spacing-md);
 }
 
-.button--fade {
-  animation: button-fade 1s ease-out forwards;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease 0.6s;
 }
 
-@keyframes button-fade {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .section {
