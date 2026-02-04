@@ -4,11 +4,7 @@ interface TypingOptions {
   duration?: number
 }
 
-export function typing(
-  textRef: Ref<string>,
-  fullText: string,
-  options: TypingOptions = {},
-): void {
+export function typing(textRef: Ref<string>, fullText: string, options: TypingOptions = {}): void {
   const { duration = 3000 } = options
   const chars = fullText.split('')
   const delay = duration / chars.length
@@ -24,4 +20,3 @@ export function typing(
 
   revealChar()
 }
-
