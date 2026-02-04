@@ -43,11 +43,11 @@ const technologiesReversed = [...technologies].reverse()
     <div class="tech-row tech-row--left">
       <div class="tech-row-inner">
         <div v-for="tech in technologies" :key="'l1-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="40" :height="40" />
+          <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>
         <div v-for="tech in technologies" :key="'l2-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="40" :height="40" />
+          <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>
       </div>
@@ -55,11 +55,11 @@ const technologiesReversed = [...technologies].reverse()
     <div class="tech-row tech-row--right">
       <div class="tech-row-inner">
         <div v-for="tech in technologiesReversed" :key="'r1-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="40" :height="40" />
+          <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>
         <div v-for="tech in technologiesReversed" :key="'r2-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="34" :height="34" />
+          <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>
       </div>
@@ -113,28 +113,29 @@ const technologiesReversed = [...technologies].reverse()
   gap: var(--spacing-sm);
   padding: var(--spacing-lg);
   color: var(--muted);
-  transition: color 0.25s ease;
 }
 
-.tech-item:hover {
+.tech-item h3 {
+  line-height: 0;
+  transition: color 0.25s ease, -webkit-text-stroke 0.25s ease;
+}
+
+.tech-item:nth-child(odd) h3 {
   color: var(--text);
 }
 
-@keyframes tech-scroll-left {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+.tech-item:nth-child(even) h3 {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--text);
 }
 
-@keyframes tech-scroll-right {
-  from {
-    transform: translateX(-50%);
-  }
-  to {
-    transform: translateX(0);
-  }
+.tech-item:nth-child(odd):hover h3 {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--text);
+}
+
+.tech-item:nth-child(even):hover h3 {
+  color: var(--text);
+  -webkit-text-stroke: none;
 }
 </style>
