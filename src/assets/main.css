@@ -139,7 +139,7 @@ span {
 
 /* Animations */
 .overlay--fade {
-  animation: fade-out 3s ease-out forwards;
+  animation: fade-out 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fade-out {
@@ -234,10 +234,63 @@ span {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
     transform: translateY(10px);
+  }
+}
+
+.immersive-bg {
+  animation: immersive-bg 4s ease-out forwards;
+}
+
+@keyframes immersive-bg {
+  from {
+    background-size: 100%;
+  }
+  to {
+    background-size: 110%;
+  }
+}
+
+.button--fade {
+  animation: button-fade 1s ease-out forwards;
+}
+
+@keyframes button-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.tech-scroll-left {
+  animation: tech-scroll-left 45s linear infinite;
+}
+
+.tech-scroll-right {
+  animation: tech-scroll-right 45s linear infinite;
+}
+
+@keyframes tech-scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes tech-scroll-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
