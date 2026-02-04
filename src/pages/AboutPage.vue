@@ -4,15 +4,17 @@ import Button from '../components/Button.vue'
 import aboutImg from '../assets/img/about-silhouette-in-forest.jpg'
 import { usePinnedTyping } from '../composables/usePinnedTyping'
 import { useTextReveal } from '../composables/useTextReveal'
+import { useFadeIn } from '../composables/useFadeIn'
 
 const entered = inject<Ref<boolean>>('entered')!
 
 const fullText = 'Développeur full-stack, web et application mobile'
+const paragraphText = `Je suis alternant chez Therasoft en Bachelor C.D.W.M. (Concepteur Développeur Web et Mobile) passionné par le développement web, le design, et grand amateur de basket-ball. Créatif et curieux, j'aime allier technique et esthétique dans mes projets.`
+
 const displayedText = ref('')
 const sectionRef = ref<HTMLElement | null>(null)
 const paragraphRef = ref<HTMLParagraphElement | null>(null)
-
-const paragraphText = `Je suis alternant chez Therasoft en Bachelor C.D.W.M. (Concepteur Développeur Web et Mobile) passionné par le développement web, le design, et grand amateur de basket-ball. Créatif et curieux, j'aime allier technique et esthétique dans mes projets.`
+const buttonRef = ref<HTMLElement | null>(null)
 
 usePinnedTyping(sectionRef, fullText, displayedText, {
   active: entered,
@@ -24,8 +26,16 @@ usePinnedTyping(sectionRef, fullText, displayedText, {
 useTextReveal(paragraphRef, paragraphText, {
   active: entered,
   threshold: 0.5,
-  rootMargin: '-100px',
   delay: 3,
+})
+
+// Utiliser useFadeIn pour animer le bouton
+useFadeIn(buttonRef, {
+  active: entered,
+  threshold: 0.5,
+  duration: 1500,
+  delay: 300,
+  translateY: 0,
 })
 </script>
 
@@ -38,7 +48,9 @@ useTextReveal(paragraphRef, paragraphText, {
     </div>
     <div class="subtitle">
       <p ref="paragraphRef"></p>
-      <Button label="Contactez moi" />
+      <div ref="buttonRef">
+        <Button label="Contactez moi" />
+      </div>
     </div>
   </section>
 </template>
@@ -90,6 +102,7 @@ useTextReveal(paragraphRef, paragraphText, {
 }
 
 .section.about .subtitle {
+  width: 100%;
   display: flex;
   flex-direction: column;
   max-width: 48ch;
