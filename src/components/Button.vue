@@ -7,6 +7,7 @@ interface Props {
   disabled?: boolean
   padding?: string
   borderRadius?: string
+  type?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -14,6 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   padding: 'var(--spacing-md)',
   borderRadius: 'var(--radius-lg) 0',
+  type: 'button',
 })
 
 const emit = defineEmits<{
@@ -39,6 +41,7 @@ const handleMouseEnter = (e: Event) => {
 <template>
   <button
     ref="buttonRef"
+    :type="type"
     :class="{ 'btn--disabled': disabled }"
     :style="{
       padding: padding,
