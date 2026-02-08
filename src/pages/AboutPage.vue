@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, inject, type Ref } from 'vue'
+import { Icon } from '@iconify/vue'
 import Button from '../components/Button.vue'
 import aboutImg from '../assets/img/about-silhouette-in-forest.jpg'
+import cvPdf from '../assets/CV-Adrien.pdf'
 import { usePinnedTyping } from '../composables/usePinnedTyping'
 import { useTextReveal } from '../composables/useTextReveal'
 import { useFadeIn } from '../composables/useFadeIn'
+import { socialLinks } from '../data/socialLinks'
 
 const entered = inject<Ref<boolean>>('entered')!
 
@@ -15,6 +18,16 @@ const displayedText = ref('')
 const sectionRef = ref<HTMLElement | null>(null)
 const paragraphRef = ref<HTMLParagraphElement | null>(null)
 const buttonRef = ref<HTMLElement | null>(null)
+const socialLinksRef = ref<HTMLElement | null>(null)
+
+const downloadCV = () => {
+  const link = document.createElement('a')
+  link.href = cvPdf
+  link.download = 'CV-Adrien-Segalat.pdf'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 
 usePinnedTyping(sectionRef, fullText, displayedText, {
   active: entered,
@@ -48,8 +61,23 @@ useFadeIn(buttonRef, {
     </div>
     <div class="subtitle">
       <p ref="paragraphRef"></p>
-      <div ref="buttonRef">
-        <Button label="Contactez moi" />
+      <div class="actions">
+        <div ref="buttonRef">
+          <Button label="Télécharger mon CV" @click="downloadCV" />
+        </div>
+        <div ref="socialLinksRef" class="social-links">
+          <a
+            v-for="link in socialLinks"
+            :key="link.url"
+            :href="link.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            :aria-label="link.label"
+            class="social-link"
+          >
+            <Icon :icon="link.icon" :width="24" :height="24" />
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -114,6 +142,33 @@ useFadeIn(buttonRef, {
 
 .section.about .subtitle p {
   min-height: 160px;
+}
+
+.section.about .subtitle .actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section.about .subtitle .social-links {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.section.about .subtitle .social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--muted);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.section.about .subtitle .social-link:hover {
+  color: var(--text);
 }
 
 @media (max-width: 900px) {
