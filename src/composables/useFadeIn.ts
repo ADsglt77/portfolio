@@ -1,4 +1,4 @@
-import { onUnmounted, watch, nextTick, type Ref } from 'vue'
+import { onUnmounted, watch, nextTick, inject, type Ref } from 'vue'
 import { fadeIn } from '../lib/fadeIn'
 import type { FadeInOptions } from '../lib/fadeIn'
 
@@ -8,6 +8,7 @@ type UseFadeInOptions = {
 } & FadeInOptions
 
 export function useFadeIn(elementRef: Ref<HTMLElement | null>, options: UseFadeInOptions = {}) {
+  const animationsEnabled = inject<{ value: boolean } | undefined>('animationsEnabled')
   const {
     active,
     threshold = 0.3,
@@ -33,8 +34,23 @@ export function useFadeIn(elementRef: Ref<HTMLElement | null>, options: UseFadeI
     }
   }
 
+  const setVisible = () => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId)
+      timeoutId = null
+    }
+    if (elementRef.value) {
+      elementRef.value.style.opacity = `${opacity}`
+      elementRef.value.style.transform = 'translate(0, 0)'
+    }
+  }
+
   const setupObserver = () => {
     if (!elementRef.value || !active?.value) return
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
 
     observer = new IntersectionObserver(
       (entries) => {
@@ -62,14 +78,37 @@ export function useFadeIn(elementRef: Ref<HTMLElement | null>, options: UseFadeI
     observer.observe(elementRef.value)
   }
 
+  const applyMode = async () => {
+    if (!active?.value) return
+    await nextTick()
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId)
+      timeoutId = null
+    }
+    if (!animationsEnabled?.value) {
+      setVisible()
+      return
+    }
+    hasAnimated = false
+    reset()
+    setupObserver()
+  }
+
   watch(
     active ?? ({ value: true } as Ref<boolean>),
-    async (isActive) => {
-      if (!isActive) return
-      await nextTick()
-      setupObserver()
-    },
+    applyMode,
     { immediate: true },
+  )
+
+  watch(
+    () => animationsEnabled?.value,
+    () => {
+      if (active?.value) applyMode()
+    },
   )
 
   onUnmounted(() => {
@@ -84,9 +123,15 @@ export function useFadeIn(elementRef: Ref<HTMLElement | null>, options: UseFadeI
 
   return {
     trigger: () => {
-      if (elementRef.value && !hasAnimated) {
+      if (elementRef.value && !hasAnimated && animationsEnabled?.value) {
         hasAnimated = true
-        timeoutId = fadeIn(elementRef.value, { duration, delay, translateY, translateX, opacity })
+        timeoutId = fadeIn(elementRef.value, {
+          duration,
+          delay,
+          translateY,
+          translateX,
+          opacity,
+        })
       }
     },
   }

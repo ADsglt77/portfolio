@@ -1,5 +1,6 @@
 export interface TextRevealOptions {
   delay?: number // Délai entre chaque lettre (en ms)
+  instant?: boolean // Afficher le texte immédiatement (sans animation)
 }
 
 export function textReveal(
@@ -7,10 +8,15 @@ export function textReveal(
   text: string,
   options: TextRevealOptions = {},
 ): void {
-  const { delay = 50 } = options
+  const { delay = 50, instant = false } = options
 
   // Normaliser le texte : trim + remplacer les espaces multiples par un seul
   const normalizedText = text.trim().replace(/\s+/g, ' ')
+
+  if (instant) {
+    element.textContent = normalizedText
+    return
+  }
 
   element.innerHTML = ''
 

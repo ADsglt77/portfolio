@@ -1,4 +1,4 @@
-import { onUnmounted, watch, nextTick, type Ref } from 'vue'
+import { onUnmounted, watch, nextTick, inject, type Ref } from 'vue'
 import { textReveal } from '../lib/textReveal'
 import type { TextRevealOptions } from '../lib/textReveal'
 
@@ -12,10 +12,18 @@ export function useTextReveal(
   text: string,
   options: UseTextRevealOptions = {},
 ) {
+  const animationsEnabled = inject<{ value: boolean } | undefined>('animationsEnabled')
   const { active, threshold = 0.3, delay = 50 } = options
 
   let hasRevealed = false
   let observer: IntersectionObserver | null = null
+
+  // Sans animation : afficher le texte une fois, pas d'observer ni de clear
+  const applyTextStatic = () => {
+    if (elementRef.value && active?.value) {
+      elementRef.value.textContent = text.trim().replace(/\s+/g, ' ')
+    }
+  }
 
   const setupObserver = () => {
     if (!elementRef.value || !active?.value) return
@@ -42,14 +50,35 @@ export function useTextReveal(
     observer.observe(elementRef.value)
   }
 
+  const applyMode = async () => {
+    if (!active?.value) return
+    await nextTick()
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
+    if (!animationsEnabled?.value) {
+      applyTextStatic()
+      return
+    }
+    hasRevealed = false
+    if (elementRef.value) {
+      elementRef.value.innerHTML = ''
+    }
+    setupObserver()
+  }
+
   watch(
     active ?? ({ value: true } as Ref<boolean>),
-    async (isActive) => {
-      if (!isActive) return
-      await nextTick()
-      setupObserver()
-    },
+    applyMode,
     { immediate: true },
+  )
+
+  watch(
+    () => animationsEnabled?.value,
+    () => {
+      if (active?.value) applyMode()
+    },
   )
 
   onUnmounted(() => {
@@ -63,7 +92,11 @@ export function useTextReveal(
     reveal: () => {
       if (elementRef.value && !hasRevealed) {
         hasRevealed = true
-        textReveal(elementRef.value, text, { delay })
+        if (!animationsEnabled?.value) {
+          elementRef.value.textContent = text.trim().replace(/\s+/g, ' ')
+        } else {
+          textReveal(elementRef.value, text, { delay })
+        }
       }
     },
   }

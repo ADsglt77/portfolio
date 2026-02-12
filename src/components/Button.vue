@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { scrambleFromEvent } from '../lib/textScramble'
 
 interface Props {
@@ -22,6 +22,7 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
+const animationsEnabled = inject<{ value: boolean } | undefined>('animationsEnabled')
 const buttonRef = ref<HTMLElement>()
 const displayLabel = ref(props.label)
 
@@ -33,7 +34,11 @@ const handleClick = (event: MouseEvent) => {
 
 const handleMouseEnter = (e: Event) => {
   if (props.label && buttonRef.value) {
-    scrambleFromEvent(e, props.label, { duration: 1000, fps: 10 })
+    scrambleFromEvent(e, props.label, {
+      duration: 1000,
+      fps: 10,
+      skipAnimation: !animationsEnabled?.value,
+    })
   }
 }
 </script>

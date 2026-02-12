@@ -26,6 +26,7 @@ export const iconPlay = 'iconoir:play'
 export const iconFastArrowDown = 'iconoir:fast-arrow-down'
 export const iconSoundOff = 'iconoir:sound-off'
 export const iconSoundHigh = 'iconoir:sound-high'
+export const iconSettings = 'iconoir:settings'
 
 // Autres
 export const iconSymfony = 'mdi:symfony'

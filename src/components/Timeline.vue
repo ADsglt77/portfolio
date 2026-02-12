@@ -17,6 +17,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const entered = inject<Ref<boolean>>('entered')!
+const animationsEnabled = inject<{ value: boolean } | undefined>('animationsEnabled')
 const contentRefs = ref<(HTMLElement | null)[]>([])
 const hasAnimated = new Set<number>()
 let observer: IntersectionObserver | null = null
@@ -34,6 +35,8 @@ const setupObserver = async () => {
     observer.disconnect()
   }
 
+  const withAnimations = animationsEnabled?.value
+
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -43,13 +46,15 @@ const setupObserver = async () => {
           if (hasAnimated.has(index)) return
 
           hasAnimated.add(index)
-          fadeIn(entry.target as HTMLElement, {
-            duration: 800,
-            delay: index * 100,
-            translateY: 30,
-          })
-        } else {
-          // Réinitialiser quand on sort du viewport
+          if (withAnimations) {
+            const target = entry.target as HTMLElement
+            fadeIn(target, {
+              duration: 800,
+              delay: index * 100,
+              translateY: 30,
+            })
+          }
+        } else if (withAnimations) {
           if (hasAnimated.has(index)) {
             hasAnimated.delete(index)
             const target = entry.target as HTMLElement
@@ -62,19 +67,24 @@ const setupObserver = async () => {
     { threshold: 0.2 },
   )
 
-  contentRefs.value.forEach((ref) => {
-    if (ref) {
-      ref.style.opacity = '0'
-      ref.style.transform = 'translateY(30px)'
-      observer?.observe(ref)
+  contentRefs.value.forEach((el) => {
+    if (el) {
+      if (withAnimations) {
+        el.style.opacity = '0'
+        el.style.transform = 'translateY(30px)'
+        observer?.observe(el)
+      } else {
+        el.style.opacity = '1'
+        el.style.transform = 'translate(0, 0)'
+      }
     }
   })
 }
 
 watch(
-  entered,
-  (isEntered) => {
-    if (isEntered) {
+  [entered, () => animationsEnabled?.value],
+  () => {
+    if (entered.value) {
       setupObserver()
     }
   },

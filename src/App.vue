@@ -20,6 +20,25 @@ const audioRef = ref<HTMLAudioElement>()
 const loadingStatusContainerRef = ref<HTMLElement>()
 const loadingStatusHeight = ref(0)
 
+const STORAGE_ANIMATIONS = 'portfolio-animations-enabled'
+const animationsEnabled = ref(
+  typeof localStorage !== 'undefined'
+    ? localStorage.getItem(STORAGE_ANIMATIONS) !== 'false'
+    : true,
+)
+watch(
+  animationsEnabled,
+  (enabled) => {
+    document.documentElement.classList.toggle('animations-off', !enabled)
+    try {
+      localStorage.setItem(STORAGE_ANIMATIONS, String(enabled))
+    } catch {
+      /* ignore */
+    }
+  },
+  { immediate: true },
+)
+
 // Configuration de la vitesse de scroll
 // Ajustez ces valeurs pour modifier la vitesse :
 // - lerp: 0.01-0.1 (plus bas = plus lent/smooth, plus haut = plus rapide)
@@ -40,6 +59,7 @@ const {
 provide('audioRef', audioRef)
 provide('entered', entered)
 provide('lenis', getLenisInstance)
+provide('animationsEnabled', animationsEnabled)
 
 onMounted(() => {
   const startTime = Date.now()

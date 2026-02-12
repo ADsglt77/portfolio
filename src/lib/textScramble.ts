@@ -2,6 +2,8 @@ interface ScrambleOptions {
   duration?: number
   fps?: number
   charset?: string
+  /** Afficher le texte directement sans effet (ex. mode sans animation) */
+  skipAnimation?: boolean
 }
 
 const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -11,7 +13,10 @@ export function scrambleText(
   finalText: string,
   options: ScrambleOptions = {},
 ): void {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (
+    options.skipAnimation ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
     el.textContent = finalText
     return
   }

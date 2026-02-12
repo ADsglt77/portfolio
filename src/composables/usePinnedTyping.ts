@@ -1,4 +1,4 @@
-import { onUnmounted, watch, nextTick, type Ref } from 'vue'
+import { onUnmounted, watch, nextTick, inject, type Ref } from 'vue'
 import { typing } from '../lib/typing'
 
 type Options = {
@@ -13,21 +13,25 @@ export function usePinnedTyping(
   displayedText: Ref<string>,
   options: Options = {},
 ) {
+  const animationsEnabled = inject<{ value: boolean } | undefined>('animationsEnabled')
   const { active, typingDuration = 3000, threshold = 0.3 } = options
 
   let hasTyped = false
   let observer: IntersectionObserver | null = null
 
-  // IntersectionObserver pour déclencher le typing automatiquement
   const setupObserver = () => {
     if (!sectionRef.value || !active?.value) return
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
 
     observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !hasTyped && active.value) {
             hasTyped = true
-            displayedText.value = '' // Reset avant de commencer
+            displayedText.value = ''
             typing(displayedText, fullText, { duration: typingDuration })
           } else if (!entry.isIntersecting && hasTyped) {
             hasTyped = false
@@ -41,15 +45,33 @@ export function usePinnedTyping(
     observer.observe(sectionRef.value)
   }
 
-  // start when active becomes true (or immediately if no active ref)
+  const applyMode = async () => {
+    if (!active?.value) return
+    await nextTick()
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
+    if (!animationsEnabled?.value) {
+      displayedText.value = fullText
+      return
+    }
+    hasTyped = false
+    displayedText.value = ''
+    setupObserver()
+  }
+
   watch(
     active ?? ({ value: true } as Ref<boolean>),
-    async (isActive) => {
-      if (!isActive) return
-      await nextTick()
-      setupObserver()
-    },
+    applyMode,
     { immediate: true },
+  )
+
+  watch(
+    () => animationsEnabled?.value,
+    () => {
+      if (active?.value) applyMode()
+    },
   )
 
   onUnmounted(() => {

@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onUnmounted, inject, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import Nav from '../components/Nav.vue'
 import { iconFastArrowDown } from '../data/icons'
-import logo from '../assets/img/logo.svg'
 import heroBg from '../assets/img/hero-misty-forest.jpg'
 
 const entered = inject('entered', ref(false))
@@ -74,7 +73,6 @@ onUnmounted(() => {
   <section id="home" class="section home">
     <div :class="{ 'overlay--fade': entered }" class="overlay" aria-hidden="true"></div>
     <div class="bg immersive-bg" aria-hidden="true"></div>
-    <img :class="{ visible: showElements }" :src="logo" alt="Logo" />
     <div :class="{ visible: showElements }"><Nav /></div>
     <h1>{{ title }}</h1>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
@@ -115,16 +113,6 @@ onUnmounted(() => {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 1;
-}
-
-.section.home img {
-  width: 6rem;
-  height: 6rem;
-  position: absolute;
-  top: var(--spacing-2xl);
-  left: var(--spacing-2xl);
-  z-index: 1;
-  opacity: 0;
 }
 
 .section.home > div:has(nav) {
