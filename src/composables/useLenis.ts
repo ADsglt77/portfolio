@@ -1,5 +1,5 @@
-import { onUnmounted } from "vue";
 import Lenis from "lenis";
+import { onUnmounted } from "vue";
 
 type LenisState = {
 	rafId: number | null;

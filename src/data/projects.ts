@@ -1,26 +1,24 @@
-import {
-	iconVue,
-	iconSymfony,
-	iconNuxt,
-	iconPhp,
-	iconCss,
-	iconTypeScript,
-	iconDocker,
-	iconFlutter,
-	iconPrisma,
-	iconCloudflare,
-	iconDart,
-	iconAndroid,
-	iconMysql,
-} from "./icons";
-
-import bibliothequeVideo from "../assets/projects/videos/bibliotheque.mp4";
-import jardinierVideo from "../assets/projects/videos/jardinier.mp4";
-
-import condatPoster from "../assets/projects/poster/condat.jpg";
 import bibliothequePoster from "../assets/projects/poster/bibliotheque.jpg";
+import condatPoster from "../assets/projects/poster/condat.jpg";
 import jardinierPoster from "../assets/projects/poster/jardinier.jpg";
 import restoPoster from "../assets/projects/poster/resto.jpg";
+import bibliothequeVideo from "../assets/projects/videos/bibliotheque.mp4";
+import jardinierVideo from "../assets/projects/videos/jardinier.mp4";
+import {
+	iconAndroid,
+	iconCloudflare,
+	iconCss,
+	iconDart,
+	iconDocker,
+	iconFlutter,
+	iconMysql,
+	iconNuxt,
+	iconPhp,
+	iconPrisma,
+	iconSymfony,
+	iconTypeScript,
+	iconVue,
+} from "./icons";
 
 export interface Technology {
 	icon: string;
