@@ -1,0 +1,18 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+	"workspaces": {
+		".": {
+			"entry": ["scripts/*.js"],
+			"project": ["scripts/*.js"]
+		},
+		"frontend": {
+			"entry": ["src/main.ts", "vite.config.ts"],
+			"project": ["src/**/*.{ts,vue}", "vite.config.ts"],
+			"ignore": ["src/env.d.ts", "**/*.test.ts", "**/*.spec.ts"]
+		},
+		"backend": {
+			"entry": ["src/index.ts"],
+			"project": ["src/**/*.ts"]
+		}
+	}
+}
