@@ -4,5 +4,11 @@
 	"workspaces": [
 		"frontend",
 		"backend"
-	]
+	],
+	"scripts": {
+		"dev:frontend": "bun run --cwd frontend dev",
+		"dev:backend": "bun run --cwd backend dev",
+		"check": "bun run check --cwd frontend",
+		"build": "bun run build --cwd frontend"
+	}
 }
