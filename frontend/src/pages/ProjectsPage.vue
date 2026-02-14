@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from "../components/Button.vue";
+import { iconExpand } from "../data/icons";
 import ProjectCard from "../components/ProjectCard.vue";
 import { projects } from "../data/projects";
 </script>
@@ -10,7 +11,7 @@ import { projects } from "../data/projects";
       <ProjectCard v-for="project in projects.slice(0, 6)" :key="project.id" :project="project" />
     </div>
     <div v-if="projects.length > 6" class="projects-more">
-      <Button label="Voir tous les projets" />
+      <Button :icon="iconExpand" label="Voir tous les projets" />
     </div>
   </section>
 </template>
