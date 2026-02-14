@@ -11,7 +11,8 @@
 		"check:knip": "knip",
 		"format": "biome format . --write",
 		"lint": "biome check . --write",
-		"build": "bun run build --cwd frontend"
+		"build": "bun run build --cwd frontend",
+		"dev": "bun run --cwd frontend dev & bun run --cwd backend dev"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.15",
