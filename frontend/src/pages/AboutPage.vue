@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/vue";
 import { inject, type Ref, ref } from "vue";
 import Button from "../components/Button.vue";
+import { iconDownload } from "../data/icons";
 import { useFadeIn } from "../composables/useFadeIn";
 import { usePinnedTyping } from "../composables/usePinnedTyping";
 import { useTextReveal } from "../composables/useTextReveal";
@@ -60,7 +61,7 @@ useFadeIn(buttonRef, {
       <p ref="paragraphRef"></p>
       <div class="actions">
         <div ref="buttonRef">
-          <Button label="Télécharger mon CV" @click="downloadCV" />
+          <Button :icon="iconDownload" label="Télécharger mon CV" @click="downloadCV" />
         </div>
         <div ref="socialLinksRef" class="social-links">
           <a
