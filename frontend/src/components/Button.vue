@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { inject, ref } from "vue";
-import { scrambleFromEvent } from "../lib/textScramble";
+import { scrambleText } from "../lib/textScramble";
+import { Icon } from "@iconify/vue";
 
 interface Props {
 	label?: string;
+	icon?: string;
+	iconPosition?: "left" | "right";
 	disabled?: boolean;
 	padding?: string;
 	borderRadius?: string;
@@ -12,6 +15,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
 	label: "",
+	icon: undefined,
+	iconPosition: "left",
 	disabled: false,
 	padding: "var(--spacing-md)",
 	borderRadius: "var(--radius-lg) 0",
@@ -26,6 +31,7 @@ const animationsEnabled = inject<{ value: boolean } | undefined>(
 	"animationsEnabled",
 );
 const buttonRef = ref<HTMLElement>();
+const labelRef = ref<HTMLElement>();
 const displayLabel = ref(props.label);
 
 const handleClick = (event: MouseEvent) => {
@@ -34,9 +40,9 @@ const handleClick = (event: MouseEvent) => {
 	}
 };
 
-const handleMouseEnter = (e: Event) => {
-	if (props.label && buttonRef.value) {
-		scrambleFromEvent(e, props.label, {
+const handleMouseEnter = () => {
+	if (props.label && labelRef.value) {
+		scrambleText(labelRef.value, props.label, {
 			duration: 1000,
 			fps: 10,
 			skipAnimation: !animationsEnabled?.value,
@@ -58,7 +64,25 @@ const handleMouseEnter = (e: Event) => {
     @click="handleClick"
     @mouseenter="handleMouseEnter"
   >
-    <slot>{{ displayLabel }}</slot>
+    <Icon
+      v-if="icon && iconPosition === 'left'"
+      :icon="icon"
+      :width="18"
+      :height="18"
+      class="btn__icon btn__icon--left"
+      aria-hidden
+    />
+    <slot>
+      <span ref="labelRef" class="btn__label">{{ displayLabel }}</span>
+    </slot>
+    <Icon
+      v-if="icon && iconPosition === 'right'"
+      :icon="icon"
+      :width="18"
+      :height="18"
+      class="btn__icon btn__icon--right"
+      aria-hidden
+    />
   </button>
 </template>
 
@@ -67,6 +91,7 @@ button {
   width: fit-content;
   display: flex;
   align-items: center;
+  gap: var(--spacing-sm);
   color: var(--text);
   font-family: var(--font-mono);
   cursor: pointer;
@@ -79,6 +104,14 @@ button {
     background: var(--glass-hover);
     border: 1px solid var(--glass-border-hover);
   }
+}
+
+.btn__icon {
+  flex-shrink: 0;
+}
+
+.btn__label {
+  display: inline-block;
 }
 
 .btn--disabled {
