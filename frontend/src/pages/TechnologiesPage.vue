@@ -6,7 +6,7 @@ import {
 	iconCursor,
 	iconDocker,
 	iconFlutter,
-	iconGithubAction,
+	iconGithub,
 	iconLinux,
 	iconNuxt,
 	iconPhotoshop,
@@ -31,7 +31,7 @@ const technologies: Technology[] = [
 	{ icon: iconCursor, label: "Cursor" },
 	{ icon: iconDocker, label: "Docker" },
 	{ icon: iconPython, label: "Python" },
-	{ icon: iconGithubAction, label: "GitHub" },
+	{ icon: iconGithub, label: "GitHub" },
 	{ icon: iconFlutter, label: "Flutter" },
 ];
 
