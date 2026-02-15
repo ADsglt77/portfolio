@@ -9,15 +9,8 @@ import {
 	ref,
 	watch,
 } from "vue";
+import type { TimelineItem } from "../data/timeline";
 import { fadeIn } from "../lib/fadeIn";
-
-interface TimelineItem {
-	date: string;
-	organization: string;
-	role?: string;
-	description?: string;
-	type: "formation" | "work";
-}
 
 interface Props {
 	items: TimelineItem[];
@@ -39,7 +32,7 @@ onMounted(() => {
 const setupObserver = async () => {
 	if (!entered.value) return;
 	await nextTick();
-	await nextTick(); // Double nextTick pour s'assurer que les refs sont assignées
+	await nextTick();
 
 	if (observer) {
 		observer.disconnect();
