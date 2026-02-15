@@ -13,13 +13,12 @@ const animationsEnabledRef = inject<Ref<boolean>>(
 	ref(true),
 );
 const showSettings = ref(false);
-const isMuted = ref(true); // mettre false en production
+const isMuted = ref(true);
 
 const soundIcon = computed(() =>
 	isMuted.value ? iconSoundOff : iconSoundHigh,
 );
 
-/** Réactif pour le template (évite que le bouton ne mette pas à jour l’état affiché) */
 const isAnimationsEnabled = computed({
 	get: () => animationsEnabledRef.value,
 	set: (v: boolean) => {
