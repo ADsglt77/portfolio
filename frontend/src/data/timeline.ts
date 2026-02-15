@@ -1,4 +1,4 @@
-interface TimelineItem {
+export interface TimelineItem {
 	date: string;
 	organization: string;
 	role?: string;

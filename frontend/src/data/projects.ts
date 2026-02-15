@@ -57,9 +57,9 @@ const techIconMap: Record<string, Technology> = {
 	mysql: { icon: iconMysql, label: "MySQL" },
 };
 
-function mapTechnologies(techI: string[]): Technology[] {
-	return techI
-		.map((tech) => techIconMap[tech.toLowerCase()])
+function mapTechnologies(keys: string[]): Technology[] {
+	return keys
+		.map((key) => techIconMap[key.toLowerCase()])
 		.filter((tech): tech is Technology => tech !== undefined);
 }
 
@@ -83,7 +83,6 @@ export const projects: Project[] = [
 			github: "https://github.com/Condat-Basket-Club",
 		},
 		video: {
-			src: undefined,
 			poster: condatPoster,
 		},
 	},
@@ -125,7 +124,6 @@ export const projects: Project[] = [
 			github: "https://github.com/ADsglt77/r3st0",
 		},
 		video: {
-			src: undefined,
 			poster: restoPoster,
 		},
 	},

@@ -1,3 +1,5 @@
+import { iconGithub, iconLinkedin } from "./icons";
+
 interface SocialLink {
 	url: string;
 	icon: string;
@@ -7,12 +9,12 @@ interface SocialLink {
 export const socialLinks: SocialLink[] = [
 	{
 		url: "https://www.linkedin.com/in/adrien-segalat",
-		icon: "iconoir:linkedin",
+		icon: iconLinkedin,
 		label: "Visiter mon profil LinkedIn",
 	},
 	{
 		url: "https://github.com/ADsglt77",
-		icon: "iconoir:github",
+		icon: iconGithub,
 		label: "Visiter mon profil GitHub",
 	},
 ];
