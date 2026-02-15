@@ -79,7 +79,17 @@ body {
 	background: var(--bg);
 }
 
-/* Typography - Global Styles */
+/* Sections */
+.section {
+	height: 100vh;
+	height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Typography */
 h1 {
 	font-family: var(--font-title);
 	font-size: var(--font-size-h1);
@@ -187,22 +197,6 @@ span {
 	}
 }
 
-.slide-down {
-	animation: slide-down 1.5s ease-out forwards;
-	animation-delay: 1s;
-}
-
-@keyframes slide-down {
-	from {
-		opacity: 0;
-		transform: translateY(-30px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
 .slide-left {
 	animation: slide-left 1.5s ease-out forwards;
 	animation-delay: 1s;
@@ -275,14 +269,6 @@ span {
 	}
 }
 
-.tech-scroll-left {
-	animation: tech-scroll-left 45s linear infinite;
-}
-
-.tech-scroll-right {
-	animation: tech-scroll-right 45s linear infinite;
-}
-
 @keyframes tech-scroll-left {
 	from {
 		transform: translateX(0);
@@ -301,13 +287,8 @@ span {
 	}
 }
 
-/*
- * Mode sans animation : désactive uniquement les reveals (scroll, texte, etc.).
- * Jamais désactivé : loader, fade bouton/background, TechnologiesPage, hovers (couleur/border).
- */
 html.animations-off .site-content .visible,
 html.animations-off .site-content .slide-up,
-html.animations-off .site-content .slide-down,
 html.animations-off .site-content .slide-left,
 html.animations-off .site-content .slide-right,
 html.animations-off .site-content .scroll-icon,
