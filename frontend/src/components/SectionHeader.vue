@@ -12,7 +12,7 @@ defineProps<Props>();
 
 <template>
 	<div class="section-header">
-		<img :src="imageSrc" :alt="imageAlt" />
+		<img :src="imageSrc" :alt="imageAlt" loading="lazy" />
 		<div class="title">
 			<HeadingStroke :text="displayedText" />
 		</div>

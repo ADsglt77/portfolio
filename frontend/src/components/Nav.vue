@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/vue";
 import type Lenis from "lenis";
 import { computed, inject, onMounted, onUnmounted, type Ref, ref } from "vue";
+import { navData } from "../data/nav";
 import { iconSettings, iconSoundHigh, iconSoundOff } from "../data/icons";
 import { scrambleText } from "../lib/textScramble";
 import Button from "./Button.vue";
@@ -88,36 +89,14 @@ const scrollToSection = (e: Event, sectionId: string) => {
 <template>
   <nav>
     <a
-      href="#about"
+      v-for="link in navData.links"
+      :key="link.sectionId"
+      :href="link.href"
       class="nav-link"
-      @click="scrollToSection($event, '#about')"
-      @mouseenter="handleScramble($event, 'ABOUT')"
+      @click="scrollToSection($event, link.sectionId)"
+      @mouseenter="handleScramble($event, link.label)"
     >
-      <span>ABOUT</span>
-    </a>
-    <a
-      href="#timeline"
-      class="nav-link"
-      @click="scrollToSection($event, '#timeline')"
-      @mouseenter="handleScramble($event, 'EXPERIENCE')"
-    >
-      <span>EXPERIENCE</span>
-    </a>
-    <a
-      href="#projects"
-      class="nav-link"
-      @click="scrollToSection($event, '#projects')"
-      @mouseenter="handleScramble($event, 'PROJECTS')"
-    >
-      <span>PROJECTS</span>
-    </a>
-    <a
-      href="#contact"
-      class="nav-link"
-      @click="scrollToSection($event, '#contact')"
-      @mouseenter="handleScramble($event, 'CONTACT')"
-    >
-      <span>CONTACT</span>
+      <span>{{ link.label }}</span>
     </a>
     <div class="nav-settings">
       <Button padding="0.6rem" borderRadius="50%" @click="toggleSettings">
@@ -126,7 +105,7 @@ const scrollToSection = (e: Event, sectionId: string) => {
       <Transition name="settings-fade">
         <div v-show="showSettings" class="settings-panel">
           <div class="settings-row">
-            <span>Son</span>
+            <span>{{ navData.settings.sound }}</span>
             <button
               type="button"
               class="settings-toggle"
@@ -137,7 +116,7 @@ const scrollToSection = (e: Event, sectionId: string) => {
             </button>
           </div>
           <div class="settings-row">
-            <span>Animations</span>
+            <span>{{ navData.settings.animations }}</span>
             <button
               type="button"
               class="settings-toggle"

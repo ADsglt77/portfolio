@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { footerData } from "../data/footer";
+
 const currentYear = new Date().getFullYear();
+const copyrightText = footerData.template
+  .replace("{{year}}", String(currentYear))
+  .replace("{{name}}", footerData.name);
 </script>
 
 <template>
   <footer class="footer">
     <div class="footer-content">
       <p class="footer-text">
-        {{ currentYear }} Adrien Segalat. Tous droits réservés.
+        {{ copyrightText }}
       </p>
     </div>
   </footer>

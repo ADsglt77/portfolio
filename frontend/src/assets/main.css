@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Gluten:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap");
-
+/* Fonts and colors are applied at runtime from site.config.json via config/theme.ts */
+/* These are fallback values only */
 :root {
 	--bg: #151e16;
 	--text: #ecffee;
@@ -56,8 +56,11 @@
 	text-decoration: none;
 	list-style: none;
 	box-sizing: border-box;
-	user-select: none;
-	outline: none;
+}
+
+*:focus-visible {
+	outline: 2px solid var(--text);
+	outline-offset: 2px;
 }
 
 html,

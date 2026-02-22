@@ -1,52 +1,19 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import {
-	iconBdd,
-	iconCss,
-	iconCursor,
-	iconDocker,
-	iconFlutter,
-	iconGithub,
-	iconLinux,
-	iconNuxt,
-	iconPhotoshop,
-	iconPhp,
-	iconPython,
-	iconSymfony,
-	iconTypeScript,
-	iconVue,
-} from "../data/icons";
-import type { Technology } from "../data/projects";
+import { technologiesList } from "../data/technologies";
 
-const technologies: Technology[] = [
-	{ icon: iconVue, label: "VueJS" },
-	{ icon: iconSymfony, label: "Symfony" },
-	{ icon: iconNuxt, label: "NuxtJS" },
-	{ icon: iconPhp, label: "PHP" },
-	{ icon: iconCss, label: "CSS" },
-	{ icon: iconLinux, label: "Linux" },
-	{ icon: iconTypeScript, label: "TypeScript" },
-	{ icon: iconPhotoshop, label: "Photoshop" },
-	{ icon: iconBdd, label: "BDD" },
-	{ icon: iconCursor, label: "Cursor" },
-	{ icon: iconDocker, label: "Docker" },
-	{ icon: iconPython, label: "Python" },
-	{ icon: iconGithub, label: "GitHub" },
-	{ icon: iconFlutter, label: "Flutter" },
-];
-
-const technologiesReversed = [...technologies].reverse();
+const technologiesReversed = [...technologiesList].reverse();
 </script>
 
 <template>
   <section id="tech" class="section technologies">
     <div class="tech-row tech-row--left">
       <div class="tech-row-inner">
-        <div v-for="tech in technologies" :key="'l1-' + tech.label" class="tech-item">
+        <div v-for="tech in technologiesList" :key="'l1-' + tech.label" class="tech-item">
           <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>
-        <div v-for="tech in technologies" :key="'l2-' + tech.label" class="tech-item">
+        <div v-for="tech in technologiesList" :key="'l2-' + tech.label" class="tech-item">
           <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>

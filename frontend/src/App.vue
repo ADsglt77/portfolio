@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, provide, ref, watch, watchEffect } from "vue";
-import audioFile from "./assets/sound/Flickering-Flames.mp3";
+import { computed, onMounted, onUnmounted, provide, ref, watch, watchEffect } from "vue";
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
 import { useLenis } from "./composables/useLenis";
+import { heroData } from "./data/hero";
 import AboutPage from "./pages/AboutPage.vue";
 import ContactPage from "./pages/ContactPage.vue";
 import HomePage from "./pages/HomePage.vue";
@@ -12,10 +12,12 @@ import TechnologiesPage from "./pages/TechnologiesPage.vue";
 import TimelinePage from "./pages/TimelinePage.vue";
 
 const progress = ref(0);
+const loadingText = computed(() =>
+	heroData.loadingLabel.replace("{{progress}}", String(progress.value)),
+);
 const ready = ref(false);
 const entered = ref(false);
 const isButtonFading = ref(false);
-const title = "ADRIEN";
 const audioRef = ref<HTMLAudioElement>();
 
 const STORAGE_ANIMATIONS = "portfolio-animations-enabled";
@@ -93,7 +95,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <audio ref="audioRef" :src="audioFile" loop preload="auto" muted></audio>
+  <audio
+    v-if="heroData.ambientSound"
+    ref="audioRef"
+    :src="heroData.ambientSound"
+    loop
+    preload="auto"
+    muted
+  ></audio>
 
   <div v-show="!entered" class="loader" role="dialog" aria-modal="true">
     <h1
@@ -101,18 +110,18 @@ onUnmounted(() => {
         backgroundImage: `linear-gradient(to right, var(--text) 0%, var(--text) ${progress}%, color-mix(in srgb, var(--text) 10%, transparent) ${progress}%, color-mix(in srgb, var(--text) 10%, transparent) 100%)`,
       }"
     >
-      {{ title }}
+      {{ heroData.displayName }}
     </h1>
     <div class="loading-status-container">
       <Transition name="fade" mode="out-in">
         <p v-if="!ready" key="loading" role="status" aria-live="polite">
-          Loading... {{ progress }}%
+          {{ loadingText }}
         </p>
         <Button
           v-else
           key="button"
           :class="{ 'button--fade': isButtonFading }"
-          label="ENTER WEBSITE"
+          :label="heroData.enterLabel"
           @click="handleEnter"
         />
       </Transition>

@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/vue";
 import { computed } from "vue";
 import { iconGithub, iconLink, iconPdf, iconPlay } from "../data/icons";
+import { projectCardData } from "../data/projects";
 import type { Project } from "../data/projects";
 
 interface Props {
@@ -12,11 +13,12 @@ const props = defineProps<Props>();
 
 const actions = computed(() => {
 	const items = [];
+	const labels = projectCardData.ariaLabels;
 	if (props.project.links.readmePdf) {
 		items.push({
 			icon: iconPdf,
 			href: props.project.links.readmePdf,
-			ariaLabel: "Lire le README PDF",
+			ariaLabel: labels.readmePdf,
 			external: false,
 		});
 	}
@@ -24,7 +26,7 @@ const actions = computed(() => {
 		items.push({
 			icon: iconLink,
 			href: props.project.links.website,
-			ariaLabel: "Visiter le site web",
+			ariaLabel: labels.website,
 			external: true,
 		});
 	}
@@ -32,7 +34,7 @@ const actions = computed(() => {
 		items.push({
 			icon: iconGithub,
 			href: props.project.links.github,
-			ariaLabel: "Voir le code source sur GitHub",
+			ariaLabel: labels.github,
 			external: true,
 		});
 	}
@@ -51,18 +53,19 @@ const actions = computed(() => {
         controlslist="nodownload noplaybackrate"
         disablePictureInPicture
         muted
-        preload="metadata"
+        preload="none"
         class="project-video"
       ></video>
       <img
         v-else-if="project.video.poster"
         :src="project.video.poster"
-        :alt="`Aperçu du projet ${project.title}`"
+        :alt="projectCardData.posterAltTemplate.replace('{{title}}', project.title)"
+        loading="lazy"
         class="project-poster"
       />
       <div v-else class="project-placeholder">
         <Icon :icon="iconPlay" :width="48" :height="48" />
-        <span>Aucune vidéo disponible</span>
+        <span>{{ projectCardData.noMediaLabel }}</span>
       </div>
     </div>
 

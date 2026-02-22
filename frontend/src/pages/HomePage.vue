@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
-import heroBg from "../assets/img/hero-misty-forest.jpg";
 import Nav from "../components/Nav.vue";
+import { heroData } from "../data/hero";
 import { iconFastArrowDown } from "../data/icons";
 
 const entered = inject("entered", ref(false));
@@ -20,11 +20,9 @@ const currentDay = ref("");
 const currentTime = ref("");
 let timeIntervalId: number | undefined;
 
-const title = "ADRIEN";
-
 const bgImage = computed(
 	() =>
-		`linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("${heroBg}")`,
+		`linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("${heroData.backgroundImage}")`,
 );
 
 onMounted(() => {
@@ -58,9 +56,9 @@ onUnmounted(() => {
     <div :class="{ 'overlay--fade': entered }" class="overlay" aria-hidden="true"></div>
     <div class="bg immersive-bg" aria-hidden="true"></div>
     <div :class="{ visible: showElements }"><Nav /></div>
-    <h1>{{ title }}</h1>
+    <h1>{{ heroData.displayName }}</h1>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
-      <h5>Scroll to explore</h5>
+      <h5>{{ heroData.scrollLabel }}</h5>
       <Icon class="scroll-icon" :icon="iconFastArrowDown" :width="20" :height="20" />
     </div>
     <h5 :class="{ 'visible slide-left': showElements }" class="meta day">

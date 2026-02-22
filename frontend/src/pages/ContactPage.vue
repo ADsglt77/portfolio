@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import { inject, type Ref, ref } from "vue";
-import contactImg from "../assets/img/contact-campfire-night.jpg";
 import Button from "../components/Button.vue";
 import Input from "../components/Input.vue";
 import SectionHeader from "../components/SectionHeader.vue";
 import { useFadeIn } from "../composables/useFadeIn";
 import { usePinnedTyping } from "../composables/usePinnedTyping";
+import { contactData } from "../data/contact";
 import { iconSend } from "../data/icons";
 import client from "../lib/client";
 
 const entered = inject<Ref<boolean>>("entered")!;
 
-const fullText = "Contactez moi";
-
 const displayedText = ref("");
 const sectionRef = ref<HTMLElement | null>(null);
 const formRef = ref<HTMLElement | null>(null);
 
-usePinnedTyping(sectionRef, fullText, displayedText, {
+usePinnedTyping(sectionRef, contactData.title, displayedText, {
 	active: entered,
 	threshold: 0.3,
 	typingDuration: 2000,
@@ -58,26 +56,27 @@ const validateForm = (): boolean => {
 	resetErrors();
 	let isValid = true;
 
+	const f = contactData.form;
 	if (!formData.value.name.trim()) {
-		errors.value.name = "Le nom est requis";
+		errors.value.name = f.name.error;
 		isValid = false;
 	}
 
 	if (!formData.value.email.trim()) {
-		errors.value.email = "L'email est requis";
+		errors.value.email = f.email.error;
 		isValid = false;
 	} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-		errors.value.email = "Format d'email invalide";
+		errors.value.email = f.email.errorInvalid;
 		isValid = false;
 	}
 
 	if (!formData.value.subject.trim()) {
-		errors.value.subject = "Le sujet est requis";
+		errors.value.subject = f.subject.error;
 		isValid = false;
 	}
 
 	if (!formData.value.message.trim()) {
-		errors.value.message = "Le message est requis";
+		errors.value.message = f.message.error;
 		isValid = false;
 	}
 
@@ -117,8 +116,8 @@ const handleSubmit = async (e: Event) => {
 <template>
   <section ref="sectionRef" id="contact" class="section contact">
     <SectionHeader
-      :image-src="contactImg"
-      image-alt="Contact"
+      :image-src="contactData.image.src"
+      :image-alt="contactData.image.alt"
       :displayed-text="displayedText"
     />
     <form ref="formRef" @submit="handleSubmit" novalidate>
@@ -126,24 +125,24 @@ const handleSubmit = async (e: Event) => {
           id="name"
           v-model="formData.name"
           type="text"
-          label="Nom"
-          placeholder="Votre nom"
+          :label="contactData.form.name.label"
+          :placeholder="contactData.form.name.placeholder"
           :error="errors.name"
         />
         <Input
           id="email"
           v-model="formData.email"
           type="email"
-          label="Email"
-          placeholder="votre.email@example.com"
+          :label="contactData.form.email.label"
+          :placeholder="contactData.form.email.placeholder"
           :error="errors.email"
         />
         <Input
           id="subject"
           v-model="formData.subject"
           type="text"
-          label="Sujet"
-          placeholder="Sujet de votre message"
+          :label="contactData.form.subject.label"
+          :placeholder="contactData.form.subject.placeholder"
           :error="errors.subject"
         />
         <Input
@@ -151,14 +150,14 @@ const handleSubmit = async (e: Event) => {
           v-model="formData.message"
           :textarea="true"
           :rows="6"
-          label="Message"
-          placeholder="Votre message..."
+          :label="contactData.form.message.label"
+          :placeholder="contactData.form.message.placeholder"
           :error="errors.message"
         />
         <Button
           type="submit"
           :icon="iconSend"
-          :label="isSubmitting ? 'Envoi...' : 'Envoyer'"
+          :label="isSubmitting ? contactData.form.submittingLabel : contactData.form.submitLabel"
           :disabled="isSubmitting"
           :success="isSuccess"
           :error="isError"
@@ -194,5 +193,4 @@ form {
 		gap: var(--spacing-xl);
 	}
 }
-
 </style>

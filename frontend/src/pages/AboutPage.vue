@@ -6,13 +6,11 @@ import SectionHeader from "../components/SectionHeader.vue";
 import { useFadeIn } from "../composables/useFadeIn";
 import { usePinnedTyping } from "../composables/usePinnedTyping";
 import { useTextReveal } from "../composables/useTextReveal";
+import { aboutData } from "../data/about";
 import { iconDownload } from "../data/icons";
 import { socialLinks } from "../data/socialLinks";
 
 const entered = inject<Ref<boolean>>("entered")!;
-
-const fullText = "Développeur full-stack, web et application mobile";
-const paragraphText = `Je suis alternant chez Therasoft en Bachelor C.D.W.M. (Concepteur Développeur Web et Mobile) passionné par le développement web, le design, et grand amateur de basket-ball. Créatif et curieux, j'aime allier technique et esthétique dans mes projets.`;
 
 const displayedText = ref("");
 const sectionRef = ref<HTMLElement | null>(null);
@@ -21,9 +19,10 @@ const buttonRef = ref<HTMLElement | null>(null);
 const isDownloaded = ref(false);
 
 const downloadCV = () => {
+	if (!aboutData.cv.path) return;
 	const link = document.createElement("a");
-	link.href = "/CV-Adrien.pdf";
-	link.download = "CV-Adrien-Segalat.pdf";
+	link.href = aboutData.cv.path;
+	link.download = aboutData.cv.filename;
 	document.body.appendChild(link);
 	link.click();
 	document.body.removeChild(link);
@@ -34,13 +33,13 @@ const downloadCV = () => {
 	}, 3000);
 };
 
-usePinnedTyping(sectionRef, fullText, displayedText, {
+usePinnedTyping(sectionRef, aboutData.title, displayedText, {
 	active: entered,
 	threshold: 0.3,
 	typingDuration: 2000,
 });
 
-useTextReveal(paragraphRef, paragraphText, {
+useTextReveal(paragraphRef, aboutData.paragraph, {
 	active: entered,
 	threshold: 0.5,
 	delay: 3,
@@ -58,19 +57,20 @@ useFadeIn(buttonRef, {
 <template>
   <section ref="sectionRef" id="about" class="section about">
     <SectionHeader
-      image-src="/img/about-silhouette-in-forest.jpg"
-      image-alt="About"
+      :image-src="aboutData.image.src"
+      :image-alt="aboutData.image.alt"
       :displayed-text="displayedText"
     />
     <div class="subtitle">
       <p ref="paragraphRef"></p>
       <div class="actions">
         <div ref="buttonRef">
-          <Button 
-            :icon="iconDownload" 
-            label="Télécharger mon CV" 
+          <Button
+            v-if="aboutData.cv.path"
+            :icon="iconDownload"
+            :label="aboutData.cv.label"
             :success="isDownloaded"
-            @click="downloadCV" 
+            @click="downloadCV"
           />
         </div>
         <div class="social-links">
