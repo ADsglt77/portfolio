@@ -1,10 +1,5 @@
 import { config } from "../config";
 
-export interface NavLink {
-	href: string;
-	label: string;
-}
-
 export const navData = {
 	links: config.nav.links.map((l) => ({
 		href: l.href,

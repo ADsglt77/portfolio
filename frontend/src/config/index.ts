@@ -33,5 +33,3 @@ export const config: SiteConfig = deepMerge(
 	defaults,
 	rawConfig as Record<string, unknown>,
 );
-
-export type { SiteConfig };

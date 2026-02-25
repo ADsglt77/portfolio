@@ -2,13 +2,13 @@
 	"$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
 	"workspaces": {
 		"frontend": {
-			"entry": ["src/main.ts", "vite.config.ts"],
-			"project": ["src/**/*.{ts,vue}", "vite.config.ts"],
+			"project": ["src/**/*.{ts,vue}"],
 			"ignore": ["src/env.d.ts", "**/*.test.ts", "**/*.spec.ts"]
 		},
 		"backend": {
 			"entry": ["src/index.ts"],
-			"project": ["src/**/*.ts"]
+			"project": ["src/**/*.ts"],
+			"ignoreBinaries": ["dist/index.js"]
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import { config } from "../config";
 
-export interface SocialLink {
+interface SocialLink {
 	url: string;
 	icon: string;
 	label: string;
