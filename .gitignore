@@ -1,6 +1,7 @@
 #Global
 node_modules/
 dist/
+.env*
 
 #Frontend
 .vite/
