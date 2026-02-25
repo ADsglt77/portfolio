@@ -23,7 +23,7 @@ type TurnstileApi = {
 	remove?: (widgetId: string) => void;
 };
 
-const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE;
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE;
 const TURNSTILE_SCRIPT_URL =
 	"https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
