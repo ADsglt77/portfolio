@@ -3,13 +3,8 @@ import { Elysia } from "elysia";
 import { contactController } from "./modules/contact";
 
 const app = new Elysia()
-	.use(
-		cors({
-			origin: true,
-			methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-			allowedHeaders: ["Content-Type", "Authorization"],
-		}),
-	)
+	.use(cors()) // Par défaut autorise tout (*)
+	.get("/", () => ({ status: "ok" })) // Health check
 	.use(contactController)
 	.listen(3000);
 
