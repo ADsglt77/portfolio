@@ -196,11 +196,23 @@ add_header X-Frame-Options "SAMEORIGIN" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 ```
 
-### Variable d'environnement
+### Variables d'environnement
+
+Frontend (`frontend/.env`):
 
 | Variable | Défaut | Description |
 |----------|--------|------------|
 | `VITE_API_URL` | `http://localhost:3000` | URL du backend Elysia |
+
+Backend (`backend/.env`):
+
+| Variable | Défaut | Description |
+|----------|--------|------------|
+| `BREVO_API_KEY` | _(requis)_ | Clé API Brevo pour l'envoi d'email |
+| `TURNSTILE` | _(requis)_ | Clé secrete Cloudflare Turnstile pour verifier le captcha |
+| `CONTACT_TO_EMAIL` | _(requis)_ | Adresse destinataire des messages du formulaire |
+| `CONTACT_FROM_EMAIL` | _(requis)_ | Adresse expéditeur configurée/validée dans Brevo |
+| `CONTACT_FROM_NAME` | `Portfolio Contact` | Nom affiché pour l'expéditeur |
 
 ## Lint & Quality
 
