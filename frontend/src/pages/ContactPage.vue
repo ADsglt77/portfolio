@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, type Ref, ref } from "vue";
+import { inject, onMounted, onUnmounted, type Ref, ref } from "vue";
 import Button from "../components/Button.vue";
 import Input from "../components/Input.vue";
 import SectionHeader from "../components/SectionHeader.vue";
@@ -8,6 +8,24 @@ import { usePinnedTyping } from "../composables/usePinnedTyping";
 import { contactData } from "../data/contact";
 import { iconSend } from "../data/icons";
 import client from "../lib/client";
+
+type TurnstileApi = {
+	render: (
+		container: HTMLElement,
+		options: {
+			sitekey: string;
+			callback: (token: string) => void;
+			"expired-callback": () => void;
+			"error-callback": () => void;
+		},
+	) => string;
+	reset: (widgetId: string) => void;
+	remove?: (widgetId: string) => void;
+};
+
+const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE;
+const TURNSTILE_SCRIPT_URL =
+	"https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 const entered = inject<Ref<boolean>>("entered")!;
 
@@ -37,6 +55,94 @@ const errors = ref({ ...EMPTY_FORM });
 const isSubmitting = ref(false);
 const isSuccess = ref(false);
 const isError = ref(false);
+const captchaError = ref("");
+const captchaLoadError = ref(false);
+const turnstileContainerRef = ref<HTMLElement | null>(null);
+const turnstileToken = ref("");
+const turnstileWidgetId = ref<string | null>(null);
+
+const getTurnstile = (): TurnstileApi | undefined =>
+	(window as Window & { turnstile?: TurnstileApi }).turnstile;
+
+const loadTurnstileScript = async (): Promise<void> => {
+	if (getTurnstile()) return;
+
+	const existingScript = document.querySelector<HTMLScriptElement>(
+		`script[src="${TURNSTILE_SCRIPT_URL}"]`,
+	);
+
+	if (existingScript) {
+		await new Promise<void>((resolve, reject) => {
+			existingScript.addEventListener("load", () => resolve(), {
+				once: true,
+			});
+			existingScript.addEventListener("error", () => reject(), {
+				once: true,
+			});
+		});
+		return;
+	}
+
+	await new Promise<void>((resolve, reject) => {
+		const script = document.createElement("script");
+		script.src = TURNSTILE_SCRIPT_URL;
+		script.async = true;
+		script.defer = true;
+		script.addEventListener("load", () => resolve(), { once: true });
+		script.addEventListener("error", () => reject(), { once: true });
+		document.head.append(script);
+	});
+};
+
+const renderTurnstile = () => {
+	const api = getTurnstile();
+	const container = turnstileContainerRef.value;
+
+	if (!api || !container || turnstileWidgetId.value) return;
+
+	turnstileWidgetId.value = api.render(container, {
+		sitekey: TURNSTILE_SITE_KEY,
+		callback: (token) => {
+			turnstileToken.value = token;
+			captchaError.value = "";
+		},
+		"expired-callback": () => {
+			turnstileToken.value = "";
+		},
+		"error-callback": () => {
+			turnstileToken.value = "";
+			captchaError.value = "Le captcha a echoue, recommence";
+		},
+	});
+};
+
+const resetTurnstile = () => {
+	turnstileToken.value = "";
+	const api = getTurnstile();
+	const widgetId = turnstileWidgetId.value;
+
+	if (api && widgetId) {
+		api.reset(widgetId);
+	}
+};
+
+onMounted(async () => {
+	try {
+		await loadTurnstileScript();
+		renderTurnstile();
+	} catch {
+		captchaLoadError.value = true;
+	}
+});
+
+onUnmounted(() => {
+	const api = getTurnstile();
+	const widgetId = turnstileWidgetId.value;
+
+	if (api?.remove && widgetId) {
+		api.remove(widgetId);
+	}
+});
 
 const resetErrors = () => {
 	errors.value = { ...EMPTY_FORM };
@@ -54,6 +160,7 @@ const showTemporaryState = (
 
 const validateForm = (): boolean => {
 	resetErrors();
+	captchaError.value = "";
 	let isValid = true;
 
 	const f = contactData.form;
@@ -80,6 +187,11 @@ const validateForm = (): boolean => {
 		isValid = false;
 	}
 
+	if (!turnstileToken.value) {
+		captchaError.value = "Valide le captcha pour envoyer le message";
+		isValid = false;
+	}
+
 	return isValid;
 };
 
@@ -95,11 +207,18 @@ const handleSubmit = async (e: Event) => {
 	isSubmitting.value = true;
 	isError.value = false;
 
-	const { error } = await client.contact.post(formData.value);
+	const { data, error } = await client.contact.post({
+		...formData.value,
+		turnstileToken: turnstileToken.value,
+	});
 
 	isSubmitting.value = false;
 
-	if (error) {
+	if (error || !data?.success) {
+		if (!error && data?.message) {
+			captchaError.value = data.message;
+		}
+		resetTurnstile();
 		showTemporaryState(isError);
 		return;
 	}
@@ -109,6 +228,7 @@ const handleSubmit = async (e: Event) => {
 	setTimeout(() => {
 		formData.value = { ...EMPTY_FORM };
 		resetErrors();
+		resetTurnstile();
 	}, FEEDBACK_DURATION);
 };
 </script>
@@ -145,19 +265,28 @@ const handleSubmit = async (e: Event) => {
           :placeholder="contactData.form.subject.placeholder"
           :error="errors.subject"
         />
-        <Input
-          id="message"
-          v-model="formData.message"
-          :textarea="true"
-          :rows="6"
-          :label="contactData.form.message.label"
-          :placeholder="contactData.form.message.placeholder"
-          :error="errors.message"
-        />
-        <Button
-          type="submit"
-          :icon="iconSend"
-          :label="isSubmitting ? contactData.form.submittingLabel : contactData.form.submitLabel"
+         <Input
+           id="message"
+           v-model="formData.message"
+           :textarea="true"
+           :rows="6"
+           :label="contactData.form.message.label"
+           :placeholder="contactData.form.message.placeholder"
+           :error="errors.message"
+         />
+        <div class="captcha-block">
+          <div ref="turnstileContainerRef" class="turnstile-widget" />
+          <p v-if="captchaLoadError" class="captcha-error">
+            Impossible de charger le captcha, verifie ta connexion.
+          </p>
+          <p v-else-if="captchaError" class="captcha-error">
+            {{ captchaError }}
+          </p>
+        </div>
+         <Button
+           type="submit"
+           :icon="iconSend"
+           :label="isSubmitting ? contactData.form.submittingLabel : contactData.form.submitLabel"
           :disabled="isSubmitting"
           :success="isSuccess"
           :error="isError"
@@ -184,6 +313,21 @@ form {
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-sm);
+}
+
+.captcha-block {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+}
+
+.turnstile-widget {
+	min-height: 65px;
+}
+
+.captcha-error {
+	font-size: 0.92rem;
+	color: var(--error-color);
 }
 
 @media (max-width: 900px) {
