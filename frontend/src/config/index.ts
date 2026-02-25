@@ -1,4 +1,4 @@
-import rawConfig from "../../../site.config.json";
+import rawConfig from "../../site.config.json";
 import { defaults } from "./defaults";
 import type { SiteConfig } from "./types";
 

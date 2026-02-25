@@ -29,9 +29,9 @@ bun run build
 
 Le frontend tourne sur `http://localhost:5173`, le backend sur `http://localhost:3000`.
 
-## Configuration — `site.config.json`
+## Configuration — `frontend/site.config.json`
 
-Tout le contenu du site est piloté par le fichier **`site.config.json`** à la racine du projet.  
+Tout le contenu du site est piloté par le fichier **`site.config.json`** dans le dossier `frontend/`.  
 Aucune connaissance en code n'est nécessaire pour le modifier.
 
 ### Structure du fichier
@@ -54,7 +54,7 @@ Aucune connaissance en code n'est nécessaire pour le modifier.
 
 ### Modifier les couleurs
 
-Dans `site.config.json`, section `theme.colors` :
+Dans `frontend/site.config.json`, section `theme.colors` :
 
 ```json
 "theme": {
