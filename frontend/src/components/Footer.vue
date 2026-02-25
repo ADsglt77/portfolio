@@ -3,8 +3,8 @@ import { footerData } from "../data/footer";
 
 const currentYear = new Date().getFullYear();
 const copyrightText = footerData.template
-  .replace("{{year}}", String(currentYear))
-  .replace("{{name}}", footerData.name);
+	.replace("{{year}}", String(currentYear))
+	.replace("{{name}}", footerData.name);
 </script>
 
 <template>

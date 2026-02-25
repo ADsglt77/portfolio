@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, provide, ref, watch, watchEffect } from "vue";
+import {
+	computed,
+	onMounted,
+	onUnmounted,
+	provide,
+	ref,
+	watch,
+	watchEffect,
+} from "vue";
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
 import { useLenis } from "./composables/useLenis";

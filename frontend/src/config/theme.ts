@@ -14,7 +14,7 @@ export function applyTheme(): void {
 
 	if (fonts.googleFontsUrl) {
 		const existing = document.querySelector(
-			'link[data-config-fonts]',
+			"link[data-config-fonts]",
 		) as HTMLLinkElement | null;
 		if (existing) {
 			existing.href = fonts.googleFontsUrl;

@@ -140,9 +140,20 @@
 	},
 
 	"technologiesBanner": [
-		"vue", "symfony", "nuxt", "php", "css", "linux",
-		"ts", "photoshop", "bdd", "cursor", "docker",
-		"python", "github", "flutter"
+		"vue",
+		"symfony",
+		"nuxt",
+		"php",
+		"css",
+		"linux",
+		"ts",
+		"photoshop",
+		"bdd",
+		"cursor",
+		"docker",
+		"python",
+		"github",
+		"flutter"
 	],
 
 	"timeline": [
@@ -243,7 +254,15 @@
 				"id": "condat",
 				"title": "Projet Basket Club",
 				"description": "Ce projet consiste à créer un site vitrine pour le Club de Basket de Condat. Il mettra en avant les valeurs du club, ses licenciés et ses produits. Avec ce site vitrine un Dashboard sera développé pour les gérants du club, il permettra la mise à jour du site facilement et rapidement. Pour cela j'utiliserai le Framework NuxtJS",
-				"technologies": ["nuxt", "vue", "ts", "prisma", "css", "cloudflare", "docker"],
+				"technologies": [
+					"nuxt",
+					"vue",
+					"ts",
+					"prisma",
+					"css",
+					"cloudflare",
+					"docker"
+				],
 				"links": {
 					"website": "https://condatbasketclub.com/",
 					"github": "https://github.com/Condat-Basket-Club"
@@ -254,7 +273,15 @@
 				"id": "therasoft",
 				"title": "Portail Médecin",
 				"description": "Application web type portail médecin en monorepo : frontend Angular 19 et API Express. Elle propose une interface pour les médecins, une API REST sécurisée (JWT, argon2), une base PostgreSQL gérée avec Prisma, et un déploiement via Docker Compose avec Nginx. Le frontend utilise Angular 19 et Lucide pour l'UI.",
-				"technologies": ["angular", "express", "ts", "prisma", "postgres", "scss", "docker"],
+				"technologies": [
+					"angular",
+					"express",
+					"ts",
+					"prisma",
+					"postgres",
+					"scss",
+					"docker"
+				],
 				"links": {
 					"website": "https://therasoft.adrien-segalat.fr/",
 					"github": "https://github.com/ADsglt77/therasoft"

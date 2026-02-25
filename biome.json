@@ -36,17 +36,12 @@
 	},
 	"overrides": [
 		{
-			"includes": ["frontend/**/*.vue"],
+			"includes": ["frontend/**/*"],
 			"linter": {
-				"rules": {
-					"correctness": {
-						"noUnusedVariables": "off",
-						"noUnusedImports": "off"
-					},
-					"style": {
-						"useConst": "off"
-					}
-				}
+				"enabled": false
+			},
+			"assist": {
+				"enabled": false
 			}
 		}
 	]
