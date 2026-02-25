@@ -5,6 +5,7 @@ export const contactBody = t.Object({
 	email: t.String({ format: "email" }),
 	subject: t.String({ minLength: 1 }),
 	message: t.String({ minLength: 1 }),
+	turnstileToken: t.String({ minLength: 1 }),
 });
 
 export type ContactBody = typeof contactBody.static;
