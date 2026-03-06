@@ -140,4 +140,20 @@ h1 {
   right: var(--spacing-3xl);
   transform: translateX(30px);
 }
+
+@media (max-width: 900px) {
+  .meta {
+    bottom: var(--spacing-xl);
+  }
+
+  .meta.day {
+    left: var(--spacing-xl);
+    transform: translateX(-10px);
+  }
+
+  .meta.time {
+    right: var(--spacing-xl);
+    transform: translateX(10px);
+  }
+}
 </style>
