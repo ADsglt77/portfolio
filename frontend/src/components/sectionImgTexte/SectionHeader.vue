@@ -24,7 +24,7 @@ img {
 
 @media (max-width: 900px) {
 	img {
-		height: clamp(240px, 44vh, 400px);
+		height: clamp(240px, 40vh, 400px);
 	}
 }
 </style>
