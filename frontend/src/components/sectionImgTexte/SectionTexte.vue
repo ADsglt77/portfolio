@@ -46,8 +46,18 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 @media (max-width: 900px) {
+	.title {
+		grid-area: unset !important;
+	}
+
 	.heading-stroke-container h2 {
 		position: static;
+		min-width: 90vw;
 	}
+
+	.heading-stroke {
+		display: none;
+	}
+
 }
 </style>
