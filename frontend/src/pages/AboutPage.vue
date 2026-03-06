@@ -2,7 +2,8 @@
 import { Icon } from "@iconify/vue";
 import { inject, type Ref, ref } from "vue";
 import Button from "../components/Button.vue";
-import SectionHeader from "../components/SectionHeader.vue";
+import SectionHeader from "../components/sectionImgTexte/SectionHeader.vue";
+import SectionTexte from "../components/sectionImgTexte/SectionTexte.vue";
 import { useFadeIn } from "../composables/useFadeIn";
 import { usePinnedTyping } from "../composables/usePinnedTyping";
 import { useTextReveal } from "../composables/useTextReveal";
@@ -56,11 +57,10 @@ useFadeIn(buttonRef, {
 
 <template>
   <section ref="sectionRef" id="about" class="section about">
-    <SectionHeader
-      :image-src="aboutData.image.src"
-      :image-alt="aboutData.image.alt"
-      :displayed-text="displayedText"
-    />
+	<div class="section-header">
+		<SectionHeader :image-src="aboutData.image.src" :image-alt="aboutData.image.alt" />
+		<SectionTexte :text="displayedText" grid-area="1 / 2 / 3 / 5" />
+	</div>
     <div class="subtitle">
       <p ref="paragraphRef"></p>
       <div class="actions">
@@ -94,14 +94,12 @@ useFadeIn(buttonRef, {
 <style scoped>
 .section.about {
 	width: 100%;
-	max-width: 80vw;
-	margin: 0 auto;
+	height: 100%;
 	padding: var(--spacing-3xl) var(--spacing-xl);
-	min-height: 100vh;
 	display: grid;
-	grid-template-columns: minmax(280px, 520px) minmax(320px, 1fr);
-	gap: var(--spacing-2xl);
-	align-items: center;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(6, 1fr);
+	gap: var(--spacing-xl);
 }
 
 .subtitle {
@@ -113,6 +111,11 @@ useFadeIn(buttonRef, {
 	gap: var(--spacing-lg);
 	align-self: center;
 	line-height: 1.8rem;
+	grid-area: 3 / 3 / 7 / 5;
+}
+
+.section-header {
+	display: contents;
 }
 
 .subtitle p {
