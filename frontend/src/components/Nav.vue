@@ -14,6 +14,7 @@ const animationsEnabledRef = inject<Ref<boolean>>(
 	ref(true),
 );
 const showSettings = ref(false);
+const showMobileMenu = ref(false);
 const isMuted = ref(true);
 
 const soundIcon = computed(() =>
@@ -46,10 +47,21 @@ const closeSettings = () => {
 	showSettings.value = false;
 };
 
+const toggleMobileMenu = () => {
+	showMobileMenu.value = !showMobileMenu.value;
+};
+
+const closeMobileMenu = () => {
+	showMobileMenu.value = false;
+};
+
 const handleClickOutside = (e: MouseEvent) => {
 	const target = e.target as HTMLElement;
 	if (showSettings.value && !target.closest(".nav-settings")) {
 		closeSettings();
+	}
+	if (showMobileMenu.value && !target.closest(".nav-mobile")) {
+		closeMobileMenu();
 	}
 };
 
@@ -73,6 +85,7 @@ const handleScramble = (e: Event, text: string) => {
 
 const scrollToSection = (e: Event, sectionId: string) => {
 	e.preventDefault();
+	closeMobileMenu();
 	const lenis = getLenisInstance?.();
 	if (!lenis) return;
 
@@ -98,6 +111,36 @@ const scrollToSection = (e: Event, sectionId: string) => {
     >
       <span>{{ link.label }}</span>
     </a>
+    <div class="nav-mobile">
+      <Button
+        padding="0.6rem"
+        borderRadius="50%"
+        class="nav-hamburger"
+        :aria-expanded="showMobileMenu"
+        aria-label="Menu"
+        @click="toggleMobileMenu"
+      >
+        <Icon
+          :icon="showMobileMenu ? 'iconoir:cancel' : 'iconoir:menu'"
+          :width="16"
+          :height="16"
+          :stroke-width="3"
+        />
+      </Button>
+      <Transition name="menu-fade">
+        <div v-show="showMobileMenu" class="mobile-menu-panel">
+          <a
+            v-for="link in navData.links"
+            :key="link.sectionId"
+            :href="link.href"
+            class="mobile-menu-link"
+            @click="scrollToSection($event, link.sectionId)"
+          >
+            {{ link.label }}
+          </a>
+        </div>
+      </Transition>
+    </div>
     <div class="nav-settings">
       <Button padding="0.6rem" borderRadius="50%" @click="toggleSettings">
         <Icon :icon="iconSettings" :width="16" :height="16" :stroke-width="3" />
@@ -136,9 +179,11 @@ const scrollToSection = (e: Event, sectionId: string) => {
 nav {
   position: absolute;
   top: var(--spacing-xl);
+  left: var(--spacing-3xl);
   right: var(--spacing-3xl);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-2xl);
 }
 
@@ -204,5 +249,70 @@ nav * {
 .settings-fade-enter-from,
 .settings-fade-leave-to {
   opacity: 0;
+}
+
+.nav-mobile {
+  display: none;
+  position: relative;
+}
+
+.nav-hamburger {
+  flex-shrink: 0;
+}
+
+.mobile-menu-panel {
+  position: absolute;
+  top: calc(100% + var(--spacing-sm));
+  left: 0;
+  min-width: 12rem;
+  padding: var(--spacing-sm);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-menu-link {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-span);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.mobile-menu-link:hover {
+  background: var(--glass-hover);
+}
+
+.menu-fade-enter-active,
+.menu-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.menu-fade-enter-from,
+.menu-fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 900px) {
+  .nav-link {
+    display: none;
+  }
+
+  .nav-mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 901px) {
+  nav {
+    justify-content: flex-end;
+  }
 }
 </style>
