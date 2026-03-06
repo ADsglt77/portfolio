@@ -2,7 +2,8 @@
 import { inject, onMounted, onUnmounted, type Ref, ref } from "vue";
 import Button from "../components/Button.vue";
 import Input from "../components/Input.vue";
-import SectionHeader from "../components/SectionHeader.vue";
+import SectionHeader from "../components/sectionImgTexte/SectionHeader.vue";
+import SectionTexte from "../components/sectionImgTexte/SectionTexte.vue";
 import { useFadeIn } from "../composables/useFadeIn";
 import { usePinnedTyping } from "../composables/usePinnedTyping";
 import { contactData } from "../data/contact";
@@ -235,11 +236,10 @@ const handleSubmit = async (e: Event) => {
 
 <template>
   <section ref="sectionRef" id="contact" class="section contact">
-    <SectionHeader
-      :image-src="contactData.image.src"
-      :image-alt="contactData.image.alt"
-      :displayed-text="displayedText"
-    />
+	<div class="section-header">
+		<SectionHeader :image-src="contactData.image.src" :image-alt="contactData.image.alt" />
+		<SectionTexte :text="displayedText" grid-area="1 / 2 / 2 / 5" />
+	</div>
     <form ref="formRef" @submit="handleSubmit" novalidate>
         <Input
           id="name"
@@ -274,23 +274,25 @@ const handleSubmit = async (e: Event) => {
            :placeholder="contactData.form.message.placeholder"
            :error="errors.message"
          />
-        <div class="captcha-block">
-          <div ref="turnstileContainerRef" class="turnstile-widget" />
-          <p v-if="captchaLoadError" class="captcha-error">
-            Impossible de charger le captcha, verifie ta connexion.
-          </p>
-          <p v-else-if="captchaError" class="captcha-error">
-            {{ captchaError }}
-          </p>
-        </div>
-         <Button
-           type="submit"
-           :icon="iconSend"
-           :label="isSubmitting ? contactData.form.submittingLabel : contactData.form.submitLabel"
-          :disabled="isSubmitting"
-          :success="isSuccess"
-          :error="isError"
-        />
+		 <div class="actions">
+			<Button
+				type="submit"
+				:icon="iconSend"
+				:label="isSubmitting ? contactData.form.submittingLabel : contactData.form.submitLabel"
+				:disabled="isSubmitting"
+				:success="isSuccess"
+				:error="isError"
+			/>
+			<div class="captcha-block">
+				<div ref="turnstileContainerRef" class="turnstile-widget" />
+				<p v-if="captchaLoadError" class="captcha-error">
+					Impossible de charger le captcha, verifie ta connexion.
+				</p>
+				<p v-else-if="captchaError" class="captcha-error">
+					{{ captchaError }}
+				</p>
+			</div>
+		 </div>
     </form>
   </section>
 </template>
@@ -298,14 +300,16 @@ const handleSubmit = async (e: Event) => {
 <style scoped>
 .section.contact {
 	width: 100%;
-	max-width: 80vw;
-	margin: 0 auto;
-	min-height: 100vh;
-	display: grid;
-	grid-template-columns: minmax(280px, 520px) minmax(320px, 1fr);
-	gap: var(--spacing-2xl);
+	height: 100%;
 	padding: var(--spacing-3xl) var(--spacing-xl);
-	align-items: center;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(6, 1fr);
+	gap: var(--spacing-xl);
+}
+
+.section-header {
+	display: contents;
 }
 
 form {
@@ -313,21 +317,29 @@ form {
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-sm);
+	align-self: center;
+	grid-area: 2 / 3 / 7 / 5;
+}
+
+form .actions {
+	display: flex;
+	gap: var(--spacing-sm);
+	justify-content: space-between;
+}
+
+form .actions button {
+	place-self: center;
+	height: fit-content;
 }
 
 .captcha-block {
 	display: flex;
 	flex-direction: column;
-	gap: 0.4rem;
-}
-
-.turnstile-widget {
-	min-height: 65px;
 }
 
 .captcha-error {
-	font-size: 0.92rem;
-	color: var(--error-color);
+	color: var(--error);
+	font-size: var(--font-size-span);
 }
 
 @media (max-width: 900px) {
