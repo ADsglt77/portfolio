@@ -344,9 +344,19 @@ form .actions button {
 
 @media (max-width: 900px) {
 	.section.contact {
-		grid-template-columns: 1fr;
-		padding: 0 var(--spacing-xl);
-		gap: var(--spacing-xl);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-lg);
+	}
+
+	.section.contact :deep(img),
+	.section.contact :deep(.title) {
+		grid-area: unset;
+	}
+
+	form {
+		grid-area: unset;
+		max-width: 100%;
 	}
 }
 </style>
