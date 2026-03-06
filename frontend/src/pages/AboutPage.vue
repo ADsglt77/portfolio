@@ -118,10 +118,6 @@ useFadeIn(buttonRef, {
 	display: contents;
 }
 
-.subtitle p {
-	min-height: 160px;
-}
-
 .subtitle .actions {
 	display: flex;
 	align-items: center;
@@ -151,13 +147,24 @@ useFadeIn(buttonRef, {
 
 @media (max-width: 900px) {
 	.section.about {
-		grid-template-columns: 1fr;
-		padding: 0 var(--spacing-xl);
-		gap: var(--spacing-xl);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-lg);
+	}
+
+	.section.about :deep(img),
+	.section.about :deep(.title) {
+		grid-area: unset;
 	}
 
 	.subtitle {
+		grid-area: unset;
 		max-width: 100%;
+	}
+
+	.subtitle .actions {
+		flex-wrap: wrap;
+		gap: var(--spacing-md);
 	}
 }
 </style>
