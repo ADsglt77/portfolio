@@ -28,7 +28,7 @@
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
-		"backgroundImage": "/img/hero-misty-forest.jpg",
+		"backgroundImage": "/img/background.jpg",
 		"ambientSound": "/sound/Flickering-Flames.mp3"
 	},
 
@@ -41,7 +41,7 @@
 			"filename": "CV-Adrien-Segalat.pdf"
 		},
 		"image": {
-			"src": "/img/about-silhouette-in-forest.jpg",
+			"src": "/img/about.jpg",
 			"alt": "About"
 		}
 	},
@@ -49,7 +49,7 @@
 	"contact": {
 		"title": "Contactez moi",
 		"image": {
-			"src": "/img/contact-campfire-night.jpg",
+			"src": "/img/contact.jpg",
 			"alt": "Contact"
 		},
 		"form": {
