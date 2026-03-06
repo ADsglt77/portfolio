@@ -257,4 +257,10 @@ onUnmounted(() => {
     margin-right: 0 !important;
   }
 }
+
+@media (max-width: 900px) {
+	.timeline {
+    padding: 0;
+  }
+}
 </style>
