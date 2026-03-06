@@ -6,6 +6,7 @@
 		"backend"
 	],
 	"scripts": {
+		"postinstall": "node -e \"if (process.platform === 'win32') require('child_process').execSync('npm install @rollup/rollup-win32-x64-msvc@4.59.0 --no-save', {stdio:'inherit'})\"",
 		"check": "bun run check:biome && bun run check:knip",
 		"check:biome": "biome check .",
 		"check:knip": "knip",
@@ -16,6 +17,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.15",
+		"@rollup/rollup-win32-x64-msvc": "^4.59.0",
 		"concurrently": "^9.2.1",
 		"knip": "^5.83.1",
 		"typescript": "^5.9.3"
