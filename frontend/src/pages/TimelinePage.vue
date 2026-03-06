@@ -14,4 +14,10 @@ import { timelineData } from "../data/timeline";
   height: 100%;
   padding: var(--spacing-3xl) var(--spacing-xl);
 }
+
+@media (max-width: 900px) {
+	.section.timeline {
+		padding: var(--spacing-lg);
+	}
+}
 </style>
