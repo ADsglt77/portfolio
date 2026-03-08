@@ -171,6 +171,7 @@ h1 {
   top: 15%;
   color: var(--muted);
   gap: var(--spacing-md);
+  z-index: 100;
 }
 
 .fade-enter-active,
