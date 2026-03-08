@@ -358,5 +358,13 @@ form .actions button {
 		grid-area: unset;
 		max-width: 100%;
 	}
+
+	form .actions {
+		flex-direction: column;
+	}
+
+	form .actions button {
+		place-self: unset;
+	}
 }
 </style>
