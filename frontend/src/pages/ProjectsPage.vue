@@ -1,17 +1,26 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
 import Button from "../components/Button.vue";
 import ProjectCard from "../components/ProjectCard.vue";
+import { config } from "../config";
 import { iconExpand } from "../data/icons";
-import { projects, projectsSectionData } from "../data/projects";
+import { projects } from "../data/projects";
+
+const INITIAL_COUNT = 6;
+
+const showAll = ref(false);
+const visibleProjects = computed(() =>
+	showAll.value ? projects : projects.slice(0, INITIAL_COUNT),
+);
 </script>
 
 <template>
   <section id="projects" class="section projects">
     <div class="projects-container">
-      <ProjectCard v-for="project in projects.slice(0, 6)" :key="project.id" :project="project" />
+      <ProjectCard v-for="project in visibleProjects" :key="project.id" :project="project" />
     </div>
-    <div v-if="projects.length > 6" class="projects-more">
-      <Button :icon="iconExpand" :label="projectsSectionData.seeAllLabel" />
+    <div v-if="visibleProjects.length < projects.length" class="projects-more">
+      <Button :icon="iconExpand" :label="config.projects.seeAllLabel" @click="showAll = true" />
     </div>
   </section>
 </template>

@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import type Lenis from "lenis";
-import { computed, inject, onMounted, onUnmounted, type Ref, ref } from "vue";
-import { navData } from "../data/nav";
-import { iconSettings, iconSoundHigh, iconSoundOff } from "../data/icons";
+import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import { config } from "../config";
+import {
+	iconCancel,
+	iconEye,
+	iconEyeOff,
+	iconMenu,
+	iconSettings,
+	iconSoundHigh,
+	iconSoundOff,
+} from "../data/icons";
+import { audioKey, lenisKey, useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
 import Button from "./Button.vue";
 
-const audioRef = inject<Ref<HTMLAudioElement | null>>("audioRef");
-const getLenisInstance = inject<() => Lenis | null>("lenis");
-const animationsEnabledRef = inject<Ref<boolean>>(
-	"animationsEnabled",
-	ref(true),
-);
+const { links, settings } = config.nav;
+
+const audioRef = inject(audioKey);
+const getLenisInstance = inject(lenisKey);
+const animationsEnabled = useAnimationsEnabled();
 const showSettings = ref(false);
 const showMobileMenu = ref(false);
 const isMuted = ref(true);
@@ -21,13 +28,6 @@ const soundIcon = computed(() =>
 	isMuted.value ? iconSoundOff : iconSoundHigh,
 );
 
-const isAnimationsEnabled = computed({
-	get: () => animationsEnabledRef.value,
-	set: (v: boolean) => {
-		animationsEnabledRef.value = v;
-	},
-});
-
 const toggleMute = () => {
 	isMuted.value = !isMuted.value;
 	if (audioRef?.value) {
@@ -35,33 +35,17 @@ const toggleMute = () => {
 	}
 };
 
-const toggleSettings = () => {
-	showSettings.value = !showSettings.value;
-};
-
 const toggleAnimations = () => {
-	animationsEnabledRef.value = !animationsEnabledRef.value;
-};
-
-const closeSettings = () => {
-	showSettings.value = false;
-};
-
-const toggleMobileMenu = () => {
-	showMobileMenu.value = !showMobileMenu.value;
-};
-
-const closeMobileMenu = () => {
-	showMobileMenu.value = false;
+	animationsEnabled.value = !animationsEnabled.value;
 };
 
 const handleClickOutside = (e: MouseEvent) => {
 	const target = e.target as HTMLElement;
 	if (showSettings.value && !target.closest(".nav-settings")) {
-		closeSettings();
+		showSettings.value = false;
 	}
 	if (showMobileMenu.value && !target.closest(".nav-mobile")) {
-		closeMobileMenu();
+		showMobileMenu.value = false;
 	}
 };
 
@@ -73,24 +57,18 @@ onUnmounted(() => {
 });
 
 const handleScramble = (e: Event, text: string) => {
-	const target = (e.currentTarget as HTMLElement)?.querySelector("span");
+	const target = (e.currentTarget as HTMLElement).querySelector("span");
 	if (target) {
-		scrambleText(target, text, {
-			duration: 1000,
-			fps: 10,
-			skipAnimation: !isAnimationsEnabled.value,
-		});
+		scrambleText(target, text, { skipAnimation: !animationsEnabled.value });
 	}
 };
 
-const scrollToSection = (e: Event, sectionId: string) => {
+const scrollToSection = (e: Event, href: string) => {
 	e.preventDefault();
-	closeMobileMenu();
+	showMobileMenu.value = false;
 	const lenis = getLenisInstance?.();
-	if (!lenis) return;
-
-	const element = document.querySelector(sectionId) as HTMLElement | null;
-	if (element) {
+	const element = document.querySelector<HTMLElement>(href);
+	if (lenis && element) {
 		lenis.scrollTo(element, {
 			duration: 5,
 			easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
@@ -102,11 +80,11 @@ const scrollToSection = (e: Event, sectionId: string) => {
 <template>
   <nav>
     <a
-      v-for="link in navData.links"
-      :key="link.sectionId"
+      v-for="link in links"
+      :key="link.href"
       :href="link.href"
       class="nav-link"
-      @click="scrollToSection($event, link.sectionId)"
+      @click="scrollToSection($event, link.href)"
       @mouseenter="handleScramble($event, link.label)"
     >
       <span>{{ link.label }}</span>
@@ -118,10 +96,10 @@ const scrollToSection = (e: Event, sectionId: string) => {
         class="nav-hamburger"
         :aria-expanded="showMobileMenu"
         aria-label="Menu"
-        @click="toggleMobileMenu"
+        @click="showMobileMenu = !showMobileMenu"
       >
         <Icon
-          :icon="showMobileMenu ? 'iconoir:cancel' : 'iconoir:menu'"
+          :icon="showMobileMenu ? iconCancel : iconMenu"
           :width="16"
           :height="16"
           :stroke-width="3"
@@ -130,11 +108,11 @@ const scrollToSection = (e: Event, sectionId: string) => {
       <Transition name="menu-fade">
         <div v-show="showMobileMenu" class="mobile-menu-panel">
           <a
-            v-for="link in navData.links"
-            :key="link.sectionId"
+            v-for="link in links"
+            :key="link.href"
             :href="link.href"
             class="mobile-menu-link"
-            @click="scrollToSection($event, link.sectionId)"
+            @click="scrollToSection($event, link.href)"
           >
             {{ link.label }}
           </a>
@@ -142,16 +120,23 @@ const scrollToSection = (e: Event, sectionId: string) => {
       </Transition>
     </div>
     <div class="nav-settings">
-      <Button padding="0.6rem" borderRadius="50%" @click="toggleSettings">
+      <Button
+        padding="0.6rem"
+        borderRadius="50%"
+        :aria-expanded="showSettings"
+        aria-label="Paramètres"
+        @click="showSettings = !showSettings"
+      >
         <Icon :icon="iconSettings" :width="16" :height="16" :stroke-width="3" />
       </Button>
       <Transition name="settings-fade">
         <div v-show="showSettings" class="settings-panel">
           <div class="settings-row">
-            <span>{{ navData.settings.sound }}</span>
+            <span>{{ settings.soundLabel }}</span>
             <button
               type="button"
               class="settings-toggle"
+              :aria-label="settings.soundLabel"
               :aria-pressed="!isMuted"
               @click="toggleMute"
             >
@@ -159,14 +144,15 @@ const scrollToSection = (e: Event, sectionId: string) => {
             </button>
           </div>
           <div class="settings-row">
-            <span>{{ navData.settings.animations }}</span>
+            <span>{{ settings.animationsLabel }}</span>
             <button
               type="button"
               class="settings-toggle"
-              :aria-pressed="isAnimationsEnabled"
+              :aria-label="settings.animationsLabel"
+              :aria-pressed="animationsEnabled"
               @click.stop="toggleAnimations"
             >
-              <Icon :icon="isAnimationsEnabled ? 'iconoir:eye' : 'iconoir:eye-off'" :width="14" :height="14" :stroke-width="3" />
+              <Icon :icon="animationsEnabled ? iconEye : iconEyeOff" :width="14" :height="14" :stroke-width="3" />
             </button>
           </div>
         </div>

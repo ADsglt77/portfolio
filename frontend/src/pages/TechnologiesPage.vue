@@ -2,30 +2,27 @@
 import { Icon } from "@iconify/vue";
 import { technologiesList } from "../data/technologies";
 
-const technologiesReversed = [...technologiesList].reverse();
+// Each row renders its list twice so the -50% translation loops seamlessly.
+const rows = [
+	{ direction: "left", items: technologiesList },
+	{ direction: "right", items: [...technologiesList].reverse() },
+].map((row) => ({ ...row, items: [...row.items, ...row.items] }));
 </script>
 
 <template>
   <section id="tech" class="section technologies">
-    <div class="tech-row tech-row--left">
+    <div
+      v-for="row in rows"
+      :key="row.direction"
+      :class="['tech-row', `tech-row--${row.direction}`]"
+    >
       <div class="tech-row-inner">
-        <div v-for="tech in technologiesList" :key="'l1-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="36" :height="36" />
-          <h3>{{ tech.label }}</h3>
-        </div>
-        <div v-for="tech in technologiesList" :key="'l2-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="36" :height="36" />
-          <h3>{{ tech.label }}</h3>
-        </div>
-      </div>
-    </div>
-    <div class="tech-row tech-row--right">
-      <div class="tech-row-inner">
-        <div v-for="tech in technologiesReversed" :key="'r1-' + tech.label" class="tech-item">
-          <Icon :icon="tech.icon" :width="36" :height="36" />
-          <h3>{{ tech.label }}</h3>
-        </div>
-        <div v-for="tech in technologiesReversed" :key="'r2-' + tech.label" class="tech-item">
+        <div
+          v-for="(tech, index) in row.items"
+          :key="index"
+          class="tech-item"
+          :aria-hidden="index >= row.items.length / 2 || undefined"
+        >
           <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
         </div>
@@ -66,11 +63,7 @@ const technologiesReversed = [...technologiesList].reverse();
   animation: tech-scroll-right 45s linear infinite;
 }
 
-.tech-row--left:has(.tech-item:hover) .tech-row-inner {
-  animation-play-state: paused;
-}
-
-.tech-row--right:has(.tech-item:hover) .tech-row-inner {
+.tech-row:has(.tech-item:hover) .tech-row-inner {
   animation-play-state: paused;
 }
 

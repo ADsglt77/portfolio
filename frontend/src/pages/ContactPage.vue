@@ -1,55 +1,46 @@
 <script setup lang="ts">
-import { inject, onMounted, onUnmounted, type Ref, ref } from "vue";
+import { ref, watch } from "vue";
 import Button from "../components/Button.vue";
+import ImageSection from "../components/ImageSection.vue";
 import Input from "../components/Input.vue";
-import SectionHeader from "../components/sectionImgTexte/SectionHeader.vue";
-import SectionTexte from "../components/sectionImgTexte/SectionTexte.vue";
 import { useFadeIn } from "../composables/useFadeIn";
-import { usePinnedTyping } from "../composables/usePinnedTyping";
-import { contactData } from "../data/contact";
+import { useTurnstile } from "../composables/useTurnstile";
+import { config } from "../config";
 import { iconSend } from "../data/icons";
-import client from "../lib/client";
+import { sendContact } from "../lib/contact";
 
-type TurnstileApi = {
-	render: (
-		container: HTMLElement,
-		options: {
-			sitekey: string;
-			callback: (token: string) => void;
-			"expired-callback": () => void;
-			"error-callback": () => void;
-		},
-	) => string;
-	reset: (widgetId: string) => void;
-	remove?: (widgetId: string) => void;
+type FieldKey = "name" | "email" | "subject" | "message";
+
+const FIELDS: Array<{
+	key: FieldKey;
+	type?: "text" | "email";
+	textarea?: boolean;
+}> = [
+	{ key: "name" },
+	{ key: "email", type: "email" },
+	{ key: "subject" },
+	{ key: "message", textarea: true },
+];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMPTY_FORM: Record<FieldKey, string> = {
+	name: "",
+	email: "",
+	subject: "",
+	message: "",
 };
+const FEEDBACK_DURATION = 3000;
 
-const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE;
-const TURNSTILE_SCRIPT_URL =
-	"https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const { contact } = config;
+const { form } = contact;
 
-const entered = inject<Ref<boolean>>("entered")!;
-
-const displayedText = ref("");
-const sectionRef = ref<HTMLElement | null>(null);
 const formRef = ref<HTMLElement | null>(null);
 
-usePinnedTyping(sectionRef, contactData.title, displayedText, {
-	active: entered,
-	threshold: 0.3,
-	typingDuration: 2000,
-});
-
 useFadeIn(formRef, {
-	active: entered,
 	threshold: 0.5,
 	duration: 1500,
 	delay: 500,
 	translateY: 30,
 });
-
-const EMPTY_FORM = { name: "", email: "", subject: "", message: "" };
-const FEEDBACK_DURATION = 3000;
 
 const formData = ref({ ...EMPTY_FORM });
 const errors = ref({ ...EMPTY_FORM });
@@ -57,147 +48,47 @@ const isSubmitting = ref(false);
 const isSuccess = ref(false);
 const isError = ref(false);
 const captchaError = ref("");
-const captchaLoadError = ref(false);
 const turnstileContainerRef = ref<HTMLElement | null>(null);
-const turnstileToken = ref("");
-const turnstileWidgetId = ref<string | null>(null);
 
-const getTurnstile = (): TurnstileApi | undefined =>
-	(window as Window & { turnstile?: TurnstileApi }).turnstile;
-
-const loadTurnstileScript = async (): Promise<void> => {
-	if (getTurnstile()) return;
-
-	const existingScript = document.querySelector<HTMLScriptElement>(
-		`script[src="${TURNSTILE_SCRIPT_URL}"]`,
-	);
-
-	if (existingScript) {
-		await new Promise<void>((resolve, reject) => {
-			existingScript.addEventListener("load", () => resolve(), {
-				once: true,
-			});
-			existingScript.addEventListener("error", () => reject(), {
-				once: true,
-			});
-		});
-		return;
-	}
-
-	await new Promise<void>((resolve, reject) => {
-		const script = document.createElement("script");
-		script.src = TURNSTILE_SCRIPT_URL;
-		script.async = true;
-		script.defer = true;
-		script.addEventListener("load", () => resolve(), { once: true });
-		script.addEventListener("error", () => reject(), { once: true });
-		document.head.append(script);
-	});
-};
-
-const renderTurnstile = () => {
-	const api = getTurnstile();
-	const container = turnstileContainerRef.value;
-
-	if (!api || !container || turnstileWidgetId.value) return;
-
-	turnstileWidgetId.value = api.render(container, {
-		sitekey: TURNSTILE_SITE_KEY,
-		callback: (token) => {
-			turnstileToken.value = token;
-			captchaError.value = "";
-		},
-		"expired-callback": () => {
-			turnstileToken.value = "";
-		},
-		"error-callback": () => {
-			turnstileToken.value = "";
-			captchaError.value = "Le captcha a echoue, recommence";
-		},
-	});
-};
-
-const resetTurnstile = () => {
-	turnstileToken.value = "";
-	const api = getTurnstile();
-	const widgetId = turnstileWidgetId.value;
-
-	if (api && widgetId) {
-		api.reset(widgetId);
-	}
-};
-
-onMounted(async () => {
-	try {
-		await loadTurnstileScript();
-		renderTurnstile();
-	} catch {
-		captchaLoadError.value = true;
-	}
+const {
+	token: turnstileToken,
+	loadError: captchaLoadError,
+	reset: resetTurnstile,
+} = useTurnstile(turnstileContainerRef, {
+	onError: () => {
+		captchaError.value = form.captcha.failed;
+	},
 });
 
-onUnmounted(() => {
-	const api = getTurnstile();
-	const widgetId = turnstileWidgetId.value;
-
-	if (api?.remove && widgetId) {
-		api.remove(widgetId);
-	}
+watch(turnstileToken, (token) => {
+	if (token) captchaError.value = "";
 });
 
-const resetErrors = () => {
-	errors.value = { ...EMPTY_FORM };
-};
-
-const showTemporaryState = (
-	state: { value: boolean },
-	duration = FEEDBACK_DURATION,
-) => {
+const showTemporaryState = (state: { value: boolean }) => {
 	state.value = true;
 	setTimeout(() => {
 		state.value = false;
-	}, duration);
+	}, FEEDBACK_DURATION);
 };
 
 const validateForm = (): boolean => {
-	resetErrors();
+	errors.value = { ...EMPTY_FORM };
 	captchaError.value = "";
-	let isValid = true;
 
-	const f = contactData.form;
-	if (!formData.value.name.trim()) {
-		errors.value.name = f.name.error;
-		isValid = false;
+	for (const { key } of FIELDS) {
+		if (!formData.value[key].trim()) errors.value[key] = form[key].error;
 	}
-
-	if (!formData.value.email.trim()) {
-		errors.value.email = f.email.error;
-		isValid = false;
-	} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-		errors.value.email = f.email.errorInvalid;
-		isValid = false;
+	if (!errors.value.email && !EMAIL_PATTERN.test(formData.value.email)) {
+		errors.value.email = form.email.errorInvalid;
 	}
-
-	if (!formData.value.subject.trim()) {
-		errors.value.subject = f.subject.error;
-		isValid = false;
-	}
-
-	if (!formData.value.message.trim()) {
-		errors.value.message = f.message.error;
-		isValid = false;
-	}
-
 	if (!turnstileToken.value) {
-		captchaError.value = "Valide le captcha pour envoyer le message";
-		isValid = false;
+		captchaError.value = form.captcha.required;
 	}
 
-	return isValid;
+	return !captchaError.value && Object.values(errors.value).every((e) => !e);
 };
 
-const handleSubmit = async (e: Event) => {
-	e.preventDefault();
+const handleSubmit = async () => {
 	if (isSubmitting.value) return;
 
 	if (!validateForm()) {
@@ -208,17 +99,15 @@ const handleSubmit = async (e: Event) => {
 	isSubmitting.value = true;
 	isError.value = false;
 
-	const { data, error } = await client.contact.post({
+	const result = await sendContact({
 		...formData.value,
 		turnstileToken: turnstileToken.value,
 	});
 
 	isSubmitting.value = false;
 
-	if (error || !data?.success) {
-		if (!error && data?.message) {
-			captchaError.value = data.message;
-		}
+	if (!result.success) {
+		if (result.message) captchaError.value = result.message;
 		resetTurnstile();
 		showTemporaryState(isError);
 		return;
@@ -228,90 +117,50 @@ const handleSubmit = async (e: Event) => {
 
 	setTimeout(() => {
 		formData.value = { ...EMPTY_FORM };
-		resetErrors();
+		errors.value = { ...EMPTY_FORM };
 		resetTurnstile();
 	}, FEEDBACK_DURATION);
 };
 </script>
 
 <template>
-  <section ref="sectionRef" id="contact" class="section contact">
-	<div class="section-header">
-		<SectionHeader :image-src="contactData.image.src" :image-alt="contactData.image.alt" />
-		<SectionTexte :text="displayedText" grid-area="1 / 2 / 2 / 5" />
-	</div>
-    <form ref="formRef" @submit="handleSubmit" novalidate>
-        <Input
-          id="name"
-          v-model="formData.name"
-          type="text"
-          :label="contactData.form.name.label"
-          :placeholder="contactData.form.name.placeholder"
-          :error="errors.name"
+  <ImageSection id="contact" :title="contact.title" :image="contact.image" title-area="1 / 2 / 2 / 5">
+    <form ref="formRef" novalidate @submit.prevent="handleSubmit">
+      <Input
+        v-for="field in FIELDS"
+        :id="field.key"
+        :key="field.key"
+        v-model="formData[field.key]"
+        :type="field.type"
+        :textarea="field.textarea"
+        :label="form[field.key].label"
+        :placeholder="form[field.key].placeholder"
+        :error="errors[field.key]"
+      />
+      <div class="actions">
+        <Button
+          type="submit"
+          :icon="iconSend"
+          :label="isSubmitting ? form.submittingLabel : form.submitLabel"
+          :disabled="isSubmitting"
+          :success="isSuccess"
+          :error="isError"
         />
-        <Input
-          id="email"
-          v-model="formData.email"
-          type="email"
-          :label="contactData.form.email.label"
-          :placeholder="contactData.form.email.placeholder"
-          :error="errors.email"
-        />
-        <Input
-          id="subject"
-          v-model="formData.subject"
-          type="text"
-          :label="contactData.form.subject.label"
-          :placeholder="contactData.form.subject.placeholder"
-          :error="errors.subject"
-        />
-         <Input
-           id="message"
-           v-model="formData.message"
-           :textarea="true"
-           :rows="6"
-           :label="contactData.form.message.label"
-           :placeholder="contactData.form.message.placeholder"
-           :error="errors.message"
-         />
-		 <div class="actions">
-			<Button
-				type="submit"
-				:icon="iconSend"
-				:label="isSubmitting ? contactData.form.submittingLabel : contactData.form.submitLabel"
-				:disabled="isSubmitting"
-				:success="isSuccess"
-				:error="isError"
-			/>
-			<div class="captcha-block">
-				<div ref="turnstileContainerRef" class="turnstile-widget" />
-				<p v-if="captchaLoadError" class="captcha-error">
-					Impossible de charger le captcha, verifie ta connexion.
-				</p>
-				<p v-else-if="captchaError" class="captcha-error">
-					{{ captchaError }}
-				</p>
-			</div>
-		 </div>
+        <div class="captcha-block">
+          <div ref="turnstileContainerRef" class="turnstile-widget" />
+          <p v-if="captchaLoadError" class="captcha-error">
+            {{ form.captcha.loadError }}
+          </p>
+          <p v-else-if="captchaError" class="captcha-error">
+            {{ captchaError }}
+          </p>
+        </div>
+      </div>
     </form>
-  </section>
+  </ImageSection>
 </template>
 
 <style scoped>
-.section.contact {
-	width: 100%;
-	height: 100%;
-	padding: var(--spacing-3xl) var(--spacing-xl);
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	grid-template-rows: repeat(6, 1fr);
-	gap: var(--spacing-xl);
-}
-
-.section-header {
-	display: contents;
-}
-
 form {
 	width: 100%;
 	display: flex;
@@ -343,19 +192,7 @@ form .actions button {
 }
 
 @media (max-width: 900px) {
-	.section.contact {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-lg);
-	}
-
-	.section.contact :deep(img),
-	.section.contact :deep(.title) {
-		grid-area: unset;
-	}
-
 	form {
-		grid-area: unset;
 		max-width: 100%;
 	}
 

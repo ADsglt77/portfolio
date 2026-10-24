@@ -7,12 +7,12 @@ Toute la personnalisation (textes, couleurs, projets, timeline…) se fait via u
 
 | Couche | Technologie |
 |--------|------------|
-| Frontend | Vue 3 + TypeScript + Vite (rolldown-vite) |
-| Backend | Elysia (Bun) — formulaire de contact |
+| Frontend | Vue 3 + TypeScript + Vite |
+| API | Cloudflare Worker (`worker/`) — formulaire de contact (Turnstile + `send_email`) |
 | Linter/Formatter | Biome |
 | Dead code | Knip |
 | Package manager | Bun |
-| CI | GitHub Actions (Biome + Knip + Build) |
+| CI | GitHub Actions (Biome + Knip + Typecheck + Build) |
 
 ## Démarrage rapide
 
@@ -20,25 +20,26 @@ Toute la personnalisation (textes, couleurs, projets, timeline…) se fait via u
 # Installer les dépendances
 bun install
 
-# Lancer le dev (frontend + backend)
+# Lancer le dev (frontend + Worker)
 bun dev
 
 # Build production
 bun run build
 ```
 
-Le frontend tourne sur `http://localhost:5173`, le backend sur `http://localhost:3000`.
+Le frontend tourne sur `http://localhost:5173` et redirige `/api/*` vers le Worker (`wrangler dev`, `http://localhost:8787`).
+En local, l'email n'est pas envoyé : Wrangler l'affiche dans la console.
 
 ## Configuration — `frontend/site.config.json`
 
 Tout le contenu du site est piloté par le fichier **`site.config.json`** dans le dossier `frontend/`.  
-Aucune connaissance en code n'est nécessaire pour le modifier.
+Aucune connaissance en code n'est nécessaire pour le modifier : `bun run typecheck` signale toute clé manquante ou mal orthographiée.
 
 ### Structure du fichier
 
 | Section | Description |
 |---------|------------|
-| `site` | Nom, titre, description, langue, URL, couleur du thème (SEO + meta) |
+| `site` | Nom, titre, description, langue, URL, couleur du thème, image d'aperçu (SEO + meta, injectés dans `index.html` au build) |
 | `theme.colors` | Couleurs du site (`bg`, `text`, `muted`, `success`, `error`) |
 | `theme.fonts` | Polices (`title`, `mono`) + URL Google Fonts |
 | `hero` | Écran d'accueil : nom affiché, labels loader/scroll, image de fond, son ambiant |
@@ -49,7 +50,7 @@ Aucune connaissance en code n'est nécessaire pour le modifier.
 | `social` | Réseaux sociaux (URL + icône Iconify + label accessibilité) |
 | `techMap` | Dictionnaire de toutes les technologies (clé → icône + label) |
 | `technologiesBanner` | Clés du `techMap` affichées dans la bande défilante |
-| `timeline` | Parcours : formations et expériences professionnelles |
+| `timeline` | Parcours : formations et expériences professionnelles (`type` : `formation` ou `work`) |
 | `projects` | Projets : labels globaux + liste des projets avec technologies, liens, médias |
 
 ### Modifier les couleurs
@@ -86,7 +87,7 @@ Pour changer de police : aller sur [Google Fonts](https://fonts.google.com), cop
 
 ### Ajouter un projet
 
-1. Ajouter le poster dans `frontend/public/projects/poster/` (ex: `mon-projet.jpg`)
+1. Ajouter le poster dans `frontend/public/projects/poster/` (ex: `mon-projet.webp`, 1280 px de large suffisent)
 2. Si vidéo : ajouter dans `frontend/public/projects/videos/` (ex: `mon-projet.mp4`)
 3. Si les technologies n'existent pas encore dans `techMap`, les ajouter :
    ```json
@@ -106,7 +107,7 @@ Pour changer de police : aller sur [Google Fonts](https://fonts.google.com), cop
        "github": "https://github.com/user/mon-projet"
      },
      "video": "/projects/videos/mon-projet.mp4",
-     "poster": "/projects/poster/mon-projet.jpg"
+     "poster": "/projects/poster/mon-projet.webp"
    }
    ```
 
@@ -129,11 +130,12 @@ Tous les fichiers média (images, vidéos, sons, CV) sont dans `frontend/public/
 
 ```
 frontend/public/
-├── img/                    # Images de sections (hero, about, contact)
+├── img/                    # Images de sections (hero, about, contact) en .webp
 ├── projects/
-│   ├── poster/             # Posters des projets (.jpg)
+│   ├── poster/             # Posters des projets (.webp)
 │   └── videos/             # Vidéos des projets (.mp4)
 ├── sound/                  # Son ambiant
+├── og.jpg                  # Image d'aperçu des liens partagés (1200×630)
 ├── CV-Adrien.pdf           # CV téléchargeable
 └── favicon.ico
 ```
@@ -142,83 +144,79 @@ frontend/public/
 
 ```
 frontend/src/
-├── config/          # Chargement + types + application du site.config.json
-│   ├── index.ts     # Import JSON + deep merge avec defaults
-│   ├── types.ts     # Interface TypeScript SiteConfig
-│   ├── defaults.ts  # Valeurs par défaut (fallback si config incomplète)
-│   ├── theme.ts     # Applique les couleurs/fonts CSS au runtime
-│   └── seo.ts       # Applique title/description/OG meta au runtime
-├── data/            # Re-exports typés depuis la config
+├── config/          # Chargement + types du site.config.json
+│   ├── index.ts     # Import JSON, vérifié contre SiteConfig
+│   └── types.ts     # Interface TypeScript SiteConfig
+├── data/            # Données dérivées de la config (projets, technologies) + icônes
 ├── components/      # Composants Vue réutilisables
-├── composables/     # Hooks Vue (animations, Lenis, typing)
-├── lib/             # Utilitaires (client API, animations)
+├── composables/     # Hooks Vue (animations au scroll, Lenis, Turnstile)
+├── lib/             # Utilitaires (appel API contact, animations, templates)
 ├── pages/           # Pages/sections du portfolio
 ├── assets/          # CSS global uniquement
-└── main.ts          # Point d'entrée (mount + theme + SEO)
+├── injectionKeys.ts # Clés provide/inject typées (entered, animations, son, Lenis)
+└── main.ts          # Point d'entrée
 ```
+
+Le titre, les meta SEO/Open Graph, les polices et les couleurs du thème sont écrits dans `index.html` au build par le plugin `siteHead` de `frontend/vite.config.ts`.
 
 ## Déploiement
 
-### Build de production
+Le site est déployé sur **Cloudflare Workers** (`wrangler.jsonc`) : les fichiers de `frontend/dist/` sont servis comme assets statiques et le Worker `worker/index.ts` répond à `/api/*`.
 
 ```bash
-bun run build
+bun run deploy   # build + wrangler deploy
 ```
 
-Les fichiers sont générés dans `frontend/dist/`.
+### Formulaire de contact
+
+Le Worker vérifie le captcha [Turnstile](https://developers.cloudflare.com/turnstile/) puis envoie l'email avec le binding [`send_email`](https://developers.cloudflare.com/email-service/) de Cloudflare. Prérequis (une seule fois, dans le dashboard Cloudflare) :
+
+1. Le domaine utilise le DNS Cloudflare et **Email Routing** est activé.
+2. L'adresse `CONTACT_TO_EMAIL` est ajoutée et **vérifiée** dans Email Routing → Destination addresses.
+3. `CONTACT_FROM_EMAIL` est une adresse du domaine (ex. `contact@adrien-segalat.fr`).
+4. Les secrets du Worker sont définis :
+
+```bash
+bunx wrangler secret put TURNSTILE_SECRET
+bunx wrangler secret put CONTACT_TO_EMAIL
+bunx wrangler secret put CONTACT_FROM_EMAIL
+```
 
 ### Checklist de déploiement
 
 - [ ] Mettre à jour `site.url` dans `site.config.json`
-- [ ] Vérifier que `VITE_API_URL` pointe vers le bon backend
+- [ ] Définir `VITE_TURNSTILE` au moment du build
 - [ ] S'assurer que le CV PDF est bien dans `frontend/public/`
 - [ ] Vérifier les images et vidéos dans `frontend/public/projects/`
-- [ ] Tester le formulaire de contact (backend Elysia opérationnel)
-
-### Headers recommandés (Nginx / reverse proxy)
-
-```nginx
-# Cache statique long pour les assets hashés
-location /assets/ {
-    expires 1y;
-    add_header Cache-Control "public, immutable";
-}
-
-# Cache modéré pour les médias publics
-location ~* \.(jpg|jpeg|png|gif|webp|mp4|mp3|pdf|ico)$ {
-    expires 30d;
-    add_header Cache-Control "public";
-}
-
-# Sécurité
-add_header X-Content-Type-Options "nosniff" always;
-add_header X-Frame-Options "SAMEORIGIN" always;
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-```
+- [ ] Tester le formulaire de contact en production
 
 ### Variables d'environnement
 
-Frontend (`frontend/.env`):
+Frontend (`frontend/.env`, voir `frontend/.env.example`) :
 
 | Variable | Défaut | Description |
 |----------|--------|------------|
-| `VITE_API_URL` | `http://localhost:3000` | URL du backend Elysia |
+| `VITE_TURNSTILE` | _(requis)_ | Clé de site Cloudflare Turnstile (captcha du formulaire) |
 
-Backend (`backend/.env`):
+Worker (secrets Cloudflare en production, `.dev.vars` en local, voir `.dev.vars.example`) :
 
 | Variable | Défaut | Description |
 |----------|--------|------------|
-| `BREVO_API_KEY` | _(requis)_ | Clé API Brevo pour l'envoi d'email |
-| `TURNSTILE` | _(requis)_ | Clé secrete Cloudflare Turnstile pour verifier le captcha |
-| `CONTACT_TO_EMAIL` | _(requis)_ | Adresse destinataire des messages du formulaire |
-| `CONTACT_FROM_EMAIL` | _(requis)_ | Adresse expéditeur configurée/validée dans Brevo |
-| `CONTACT_FROM_NAME` | `Portfolio Contact` | Nom affiché pour l'expéditeur |
+| `TURNSTILE_SECRET` | _(requis)_ | Clé secrète Turnstile pour vérifier le captcha |
+| `CONTACT_TO_EMAIL` | _(requis)_ | Adresse qui reçoit les messages (vérifiée dans Email Routing) |
+| `CONTACT_FROM_EMAIL` | _(requis)_ | Adresse expéditrice, sur le domaine du site |
+| `CONTACT_FROM_NAME` | `Portfolio Contact` | Nom de l'expéditeur (`vars` dans `wrangler.jsonc`) |
+
+Après une modification de `wrangler.jsonc`, régénérer les types du Worker avec `bun run cf-typegen`.
 
 ## Lint & Quality
 
 ```bash
-# Vérifier le code (Biome + Knip)
+# Vérifier le code (Biome + Knip + types)
 bun run check
+
+# Vérifier uniquement les types (frontend + Worker)
+bun run typecheck
 
 # Formater
 bun run format

@@ -1,93 +1,52 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import {
-	inject,
-	nextTick,
-	onMounted,
-	onUnmounted,
-	type Ref,
-	ref,
-	watch,
-} from "vue";
-import type { TimelineItem } from "../data/timeline";
-import { fadeIn } from "../lib/fadeIn";
+import { nextTick, onUnmounted, ref, watch } from "vue";
+import type { TimelineItem } from "../config/types";
+import { iconFormation, iconWork } from "../data/icons";
+import { useAnimationsEnabled, useEntered } from "../injectionKeys";
+import { fadeIn, setFadeState } from "../lib/fadeIn";
 
-interface Props {
-	items: TimelineItem[];
-}
+const TRANSLATE_Y = 30;
 
-const props = defineProps<Props>();
-const entered = inject<Ref<boolean>>("entered")!;
-const animationsEnabled = inject<{ value: boolean } | undefined>(
-	"animationsEnabled",
-);
-const contentRefs = ref<(HTMLElement | null)[]>([]);
-const hasAnimated = new Set<number>();
+defineProps<{ items: TimelineItem[] }>();
+
+const entered = useEntered();
+const animationsEnabled = useAnimationsEnabled();
+const contentRefs = ref<HTMLElement[]>([]);
 let observer: IntersectionObserver | null = null;
 
-onMounted(() => {
-	contentRefs.value = Array(props.items.length).fill(null);
-});
-
 const setupObserver = async () => {
-	if (!entered.value) return;
 	await nextTick();
-	await nextTick();
+	observer?.disconnect();
 
-	if (observer) {
-		observer.disconnect();
+	const animate = animationsEnabled.value;
+	for (const el of contentRefs.value) {
+		setFadeState(el, !animate, TRANSLATE_Y);
 	}
+	if (!animate) return;
 
-	const withAnimations = animationsEnabled?.value;
-
+	// Each item fades in once; re-running the setup (animations toggled) replays them.
 	observer = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((entry) => {
-				const index = parseInt(
-					(entry.target as HTMLElement).dataset.index || "0",
-					10,
-				);
-
-				if (entry.isIntersecting && !hasAnimated.has(index)) {
-					hasAnimated.add(index);
-					if (withAnimations) {
-						const target = entry.target as HTMLElement;
-						fadeIn(target, {
-							duration: 800,
-							delay: index * 100,
-							translateY: 30,
-						});
-					} else {
-						const target = entry.target as HTMLElement;
-						target.style.opacity = "1";
-						target.style.transform = "translate(0, 0)";
-					}
-				}
-			});
+		(entries, obs) => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				const target = entry.target as HTMLElement;
+				obs.unobserve(target);
+				fadeIn(target, {
+					delay: Number(target.dataset.index) * 100,
+					translateY: TRANSLATE_Y,
+				});
+			}
 		},
 		{ threshold: 0.2 },
 	);
-
-	contentRefs.value.forEach((el) => {
-		if (el) {
-			if (withAnimations) {
-				el.style.opacity = "0";
-				el.style.transform = "translateY(30px)";
-				observer?.observe(el);
-			} else {
-				el.style.opacity = "1";
-				el.style.transform = "translate(0, 0)";
-			}
-		}
-	});
+	for (const el of contentRefs.value) observer.observe(el);
 };
 
 watch(
-	[entered, () => animationsEnabled?.value],
+	[entered, animationsEnabled],
 	() => {
-		if (entered.value) {
-			setupObserver();
-		}
+		if (entered.value) setupObserver();
 	},
 	{ immediate: true },
 );
@@ -110,11 +69,7 @@ onUnmounted(() => {
           <div class="timeline-marker-inner"></div>
         </div>
         <div
-          :ref="
-            (el) => {
-              if (el) contentRefs[index] = el as HTMLElement
-            }
-          "
+          ref="contentRefs"
           :data-index="index"
           class="timeline-content"
         >
@@ -123,7 +78,7 @@ onUnmounted(() => {
           </div>
           <div class="timeline-organization">
             <Icon
-              :icon="item.type === 'formation' ? 'iconoir:graduation-cap' : 'iconoir:community'"
+              :icon="item.type === 'formation' ? iconFormation : iconWork"
               class="timeline-icon"
             />
             <h4>{{ item.organization }}</h4>

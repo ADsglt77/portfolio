@@ -2,24 +2,26 @@
 	"name": "portfoliov2",
 	"private": true,
 	"workspaces": [
-		"frontend",
-		"backend"
+		"frontend"
 	],
 	"scripts": {
-		"postinstall": "node -e \"if (process.platform === 'win32') require('child_process').execSync('npm install @rollup/rollup-win32-x64-msvc@4.59.0 --no-save', {stdio:'inherit'})\"",
-		"check": "bun run check:biome && bun run check:knip",
+		"check": "bun run check:biome && bun run check:knip && bun run typecheck",
 		"check:biome": "biome check .",
 		"check:knip": "knip",
 		"format": "biome format . --write",
 		"lint": "biome check . --write",
 		"build": "cd frontend && bun run build",
-		"dev": "concurrently \"bun run --cwd frontend dev\" \"bun run --cwd backend dev\""
+		"dev": "bun run build && concurrently \"bun run --cwd frontend dev\" \"wrangler dev\"",
+		"deploy": "bun run build && wrangler deploy",
+		"cf-typegen": "wrangler types worker/worker-configuration.d.ts --env-file .dev.vars.example",
+		"typecheck": "bun run --cwd frontend typecheck && bun run cf-typegen && tsc -p worker/tsconfig.json"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.15",
 		"@rollup/rollup-win32-x64-msvc": "^4.59.0",
 		"concurrently": "^9.2.1",
 		"knip": "^5.83.1",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"wrangler": "^4.152.0"
 	}
 }

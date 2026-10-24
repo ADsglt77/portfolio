@@ -1,83 +1,29 @@
-import { inject, nextTick, onUnmounted, type Ref, watch } from "vue";
+import { onUnmounted, type Ref } from "vue";
 import { typing } from "../lib/typing";
-
-type Options = {
-	active?: Ref<boolean>;
-	typingDuration?: number;
-	threshold?: number;
-};
+import { useInViewAnimation } from "./useInViewAnimation";
 
 export function usePinnedTyping(
 	sectionRef: Ref<HTMLElement | null>,
 	fullText: string,
 	displayedText: Ref<string>,
-	options: Options = {},
+	{ typingDuration = 3000, threshold = 0.3 } = {},
 ) {
-	const animationsEnabled = inject<{ value: boolean } | undefined>(
-		"animationsEnabled",
-	);
-	const { active, typingDuration = 3000, threshold = 0.3 } = options;
+	let cancel = () => {};
 
-	let hasTyped = false;
-	let observer: IntersectionObserver | null = null;
-
-	const setupObserver = () => {
-		if (!sectionRef.value || !active?.value) return;
-		if (observer) {
-			observer.disconnect();
-			observer = null;
-		}
-
-		observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting && !hasTyped && active.value) {
-						hasTyped = true;
-						displayedText.value = "";
-						typing(displayedText, fullText, { duration: typingDuration });
-					} else if (!entry.isIntersecting && hasTyped) {
-						hasTyped = false;
-						displayedText.value = "";
-					}
-				});
-			},
-			{ threshold },
-		);
-
-		observer.observe(sectionRef.value);
+	const setText = (text: string) => {
+		cancel();
+		displayedText.value = text;
 	};
 
-	const applyMode = async () => {
-		if (!active?.value) return;
-		await nextTick();
-		if (observer) {
-			observer.disconnect();
-			observer = null;
-		}
-		if (!animationsEnabled?.value) {
-			displayedText.value = fullText;
-			return;
-		}
-		hasTyped = false;
-		displayedText.value = "";
-		setupObserver();
-	};
-
-	watch(active ?? ({ value: true } as Ref<boolean>), applyMode, {
-		immediate: true,
-	});
-
-	watch(
-		() => animationsEnabled?.value,
-		() => {
-			if (active?.value) applyMode();
+	useInViewAnimation(sectionRef, {
+		threshold,
+		enter: () => {
+			setText("");
+			cancel = typing(displayedText, fullText, typingDuration);
 		},
-	);
-
-	onUnmounted(() => {
-		if (observer) {
-			observer.disconnect();
-			observer = null;
-		}
+		reset: () => setText(""),
+		show: () => setText(fullText),
 	});
+
+	onUnmounted(() => cancel());
 }

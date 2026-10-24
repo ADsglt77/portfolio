@@ -1,76 +1,51 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
 interface Props {
-	modelValue: string;
-	type?: "text" | "email" | "password";
+	id: string;
+	type?: "text" | "email";
 	label?: string;
 	placeholder?: string;
-	required?: boolean;
 	error?: string;
-	id?: string;
-	name?: string;
-	disabled?: boolean;
 	textarea?: boolean;
 	rows?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
 	type: "text",
 	label: "",
 	placeholder: "",
-	required: false,
 	error: undefined,
-	id: undefined,
-	name: undefined,
-	disabled: false,
 	textarea: false,
 	rows: 6,
 });
 
-const emit = defineEmits<{
-	"update:modelValue": [value: string];
-}>();
-
-const inputId = computed(
-	() => props.id || `input-${Math.random().toString(36).slice(2, 11)}`,
-);
-
-const handleInput = (event: Event) => {
-	const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-	emit("update:modelValue", target.value);
-};
+const model = defineModel<string>({ required: true });
 </script>
 
 <template>
 	<div class="input-group">
-		<label v-if="label" :for="inputId">
+		<label v-if="label" :for="id">
 			{{ label }}
 		</label>
-		<input
-			v-if="!textarea"
-			:id="inputId"
-			:name="name || inputId"
-			:type="type"
-			:value="modelValue"
-			:placeholder="placeholder"
-			:disabled="disabled"
-			:class="{ 'input--error': error }"
-			@input="handleInput"
-		/>
 		<textarea
-			v-else
-			:id="inputId"
-			:name="name || inputId"
-			:value="modelValue"
+			v-if="textarea"
+			:id="id"
+			v-model="model"
+			:name="id"
 			:placeholder="placeholder"
-			:disabled="disabled"
 			:rows="rows"
 			:class="{ 'input--error': error }"
-			@input="handleInput"
 		></textarea>
+		<input
+			v-else
+			:id="id"
+			v-model="model"
+			:name="id"
+			:type="type"
+			:placeholder="placeholder"
+			:class="{ 'input--error': error }"
+		/>
 		<span class="input-error" :class="{ 'input-error--visible': error }">
-			{{ error || "\u00A0" }}
+			{{ error || " " }}
 		</span>
 	</div>
 </template>
@@ -106,12 +81,6 @@ input::placeholder,
 textarea::placeholder {
 	color: var(--muted);
 	opacity: 0.6;
-}
-
-input:disabled,
-textarea:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
 }
 
 .input--error {

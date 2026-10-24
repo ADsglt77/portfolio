@@ -1,12 +1,14 @@
 interface ScrambleOptions {
 	duration?: number;
 	fps?: number;
-	charset?: string;
 	/** Afficher le texte directement sans effet (ex. mode sans animation) */
 	skipAnimation?: boolean;
 }
 
 const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+const getRandomChar = () =>
+	charset[Math.floor(Math.random() * charset.length)] ?? "A";
 
 export function scrambleText(
 	el: HTMLElement,
@@ -21,17 +23,10 @@ export function scrambleText(
 		return;
 	}
 
-	const {
-		duration = 1000,
-		fps = 10,
-		charset: customCharset = charset,
-	} = options;
+	const { duration = 1000, fps = 10 } = options;
 	const frameTime = 1000 / fps;
 	const totalFrames = Math.ceil(duration / frameTime);
 	let frame = 0;
-
-	const getRandomChar = () =>
-		customCharset[Math.floor(Math.random() * customCharset.length)] ?? "A";
 
 	const animate = () => {
 		if (frame >= totalFrames) {

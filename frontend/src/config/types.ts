@@ -1,3 +1,45 @@
+export interface Technology {
+	icon: string;
+	label: string;
+}
+
+export interface SocialLink {
+	url: string;
+	icon: string;
+	label: string;
+}
+
+export interface TimelineItem {
+	date: string;
+	organization: string;
+	role?: string;
+	description?: string;
+	/** "formation" or "work" */
+	type: string;
+}
+
+export interface ProjectLinks {
+	readmePdf?: string;
+	website?: string;
+	github?: string;
+}
+
+export interface ProjectItem {
+	id: string;
+	title: string;
+	description: string;
+	technologies: string[];
+	links: ProjectLinks;
+	video?: string;
+	poster?: string;
+}
+
+interface FieldLabels {
+	label: string;
+	placeholder: string;
+	error: string;
+}
+
 export interface SiteConfig {
 	site: {
 		name: string;
@@ -6,6 +48,8 @@ export interface SiteConfig {
 		lang: string;
 		themeColor: string;
 		url: string;
+		/** Link preview image (og:image), relative to `url`. */
+		image: string;
 	};
 	theme: {
 		colors: {
@@ -39,15 +83,11 @@ export interface SiteConfig {
 		title: string;
 		image: { src: string; alt: string };
 		form: {
-			name: { label: string; placeholder: string; error: string };
-			email: {
-				label: string;
-				placeholder: string;
-				error: string;
-				errorInvalid: string;
-			};
-			subject: { label: string; placeholder: string; error: string };
-			message: { label: string; placeholder: string; error: string };
+			name: FieldLabels;
+			email: FieldLabels & { errorInvalid: string };
+			subject: FieldLabels;
+			message: FieldLabels;
+			captcha: { required: string; failed: string; loadError: string };
 			submitLabel: string;
 			submittingLabel: string;
 		};
@@ -60,37 +100,15 @@ export interface SiteConfig {
 		links: Array<{ href: string; label: string }>;
 		settings: { soundLabel: string; animationsLabel: string };
 	};
-	social: Array<{ url: string; icon: string; label: string }>;
-	techMap: Record<string, { icon: string; label: string }>;
+	social: SocialLink[];
+	techMap: Record<string, Technology>;
 	technologiesBanner: string[];
-	timeline: Array<{
-		date: string;
-		organization: string;
-		role?: string;
-		description?: string;
-		type: "formation" | "work";
-	}>;
+	timeline: TimelineItem[];
 	projects: {
 		seeAllLabel: string;
 		noMediaLabel: string;
 		posterAltTemplate: string;
-		ariaLabels: {
-			readmePdf: string;
-			website: string;
-			github: string;
-		};
-		items: Array<{
-			id: string;
-			title: string;
-			description: string;
-			technologies: string[];
-			links: {
-				readmePdf?: string;
-				website?: string;
-				github?: string;
-			};
-			video?: string;
-			poster?: string;
-		}>;
+		ariaLabels: Required<ProjectLinks>;
+		items: ProjectItem[];
 	};
 }

@@ -11,7 +11,14 @@ import {
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
 import { useLenis } from "./composables/useLenis";
-import { heroData } from "./data/hero";
+import { config } from "./config";
+import {
+	animationsEnabledKey,
+	audioKey,
+	enteredKey,
+	lenisKey,
+} from "./injectionKeys";
+import { formatTemplate } from "./lib/format";
 import AboutPage from "./pages/AboutPage.vue";
 import ContactPage from "./pages/ContactPage.vue";
 import HomePage from "./pages/HomePage.vue";
@@ -19,9 +26,11 @@ import ProjectsPage from "./pages/ProjectsPage.vue";
 import TechnologiesPage from "./pages/TechnologiesPage.vue";
 import TimelinePage from "./pages/TimelinePage.vue";
 
+const { hero } = config;
+
 const progress = ref(0);
 const loadingText = computed(() =>
-	heroData.loadingLabel.replace("{{progress}}", String(progress.value)),
+	formatTemplate(hero.loadingLabel, { progress: progress.value }),
 );
 const ready = ref(false);
 const entered = ref(false);
@@ -29,39 +38,45 @@ const isButtonFading = ref(false);
 const audioRef = ref<HTMLAudioElement>();
 
 const STORAGE_ANIMATIONS = "portfolio-animations-enabled";
-const animationsEnabled = ref(
-	typeof localStorage !== "undefined"
-		? localStorage.getItem(STORAGE_ANIMATIONS) !== "false"
-		: true,
-);
-watch(
-	animationsEnabled,
-	(enabled) => {
-		document.documentElement.classList.toggle("animations-off", !enabled);
-		try {
-			localStorage.setItem(STORAGE_ANIMATIONS, String(enabled));
-		} catch {
-			/* quota exceeded */
-		}
-	},
-	{ immediate: true },
-);
+// A saved choice wins; otherwise follow the system "reduce motion" setting.
+const readStoredAnimations = () => {
+	let stored: string | null = null;
+	try {
+		stored = localStorage.getItem(STORAGE_ANIMATIONS);
+	} catch {
+		/* storage unavailable */
+	}
+	return stored === null
+		? !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+		: stored !== "false";
+};
+const animationsEnabled = ref(readStoredAnimations());
+watchEffect(() => {
+	document.documentElement.classList.toggle(
+		"animations-off",
+		!animationsEnabled.value,
+	);
+});
+// Only an explicit toggle is saved, so the system setting keeps applying until then.
+watch(animationsEnabled, (enabled) => {
+	try {
+		localStorage.setItem(STORAGE_ANIMATIONS, String(enabled));
+	} catch {
+		/* storage unavailable */
+	}
+});
 
-const {
-	start: startLenis,
-	stop: stopLenis,
-	getInstance: getLenisInstance,
-} = useLenis({
+const { start: startLenis, getInstance: getLenisInstance } = useLenis({
 	lerp: 0.5,
 	duration: 3,
 	wheelMultiplier: 0.5,
 	touchMultiplier: 1,
 });
 
-provide("audioRef", audioRef);
-provide("entered", entered);
-provide("lenis", getLenisInstance);
-provide("animationsEnabled", animationsEnabled);
+provide(audioKey, audioRef);
+provide(enteredKey, entered);
+provide(lenisKey, getLenisInstance);
+provide(animationsEnabledKey, animationsEnabled);
 
 onMounted(() => {
 	const startTime = Date.now();
@@ -97,16 +112,15 @@ watchEffect(() => {
 });
 
 onUnmounted(() => {
-	stopLenis();
 	document.body.style.overflow = "";
 });
 </script>
 
 <template>
   <audio
-    v-if="heroData.ambientSound"
+    v-if="hero.ambientSound"
     ref="audioRef"
-    :src="heroData.ambientSound"
+    :src="hero.ambientSound"
     loop
     preload="auto"
     muted
@@ -118,7 +132,7 @@ onUnmounted(() => {
         backgroundImage: `linear-gradient(to right, var(--text) 0%, var(--text) ${progress}%, color-mix(in srgb, var(--text) 10%, transparent) ${progress}%, color-mix(in srgb, var(--text) 10%, transparent) 100%)`,
       }"
     >
-      {{ heroData.displayName }}
+      {{ hero.displayName }}
     </h1>
     <div class="loading-status-container">
       <Transition name="fade" mode="out-in">
@@ -129,7 +143,7 @@ onUnmounted(() => {
           v-else
           key="button"
           :class="{ 'button--fade': isButtonFading }"
-          :label="heroData.enterLabel"
+          :label="hero.enterLabel"
           @click="handleEnter"
         />
       </Transition>
@@ -163,14 +177,12 @@ h1 {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  transition: background-image 0.08s linear;
 }
 
 .loading-status-container {
   position: relative;
   top: 15%;
   color: var(--muted);
-  gap: var(--spacing-md);
   z-index: 100;
 }
 

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { footerData } from "../data/footer";
+import { config } from "../config";
+import { formatTemplate } from "../lib/format";
 
-const currentYear = new Date().getFullYear();
-const copyrightText = footerData.template
-	.replace("{{year}}", String(currentYear))
-	.replace("{{name}}", footerData.name);
+const copyrightText = formatTemplate(config.footer.template, {
+	year: new Date().getFullYear(),
+	name: config.footer.name,
+});
 </script>
 
 <template>

@@ -1,66 +1,45 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed, inject, ref } from "vue";
+import { computed, ref } from "vue";
 import { iconCheck, iconClose } from "../data/icons";
+import { useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
 
 interface Props {
 	label?: string;
 	icon?: string;
-	iconPosition?: "left" | "right";
 	disabled?: boolean;
 	padding?: string;
 	borderRadius?: string;
 	type?: "button" | "submit" | "reset";
 	success?: boolean;
-	successIcon?: string;
 	error?: boolean;
-	errorIcon?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	label: "",
 	icon: undefined,
-	iconPosition: "left",
 	disabled: false,
 	padding: "var(--spacing-md)",
 	borderRadius: "var(--radius-lg) 0",
 	type: "button",
 	success: false,
-	successIcon: iconCheck,
 	error: false,
-	errorIcon: iconClose,
 });
 
-const emit = defineEmits<{
-	click: [event: MouseEvent];
-}>();
-
-const animationsEnabled = inject<{ value: boolean } | undefined>(
-	"animationsEnabled",
-);
-const buttonRef = ref<HTMLElement>();
+const animationsEnabled = useAnimationsEnabled();
 const labelRef = ref<HTMLElement>();
-const displayLabel = ref(props.label);
 
 const currentIcon = computed(() => {
-	if (props.error && props.errorIcon) return props.errorIcon;
-	if (props.success && props.successIcon) return props.successIcon;
+	if (props.error) return iconClose;
+	if (props.success) return iconCheck;
 	return props.icon;
 });
-
-const handleClick = (event: MouseEvent) => {
-	if (!props.disabled) {
-		emit("click", event);
-	}
-};
 
 const handleMouseEnter = () => {
 	if (props.label && labelRef.value) {
 		scrambleText(labelRef.value, props.label, {
-			duration: 1000,
-			fps: 10,
-			skipAnimation: !animationsEnabled?.value,
+			skipAnimation: !animationsEnabled.value,
 		});
 	}
 };
@@ -68,15 +47,10 @@ const handleMouseEnter = () => {
 
 <template>
   <button
-    ref="buttonRef"
     :type="type"
-    :class="{ 'btn--disabled': disabled, 'btn--success': success, 'btn--error': error }"
-    :style="{
-      padding: padding,
-      borderRadius: borderRadius,
-    }"
+    :class="{ 'btn--success': success, 'btn--error': error }"
+    :style="{ padding, borderRadius }"
     :disabled="disabled"
-    @click="handleClick"
     @mouseenter="handleMouseEnter"
   >
     <Icon
@@ -84,20 +58,12 @@ const handleMouseEnter = () => {
       :icon="currentIcon"
       :width="18"
       :height="18"
-      :class="['btn__icon', (iconPosition === 'left' || error || success) ? 'btn__icon--left' : 'btn__icon--right']"
+      class="btn__icon"
       aria-hidden
     />
     <slot>
-      <span ref="labelRef" class="btn__label">{{ displayLabel }}</span>
+      <span ref="labelRef" class="btn__label">{{ label }}</span>
     </slot>
-    <Icon
-      v-if="currentIcon && iconPosition === 'right' && !error && !success"
-      :icon="currentIcon"
-      :width="18"
-      :height="18"
-      class="btn__icon btn__icon--right"
-      aria-hidden
-    />
   </button>
 </template>
 
@@ -121,17 +87,17 @@ button {
   }
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn__icon {
   flex-shrink: 0;
 }
 
 .btn__label {
   display: inline-block;
-}
-
-.btn--disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .btn--success {

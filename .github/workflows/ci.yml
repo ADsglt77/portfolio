@@ -26,6 +26,17 @@ jobs:
       - run: bun install
       - run: bun x knip
 
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run typecheck
+
   build:
     name: Build
     runs-on: ubuntu-latest

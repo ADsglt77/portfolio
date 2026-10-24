@@ -5,3 +5,8 @@ dist/
 
 #Frontend
 .vite/
+
+#Worker
+.wrangler/
+.dev.vars
+worker/worker-configuration.d.ts

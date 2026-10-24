@@ -1,25 +1,23 @@
-export interface TextRevealOptions {
-	delay?: number;
-	instant?: boolean;
+export const normalizeText = (text: string): string =>
+	text.trim().replace(/\s+/g, " ");
+
+function createHiddenChar(char: string): HTMLSpanElement {
+	const span = document.createElement("span");
+	span.textContent = char;
+	span.style.opacity = "0";
+	span.style.transition = "opacity 0.3s ease-out";
+	return span;
 }
 
+/** Reveals the text character by character in random order and returns a function cancelling it. */
 export function textReveal(
 	element: HTMLElement,
 	text: string,
-	options: TextRevealOptions = {},
-): void {
-	const { delay = 50, instant = false } = options;
-
-	const normalizedText = text.trim().replace(/\s+/g, " ");
-
-	if (instant) {
-		element.textContent = normalizedText;
-		return;
-	}
-
+	delay = 50,
+): () => void {
 	element.innerHTML = "";
 
-	const words = normalizedText.split(" ");
+	const words = normalizeText(text).split(" ");
 	const spans: HTMLSpanElement[] = [];
 
 	words.forEach((word, wordIndex) => {
@@ -27,47 +25,28 @@ export function textReveal(
 		wordSpan.style.display = "inline-block";
 		wordSpan.style.whiteSpace = "nowrap";
 
-		const wordChars = word.split("");
-		wordChars.forEach((char) => {
-			const charSpan = document.createElement("span");
-			charSpan.textContent = char;
-			charSpan.style.opacity = "0";
-			charSpan.style.transition = "opacity 0.3s ease-out";
-			charSpan.style.display = "inline";
+		const chars = wordIndex < words.length - 1 ? [...word, " "] : [...word];
+		for (const char of chars) {
+			const charSpan = createHiddenChar(char);
 			wordSpan.appendChild(charSpan);
 			spans.push(charSpan);
-		});
-
-		if (wordIndex < words.length - 1) {
-			const spaceSpan = document.createElement("span");
-			spaceSpan.textContent = "\u00A0";
-			spaceSpan.style.opacity = "0";
-			spaceSpan.style.transition = "opacity 0.3s ease-out";
-			spaceSpan.style.display = "inline";
-			wordSpan.appendChild(spaceSpan);
-			spans.push(spaceSpan);
 		}
 
 		element.appendChild(wordSpan);
 	});
 
-	const indices = Array.from({ length: spans.length }, (_, i) => i);
-	for (let i = indices.length - 1; i > 0; i--) {
+	// Fisher-Yates shuffle
+	for (let i = spans.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
-		const valI = indices[i];
-		const valJ = indices[j];
-		if (valI !== undefined && valJ !== undefined) {
-			indices[i] = valJ;
-			indices[j] = valI;
-		}
+		[spans[i], spans[j]] = [spans[j]!, spans[i]!];
 	}
 
-	indices.forEach((index, i) => {
-		setTimeout(() => {
-			const span = spans[index];
-			if (span) {
-				span.style.opacity = "1";
-			}
-		}, i * delay);
-	});
+	const timeoutIds = spans.map((span, i) =>
+		window.setTimeout(() => {
+			span.style.opacity = "1";
+		}, i * delay),
+	);
+	return () => {
+		for (const id of timeoutIds) clearTimeout(id);
+	};
 }

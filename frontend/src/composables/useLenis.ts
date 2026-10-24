@@ -22,8 +22,6 @@ interface LenisOptions {
 	duration?: number;
 	wheelMultiplier?: number;
 	touchMultiplier?: number;
-	smoothWheel?: boolean;
-	easing?: (t: number) => number;
 }
 
 export function useLenis(options: LenisOptions = {}) {
@@ -35,8 +33,6 @@ export function useLenis(options: LenisOptions = {}) {
 			duration: options.duration ?? 1.2,
 			wheelMultiplier: options.wheelMultiplier ?? 1,
 			touchMultiplier: options.touchMultiplier ?? 2,
-			smoothWheel: options.smoothWheel ?? true,
-			easing: options.easing,
 		});
 
 		state.rafId = requestAnimationFrame(loop);
@@ -57,7 +53,6 @@ export function useLenis(options: LenisOptions = {}) {
 
 	return {
 		start,
-		stop,
 		getInstance: () => state.lenis,
 	};
 }

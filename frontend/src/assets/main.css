@@ -1,18 +1,10 @@
-/* Fonts and colors are applied at runtime from site.config.json via config/theme.ts */
-/* These are fallback values only */
+/* Colors (--bg, --text, --muted, --success, --error) and fonts (--font-title, --font-mono)
+   come from site.config.json and are injected into index.html by vite.config.ts */
 :root {
-	--bg: #151e16;
-	--text: #ecffee;
-	--muted: #808080;
-	--success: #69a47e;
-	--error: #da6a6a;
 	--glass-bg: rgb(255, 255, 255, 0.1);
 	--glass-hover: rgb(255, 255, 255, 0.2);
 	--glass-border: rgb(255, 255, 255, 0.3);
 	--glass-border-hover: rgb(255, 255, 255, 0.4);
-
-	--font-title: "Gluten", sans-serif;
-	--font-mono: "Space Mono", monospace;
 
 	/* Typography Sizes */
 	--font-size-h1: clamp(4rem, 16vw, 12rem); /* Hero title */
@@ -56,6 +48,10 @@
 	text-decoration: none;
 	list-style: none;
 	box-sizing: border-box;
+}
+
+button,
+nav {
 	user-select: none;
 }
 

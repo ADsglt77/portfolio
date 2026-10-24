@@ -1,0 +1,3 @@
+TURNSTILE_SECRET=0x1234567890abcdef
+CONTACT_TO_EMAIL=moi@domaine.fr
+CONTACT_FROM_EMAIL=contact@domaine.fr

@@ -1,26 +1,24 @@
 import type { Ref } from "vue";
 
-interface TypingOptions {
-	duration?: number;
-}
-
+/** Types `fullText` into `textRef` over `duration` ms and returns a function cancelling it. */
 export function typing(
 	textRef: Ref<string>,
 	fullText: string,
-	options: TypingOptions = {},
-): void {
-	const { duration = 3000 } = options;
-	const chars = fullText.split("");
+	duration = 3000,
+): () => void {
+	const chars = [...fullText];
 	const delay = duration / chars.length;
 	let index = 0;
+	let timeoutId: number | undefined;
 
 	const revealChar = () => {
 		if (index < chars.length) {
 			textRef.value += chars[index];
 			index++;
-			setTimeout(revealChar, delay);
+			timeoutId = window.setTimeout(revealChar, delay);
 		}
 	};
 
 	revealChar();
+	return () => clearTimeout(timeoutId);
 }

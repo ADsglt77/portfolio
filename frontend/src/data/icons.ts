@@ -10,6 +10,12 @@ export const iconFastArrowDown = "iconoir:fast-arrow-down";
 export const iconSoundOff = "iconoir:sound-off";
 export const iconSoundHigh = "iconoir:sound-high";
 export const iconSettings = "iconoir:settings";
+export const iconMenu = "iconoir:menu";
+export const iconCancel = "iconoir:cancel";
+export const iconEye = "iconoir:eye";
+export const iconEyeOff = "iconoir:eye-off";
+export const iconFormation = "iconoir:graduation-cap";
+export const iconWork = "iconoir:community";
 
 // Material Symbols
 export const iconCheck = "material-symbols:check-rounded";

@@ -5,7 +5,8 @@
 		"description": "Portfolio d'Adrien Segalat — Développeur full-stack web et mobile",
 		"lang": "fr",
 		"themeColor": "#151e16",
-		"url": "https://adrien-segalat.fr"
+		"url": "https://adrien-segalat.fr",
+		"image": "/og.jpg"
 	},
 
 	"theme": {
@@ -28,7 +29,7 @@
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
-		"backgroundImage": "/img/background.jpg",
+		"backgroundImage": "/img/background.webp",
 		"ambientSound": "/sound/Flickering-Flames.mp3"
 	},
 
@@ -41,7 +42,7 @@
 			"filename": "CV-Adrien-Segalat.pdf"
 		},
 		"image": {
-			"src": "/img/about.jpg",
+			"src": "/img/about.webp",
 			"alt": "About"
 		}
 	},
@@ -49,7 +50,7 @@
 	"contact": {
 		"title": "Contactez moi",
 		"image": {
-			"src": "/img/contact.jpg",
+			"src": "/img/contact.webp",
 			"alt": "Contact"
 		},
 		"form": {
@@ -73,6 +74,11 @@
 				"label": "Message",
 				"placeholder": "Votre message...",
 				"error": "Le message est requis"
+			},
+			"captcha": {
+				"required": "Valide le captcha pour envoyer le message",
+				"failed": "Le captcha a échoué, recommence",
+				"loadError": "Impossible de charger le captcha, vérifie ta connexion."
 			},
 			"submitLabel": "Envoyer",
 			"submittingLabel": "Envoi..."
@@ -267,7 +273,7 @@
 					"website": "https://condatbasketclub.com/",
 					"github": "https://github.com/Condat-Basket-Club"
 				},
-				"poster": "/projects/poster/condat.jpg"
+				"poster": "/projects/poster/condat.webp"
 			},
 			{
 				"id": "therasoft",
@@ -286,7 +292,7 @@
 					"website": "https://therasoft.adrien-segalat.fr/",
 					"github": "https://github.com/ADsglt77/therasoft"
 				},
-				"poster": "/projects/poster/therasoft.jpg"
+				"poster": "/projects/poster/therasoft.webp"
 			},
 			{
 				"id": "bibliotheque",
@@ -297,7 +303,7 @@
 					"github": "https://github.com/ADsglt77/bibliotheque"
 				},
 				"video": "/projects/videos/bibliotheque.mp4",
-				"poster": "/projects/poster/bibliotheque.jpg"
+				"poster": "/projects/poster/bibliotheque.webp"
 			},
 			{
 				"id": "jardinier",
@@ -308,7 +314,7 @@
 					"github": "https://github.com/ADsglt77/jardinierV2"
 				},
 				"video": "/projects/videos/jardinier.mp4",
-				"poster": "/projects/poster/jardinier.jpg"
+				"poster": "/projects/poster/jardinier.webp"
 			},
 			{
 				"id": "resto",
@@ -318,7 +324,7 @@
 				"links": {
 					"github": "https://github.com/ADsglt77/r3st0"
 				},
-				"poster": "/projects/poster/resto.jpg"
+				"poster": "/projects/poster/resto.webp"
 			}
 		]
 	}

@@ -1,54 +1,47 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { computed } from "vue";
+import { config } from "../config";
+import type { ProjectLinks } from "../config/types";
 import { iconGithub, iconLink, iconPdf, iconPlay } from "../data/icons";
-import { projectCardData } from "../data/projects";
 import type { Project } from "../data/projects";
+import { formatTemplate } from "../lib/format";
 
-interface Props {
-	project: Project;
-}
+const MAX_TECHNOLOGIES = 4;
 
-const props = defineProps<Props>();
+const LINK_TYPES: Array<{
+	key: keyof ProjectLinks;
+	icon: string;
+	external: boolean;
+}> = [
+	{ key: "readmePdf", icon: iconPdf, external: false },
+	{ key: "website", icon: iconLink, external: true },
+	{ key: "github", icon: iconGithub, external: true },
+];
 
-const actions = computed(() => {
-	const items = [];
-	const labels = projectCardData.ariaLabels;
-	if (props.project.links.readmePdf) {
-		items.push({
-			icon: iconPdf,
-			href: props.project.links.readmePdf,
-			ariaLabel: labels.readmePdf,
-			external: false,
-		});
-	}
-	if (props.project.links.website) {
-		items.push({
-			icon: iconLink,
-			href: props.project.links.website,
-			ariaLabel: labels.website,
-			external: true,
-		});
-	}
-	if (props.project.links.github) {
-		items.push({
-			icon: iconGithub,
-			href: props.project.links.github,
-			ariaLabel: labels.github,
-			external: true,
-		});
-	}
-	return items;
-});
+const props = defineProps<{ project: Project }>();
+
+const { noMediaLabel, posterAltTemplate, ariaLabels } = config.projects;
+
+const posterAlt = computed(() =>
+	formatTemplate(posterAltTemplate, { title: props.project.title }),
+);
+
+const actions = computed(() =>
+	LINK_TYPES.flatMap(({ key, icon, external }) => {
+		const href = props.project.links[key];
+		return href ? [{ icon, href, external, ariaLabel: ariaLabels[key] }] : [];
+	}),
+);
 </script>
 
 <template>
   <article>
     <div class="project-media">
       <video
-        v-if="project.video.src"
-        :src="project.video.src"
-        :poster="project.video.poster"
+        v-if="project.video"
+        :src="project.video"
+        :poster="project.poster"
         controls
         controlslist="nodownload noplaybackrate"
         disablePictureInPicture
@@ -57,15 +50,15 @@ const actions = computed(() => {
         class="project-video"
       ></video>
       <img
-        v-else-if="project.video.poster"
-        :src="project.video.poster"
-        :alt="projectCardData.posterAltTemplate.replace('{{title}}', project.title)"
+        v-else-if="project.poster"
+        :src="project.poster"
+        :alt="posterAlt"
         loading="lazy"
         class="project-poster"
       />
       <div v-else class="project-placeholder">
         <Icon :icon="iconPlay" :width="48" :height="48" />
-        <span>{{ projectCardData.noMediaLabel }}</span>
+        <span>{{ noMediaLabel }}</span>
       </div>
     </div>
 
@@ -75,15 +68,15 @@ const actions = computed(() => {
 
       <div class="project-technologies">
         <span
-          v-for="tech in project.technologies.slice(0, 4)"
+          v-for="tech in project.technologies.slice(0, MAX_TECHNOLOGIES)"
           :key="tech.label"
           class="project-tech-tag"
         >
           <Icon :icon="tech.icon" :width="18" :height="18" />
           <span>{{ tech.label }}</span>
         </span>
-        <span v-if="project.technologies.length > 4" class="project-tech-tag">
-          <span>+{{ project.technologies.length - 4 }}</span>
+        <span v-if="project.technologies.length > MAX_TECHNOLOGIES" class="project-tech-tag">
+          <span>+{{ project.technologies.length - MAX_TECHNOLOGIES }}</span>
         </span>
       </div>
 

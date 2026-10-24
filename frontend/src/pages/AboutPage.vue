@@ -1,32 +1,26 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { inject, type Ref, ref } from "vue";
+import { ref } from "vue";
 import Button from "../components/Button.vue";
-import SectionHeader from "../components/sectionImgTexte/SectionHeader.vue";
-import SectionTexte from "../components/sectionImgTexte/SectionTexte.vue";
+import ImageSection from "../components/ImageSection.vue";
 import { useFadeIn } from "../composables/useFadeIn";
-import { usePinnedTyping } from "../composables/usePinnedTyping";
 import { useTextReveal } from "../composables/useTextReveal";
-import { aboutData } from "../data/about";
+import { config } from "../config";
 import { iconDownload } from "../data/icons";
-import { socialLinks } from "../data/socialLinks";
 
-const entered = inject<Ref<boolean>>("entered")!;
+const { about, social } = config;
 
-const displayedText = ref("");
-const sectionRef = ref<HTMLElement | null>(null);
 const paragraphRef = ref<HTMLParagraphElement | null>(null);
 const buttonRef = ref<HTMLElement | null>(null);
 const isDownloaded = ref(false);
 
 const downloadCV = () => {
-	if (!aboutData.cv.path) return;
 	const link = document.createElement("a");
-	link.href = aboutData.cv.path;
-	link.download = aboutData.cv.filename;
+	link.href = about.cv.path;
+	link.download = about.cv.filename;
 	document.body.appendChild(link);
 	link.click();
-	document.body.removeChild(link);
+	link.remove();
 
 	isDownloaded.value = true;
 	setTimeout(() => {
@@ -34,20 +28,12 @@ const downloadCV = () => {
 	}, 3000);
 };
 
-usePinnedTyping(sectionRef, aboutData.title, displayedText, {
-	active: entered,
-	threshold: 0.3,
-	typingDuration: 2000,
-});
-
-useTextReveal(paragraphRef, aboutData.paragraph, {
-	active: entered,
+useTextReveal(paragraphRef, about.paragraph, {
 	threshold: 0.5,
 	delay: 3,
 });
 
 useFadeIn(buttonRef, {
-	active: entered,
 	threshold: 0.5,
 	duration: 1500,
 	delay: 300,
@@ -56,26 +42,22 @@ useFadeIn(buttonRef, {
 </script>
 
 <template>
-  <section ref="sectionRef" id="about" class="section about">
-	<div class="section-header">
-		<SectionHeader :image-src="aboutData.image.src" :image-alt="aboutData.image.alt" />
-		<SectionTexte :text="displayedText" grid-area="1 / 2 / 3 / 5" />
-	</div>
+  <ImageSection id="about" :title="about.title" :image="about.image" title-area="1 / 2 / 3 / 5">
     <div class="subtitle">
       <p ref="paragraphRef"></p>
       <div class="actions">
         <div ref="buttonRef">
           <Button
-            v-if="aboutData.cv.path"
+            v-if="about.cv.path"
             :icon="iconDownload"
-            :label="aboutData.cv.label"
+            :label="about.cv.label"
             :success="isDownloaded"
             @click="downloadCV"
           />
         </div>
         <div class="social-links">
           <a
-            v-for="link in socialLinks"
+            v-for="link in social"
             :key="link.url"
             :href="link.url"
             target="_blank"
@@ -88,20 +70,10 @@ useFadeIn(buttonRef, {
         </div>
       </div>
     </div>
-  </section>
+  </ImageSection>
 </template>
 
 <style scoped>
-.section.about {
-	width: 100%;
-	height: 100%;
-	padding: var(--spacing-3xl) var(--spacing-xl);
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	grid-template-rows: repeat(6, 1fr);
-	gap: var(--spacing-xl);
-}
-
 .subtitle {
 	width: 100%;
 	display: flex;
@@ -112,10 +84,6 @@ useFadeIn(buttonRef, {
 	align-self: center;
 	line-height: 1.8rem;
 	grid-area: 3 / 3 / 7 / 5;
-}
-
-.section-header {
-	display: contents;
 }
 
 .subtitle .actions {
@@ -146,19 +114,7 @@ useFadeIn(buttonRef, {
 }
 
 @media (max-width: 900px) {
-	.section.about {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-lg);
-	}
-
-	.section.about :deep(img),
-	.section.about :deep(.title) {
-		grid-area: unset;
-	}
-
 	.subtitle {
-		grid-area: unset;
 		max-width: 100%;
 	}
 
