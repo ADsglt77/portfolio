@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import gsap from "gsap";
 import { ref } from "vue";
 import { usePinnedTyping } from "../composables/usePinnedTyping";
+import { useScrollScene } from "../composables/useScrollScene";
 
 interface Props {
 	id: string;
@@ -14,16 +16,35 @@ const props = defineProps<Props>();
 
 const sectionRef = ref<HTMLElement | null>(null);
 const displayedText = ref("");
+const imageRef = ref<HTMLImageElement | null>(null);
 
 usePinnedTyping(sectionRef, props.title, displayedText, {
 	threshold: 0.3,
 	typingDuration: 2000,
 });
+
+// The picture drifts inside its frame while the section crosses the screen.
+useScrollScene(() => {
+	gsap.fromTo(
+		imageRef.value,
+		{ objectPosition: "50% 15%" },
+		{
+			objectPosition: "50% 85%",
+			ease: "none",
+			scrollTrigger: {
+				trigger: imageRef.value,
+				start: "top bottom",
+				end: "bottom top",
+				scrub: true,
+			},
+		},
+	);
+});
 </script>
 
 <template>
 	<section :id="id" ref="sectionRef" class="section image-section">
-		<img :src="image.src" :alt="image.alt" loading="lazy" />
+		<img ref="imageRef" :src="image.src" :alt="image.alt" loading="lazy" />
 		<div class="title" :style="{ gridArea: titleArea }">
 			<h2 class="heading-stroke" aria-hidden="true">{{ displayedText }}</h2>
 			<h2 class="heading">{{ displayedText }}</h2>

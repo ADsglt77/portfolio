@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { nextTick, onUnmounted, ref, watch } from "vue";
+import { useScrollScene } from "../composables/useScrollScene";
 import type { TimelineItem } from "../config/types";
 import { iconFormation, iconWork } from "../data/icons";
 import { useAnimationsEnabled, useEntered } from "../injectionKeys";
@@ -13,6 +16,31 @@ defineProps<{ items: TimelineItem[] }>();
 const entered = useEntered();
 const animationsEnabled = useAnimationsEnabled();
 const contentRefs = ref<HTMLElement[]>([]);
+const containerRef = ref<HTMLElement | null>(null);
+const lineFillRef = ref<HTMLElement | null>(null);
+const markerRefs = ref<HTMLElement[]>([]);
+
+useScrollScene(() => {
+	gsap.to(lineFillRef.value, {
+		scaleY: 1,
+		ease: "none",
+		scrollTrigger: {
+			trigger: containerRef.value,
+			start: "top 60%",
+			end: "bottom 60%",
+			scrub: true,
+		},
+	});
+	for (const marker of markerRefs.value) {
+		ScrollTrigger.create({
+			trigger: marker,
+			start: "center 60%",
+			endTrigger: document.documentElement,
+			end: "bottom bottom",
+			toggleClass: { targets: marker, className: "is-lit" },
+		});
+	}
+});
 let observer: IntersectionObserver | null = null;
 
 const setupObserver = async () => {
@@ -58,15 +86,17 @@ onUnmounted(() => {
 
 <template>
   <div class="timeline">
-    <div class="timeline-container">
-      <div class="timeline-line"></div>
+    <div ref="containerRef" class="timeline-container">
+      <div class="timeline-line">
+        <div ref="lineFillRef" class="timeline-line-fill"></div>
+      </div>
       <div
         v-for="(item, index) in items"
         :key="index"
         :class="['timeline-item', index % 2 === 0 ? 'timeline-item--left' : 'timeline-item--right']"
       >
         <div class="timeline-marker">
-          <div class="timeline-marker-inner"></div>
+          <div ref="markerRefs" class="timeline-marker-inner"></div>
         </div>
         <div
           ref="contentRefs"
@@ -152,6 +182,20 @@ onUnmounted(() => {
   justify-content: center;
 }
 
+.timeline-line-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--text) 10%,
+    var(--text) 90%,
+    transparent
+  );
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
 .timeline-marker-inner {
   width: 12px;
   height: 12px;
@@ -159,6 +203,14 @@ onUnmounted(() => {
   background: var(--text);
   border: 3px solid var(--bg);
   box-shadow: 0 0 0 2px var(--glass-border);
+  transition:
+    box-shadow 0.4s ease,
+    transform 0.4s ease;
+}
+
+.timeline-marker-inner.is-lit {
+  box-shadow: 0 0 0 2px var(--text);
+  transform: scale(1.25);
 }
 
 .timeline-content {

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import gsap from "gsap";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import Nav from "../components/Nav.vue";
+import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
 import { iconFastArrowDown } from "../data/icons";
 import { useEntered } from "../injectionKeys";
@@ -16,6 +18,36 @@ watch(entered, (val) => {
 			showElements.value = true;
 		}, 1000);
 	}
+});
+
+const sectionRef = ref<HTMLElement | null>(null);
+const titleRef = ref<HTMLElement | null>(null);
+const veilRef = ref<HTMLElement | null>(null);
+
+// Leaving the hero, the forest zooms in, the name rises into the fog and the
+// screen darkens into the next section.
+useScrollScene(() => {
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: sectionRef.value,
+				start: "top top",
+				end: "bottom top",
+				scrub: true,
+			},
+		})
+		.fromTo(
+			sectionRef.value,
+			{ "--hero-zoom": 1 },
+			{ "--hero-zoom": 1.25, ease: "none" },
+			0,
+		)
+		.to(
+			titleRef.value,
+			{ yPercent: -60, scale: 1.3, filter: "blur(10px)", ease: "none" },
+			0,
+		)
+		.to(veilRef.value, { opacity: 0.9, ease: "none" }, 0);
 });
 
 const currentDay = ref("");
@@ -54,11 +86,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section id="home" class="section home">
+  <section id="home" ref="sectionRef" class="section home">
     <div :class="{ 'overlay--fade': entered }" class="overlay" aria-hidden="true"></div>
     <div class="bg immersive-bg" aria-hidden="true"></div>
+    <div ref="veilRef" class="hero-veil" aria-hidden="true"></div>
     <div :class="{ visible: showElements }"><Nav /></div>
-    <h1>{{ hero.displayName }}</h1>
+    <h1 ref="titleRef">{{ hero.displayName }}</h1>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
       <h5>{{ hero.scrollLabel }}</h5>
       <Icon class="scroll-icon" :icon="iconFastArrowDown" :width="20" :height="20" />
@@ -96,6 +129,15 @@ onUnmounted(() => {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 1;
+  scale: var(--hero-zoom, 1);
+}
+
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .section.home > div:has(nav) {

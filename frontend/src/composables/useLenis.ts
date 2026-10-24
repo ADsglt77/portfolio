@@ -1,3 +1,4 @@
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { onUnmounted } from "vue";
 
@@ -34,6 +35,7 @@ export function useLenis(options: LenisOptions = {}) {
 			wheelMultiplier: options.wheelMultiplier ?? 1,
 			touchMultiplier: options.touchMultiplier ?? 2,
 		});
+		state.lenis.on("scroll", ScrollTrigger.update);
 
 		state.rafId = requestAnimationFrame(loop);
 	};

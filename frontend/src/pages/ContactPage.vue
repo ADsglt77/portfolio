@@ -3,6 +3,7 @@ import { ref, watch } from "vue";
 import Button from "../components/Button.vue";
 import ImageSection from "../components/ImageSection.vue";
 import Input from "../components/Input.vue";
+import { useCampfireSound } from "../composables/useCampfireSound";
 import { useFadeIn } from "../composables/useFadeIn";
 import { useTurnstile } from "../composables/useTurnstile";
 import { config } from "../config";
@@ -34,6 +35,8 @@ const { contact } = config;
 const { form } = contact;
 
 const formRef = ref<HTMLElement | null>(null);
+
+useCampfireSound(formRef);
 
 useFadeIn(formRef, {
 	threshold: 0.5,

@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ref } from "vue";
+import { useScrollScene } from "../composables/useScrollScene";
 import { technologiesList } from "../data/technologies";
 
 // Each row renders its list twice so the -50% translation loops seamlessly.
@@ -7,16 +11,45 @@ const rows = [
 	{ direction: "left", items: technologiesList },
 	{ direction: "right", items: [...technologiesList].reverse() },
 ].map((row) => ({ ...row, items: [...row.items, ...row.items] }));
+
+const sectionRef = ref<HTMLElement | null>(null);
+const trackRefs = ref<HTMLElement[]>([]);
+
+useScrollScene(() => {
+	const animations = trackRefs.value.flatMap((track) => track.getAnimations());
+	let velocity = 0;
+	let rate = 1;
+	ScrollTrigger.create({
+		trigger: sectionRef.value,
+		start: "top bottom",
+		end: "bottom top",
+		onUpdate: (self) => {
+			velocity = self.getVelocity();
+		},
+	});
+	const tick = () => {
+		velocity *= 0.9;
+		const target =
+			(velocity < -1 ? -1 : 1) * (1 + Math.min(Math.abs(velocity) / 300, 8));
+		rate += (target - rate) * 0.1;
+		for (const animation of animations) animation.playbackRate = rate;
+	};
+	gsap.ticker.add(tick);
+	return () => {
+		gsap.ticker.remove(tick);
+		for (const animation of animations) animation.playbackRate = 1;
+	};
+});
 </script>
 
 <template>
-  <section id="tech" class="section technologies">
+  <section id="tech" ref="sectionRef" class="section technologies">
     <div
       v-for="row in rows"
       :key="row.direction"
       :class="['tech-row', `tech-row--${row.direction}`]"
     >
-      <div class="tech-row-inner">
+      <div ref="trackRefs" class="tech-row-inner">
         <div
           v-for="(tech, index) in row.items"
           :key="index"

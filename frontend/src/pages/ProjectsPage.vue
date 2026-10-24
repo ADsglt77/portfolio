@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { computed, ref } from "vue";
 import Button from "../components/Button.vue";
 import ProjectCard from "../components/ProjectCard.vue";
+import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
 import { iconExpand } from "../data/icons";
 import { projects } from "../data/projects";
@@ -12,11 +15,32 @@ const showAll = ref(false);
 const visibleProjects = computed(() =>
 	showAll.value ? projects : projects.slice(0, INITIAL_COUNT),
 );
+
+const containerRef = ref<HTMLElement | null>(null);
+
+useScrollScene(() => {
+	const cards = [...(containerRef.value?.children ?? [])];
+	// the cards' own hover transition would fight the entrance, so it is held until they land
+	gsap.set(cards, { opacity: 0, y: 60, transition: "none" });
+	ScrollTrigger.batch(cards, {
+		start: "top 88%",
+		once: true,
+		onEnter: (batch) =>
+			gsap.to(batch, {
+				opacity: 1,
+				y: 0,
+				duration: 0.9,
+				stagger: 0.12,
+				ease: "power3.out",
+				clearProps: "transition,transform,opacity",
+			}),
+	});
+});
 </script>
 
 <template>
   <section id="projects" class="section projects">
-    <div class="projects-container">
+    <div ref="containerRef" class="projects-container">
       <ProjectCard v-for="project in visibleProjects" :key="project.id" :project="project" />
     </div>
     <div v-if="visibleProjects.length < projects.length" class="projects-more">
