@@ -40,18 +40,17 @@ async function verifyTurnstile(
 	const body = new URLSearchParams({ secret, response: token });
 	if (ip) body.set("remoteip", ip);
 
+	// Siteverify answers in JSON even when it fails (a wrong secret is a 400), so the
+	// reason always reaches the logs.
 	const response = await fetch(TURNSTILE_VERIFY_URL, { method: "POST", body });
-	if (!response.ok) {
-		console.error("Turnstile API error", { status: response.status });
-		return false;
-	}
-
-	const result = await response.json<{
-		success: boolean;
-		"error-codes"?: string[];
-	}>();
+	const result = await response
+		.json<{ success: boolean; "error-codes"?: string[] }>()
+		.catch(() => ({ success: false, "error-codes": ["unreadable-response"] }));
 	if (!result.success) {
-		console.error("Turnstile validation failed", result["error-codes"]);
+		console.error("Turnstile validation failed", {
+			status: response.status,
+			errors: result["error-codes"],
+		});
 	}
 	return result.success;
 }
