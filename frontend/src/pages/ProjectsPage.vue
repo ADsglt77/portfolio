@@ -183,6 +183,7 @@ const openSheet = (project: Project, event: MouseEvent) => {
         <div class="slide-shade" aria-hidden="true"></div>
 
         <div class="slide-content">
+          <p class="slide-count">{{ index + 1 }} / {{ projects.length }}</p>
           <h3 class="slide-title">{{ project.title }}</h3>
           <p class="slide-description">{{ project.description }}</p>
           <ProjectTags :technologies="project.technologies" :max="MAX_TECHNOLOGIES" />
@@ -192,10 +193,6 @@ const openSheet = (project: Project, event: MouseEvent) => {
           </div>
         </div>
       </article>
-
-      <p v-if="animationsEnabled" class="projects-count" aria-hidden="true">
-        {{ active + 1 }} / {{ projects.length }}
-      </p>
     </div>
 
     <ProjectSheet :project="selected" :origin="origin" @close="selected = null" />
@@ -309,22 +306,13 @@ const openSheet = (project: Project, event: MouseEvent) => {
   margin-top: var(--spacing-sm);
 }
 
-.projects-count {
-  position: absolute;
-  top: var(--spacing-xl);
-  right: var(--spacing-3xl);
-  z-index: 2;
-  color: var(--text);
-  opacity: 0.75;
+.slide-count {
+  color: var(--muted);
 }
 
 @media (max-width: 900px) {
   .slide-content {
     padding: var(--spacing-xl);
-  }
-
-  .projects-count {
-    right: var(--spacing-xl);
   }
 }
 </style>

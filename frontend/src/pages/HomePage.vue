@@ -140,9 +140,17 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
+/* above every section that scrolls under the nav */
 .section.home > div:has(nav) {
-  z-index: 1;
+  z-index: 10;
   opacity: 0;
+}
+
+/* once faded in, the fade lets go of the nav: held, it would stop the menu and
+   settings panels from blurring the page behind them */
+.section.home > div.visible:has(nav) {
+  opacity: 1;
+  animation-fill-mode: backwards;
 }
 
 h1 {

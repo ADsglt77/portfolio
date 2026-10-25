@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 import { config } from "../config";
 import {
 	iconCancel,
@@ -49,19 +49,49 @@ const handleClickOutside = (e: MouseEvent) => {
 	}
 };
 
-onMounted(() => {
-	document.addEventListener("click", handleClickOutside);
-});
-onUnmounted(() => {
-	document.removeEventListener("click", handleClickOutside);
-});
-
-const handleScramble = (e: Event, text: string) => {
-	const target = (e.currentTarget as HTMLElement).querySelector("span");
-	if (target) {
-		scrambleText(target, text, { skipAnimation: !animationsEnabled.value });
+const scramble = (link: Element | null | undefined, text: string) => {
+	const label = link?.querySelector("span");
+	if (label) {
+		scrambleText(label, text, { skipAnimation: !animationsEnabled.value });
 	}
 };
+
+// The link of the section crossing the middle of the screen is lit, and scrambles
+// as it lights up.
+const navRef = ref<HTMLElement | null>(null);
+const activeHref = ref<string | null>(null);
+const observer = new IntersectionObserver(
+	(entries) => {
+		for (const { target, isIntersecting } of entries) {
+			const href = `#${target.id}`;
+			if (isIntersecting) activeHref.value = href;
+			else if (activeHref.value === href) activeHref.value = null;
+		}
+	},
+	{ rootMargin: "-50% 0px" },
+);
+
+watch(activeHref, (href) => {
+	const link = links.find((l) => l.href === href);
+	if (link) {
+		scramble(navRef.value?.querySelector(`[href="${href}"]`), link.label);
+	}
+});
+
+onMounted(() => {
+	// captured before the click is handled: a toggled icon re-renders and would leave
+	// the clicked element detached, so it would look like a click outside
+	document.addEventListener("click", handleClickOutside, true);
+	// the hero is watched too, so the nav knows when it is over it
+	for (const href of ["#home", ...links.map((link) => link.href)]) {
+		const section = document.querySelector(href);
+		if (section) observer.observe(section);
+	}
+});
+onUnmounted(() => {
+	document.removeEventListener("click", handleClickOutside, true);
+	observer.disconnect();
+});
 
 const scrollToSection = (e: Event, href: string) => {
 	e.preventDefault();
@@ -78,14 +108,16 @@ const scrollToSection = (e: Event, href: string) => {
 </script>
 
 <template>
-  <nav>
+  <nav ref="navRef" :class="{ 'over-hero': activeHref === '#home' }">
     <a
       v-for="link in links"
       :key="link.href"
       :href="link.href"
       class="nav-link"
+      :class="{ 'is-active': link.href === activeHref }"
+      :aria-current="link.href === activeHref ? 'location' : undefined"
       @click="scrollToSection($event, link.href)"
-      @mouseenter="handleScramble($event, link.label)"
+      @mouseenter="scramble($event.currentTarget as Element, link.label)"
     >
       <span>{{ link.label }}</span>
     </a>
@@ -112,6 +144,8 @@ const scrollToSection = (e: Event, href: string) => {
             :key="link.href"
             :href="link.href"
             class="mobile-menu-link"
+            :class="{ 'is-active': link.href === activeHref }"
+            :aria-current="link.href === activeHref ? 'location' : undefined"
             @click="scrollToSection($event, link.href)"
           >
             {{ link.label }}
@@ -150,7 +184,7 @@ const scrollToSection = (e: Event, href: string) => {
               class="settings-toggle"
               :aria-label="settings.animationsLabel"
               :aria-pressed="animationsEnabled"
-              @click.stop="toggleAnimations"
+              @click="toggleAnimations"
             >
               <Icon :icon="animationsEnabled ? iconEye : iconEyeOff" :width="14" :height="14" :stroke-width="3" />
             </button>
@@ -162,8 +196,9 @@ const scrollToSection = (e: Event, href: string) => {
 </template>
 
 <style scoped>
+/* fixed, the nav stays where it is in the hero for the whole scroll */
 nav {
-  position: absolute;
+  position: fixed;
   top: var(--spacing-xl);
   left: var(--spacing-3xl);
   right: var(--spacing-3xl);
@@ -171,10 +206,37 @@ nav {
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-2xl);
+  pointer-events: none;
+}
+
+/* only the controls catch clicks, not the empty band between them */
+nav > * {
+  pointer-events: auto;
 }
 
 nav * {
   color: var(--text);
+}
+
+/* past the hero, the page fades out under the nav so the nav stays readable */
+nav::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 7rem;
+  background: linear-gradient(var(--bg) 50%, transparent);
+  transition: opacity 0.4s ease;
+}
+
+nav.over-hero::before {
+  opacity: 0;
+}
+
+.nav-link.is-active span {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
 }
 
 .nav-settings {
@@ -272,7 +334,8 @@ nav * {
   transition: background 0.15s;
 }
 
-.mobile-menu-link:hover {
+.mobile-menu-link:hover,
+.mobile-menu-link.is-active {
   background: var(--glass-hover);
 }
 
