@@ -2,7 +2,7 @@
 	"site": {
 		"name": "Adrien Segalat",
 		"title": "Adrien Segalat — Portfolio",
-		"description": "Portfolio d'Adrien Segalat — Développeur full-stack web et mobile",
+		"description": "Portfolio d'Adrien Segalat — Élève-ingénieur à l'EFREI et développeur full-stack",
 		"lang": "fr",
 		"themeColor": "#151e16",
 		"url": "https://adrien-segalat.fr",
@@ -34,8 +34,8 @@
 	},
 
 	"about": {
-		"title": "Développeur full-stack, web et application mobile",
-		"paragraph": "Je suis alternant chez Therasoft en Bachelor C.D.W.M. (Concepteur Développeur Web et Mobile) passionné par le développement web, le design, et grand amateur de basket-ball. Créatif et curieux, j'aime allier technique et esthétique dans mes projets.",
+		"title": "Élève-ingénieur et développeur full-stack",
+		"paragraph": "Élève-ingénieur à l'EFREI en spécialité Logiciels et Systèmes d'Information, je poursuis mon alternance chez Therasoft, où je développe des applications métier pour le secteur médical avec Angular, Express et C#. Passionné de développement web, de design et grand amateur de basket-ball, j'aime allier technique et esthétique dans mes projets.",
 		"cv": {
 			"label": "Télécharger mon CV",
 			"path": "/CV-Adrien.pdf",
@@ -132,6 +132,7 @@
 		"mysql": { "icon": "devicon:mysql", "label": "MySQL" },
 		"postgres": { "icon": "devicon:postgresql", "label": "PostgreSQL" },
 		"angular": { "icon": "devicon:angular", "label": "Angular" },
+		"csharp": { "icon": "devicon:csharp", "label": "C#" },
 		"express": { "icon": "devicon:express", "label": "Express" },
 		"dart": { "icon": "devicon:dart", "label": "Dart" },
 		"flutter": { "icon": "devicon:flutter", "label": "Flutter" },
@@ -148,6 +149,8 @@
 	},
 
 	"technologiesBanner": [
+		"angular",
+		"csharp",
 		"vue",
 		"symfony",
 		"nuxt",
@@ -209,8 +212,8 @@
 		{
 			"date": "Mai/Juin 2024",
 			"organization": "Broussaud Textile",
-			"role": "Stage de cinq semaines",
-			"description": "Symfony/PHP, migration API REST vers GraphQL, découverte rôle dev en entreprise",
+			"role": "Stage de 1ère année de BTS (cinq semaines)",
+			"description": "API GraphQL avec Shopify : migration d'une API REST vers GraphQL en Symfony/PHP, découverte du travail en entreprise",
 			"type": "work"
 		},
 		{
@@ -223,28 +226,36 @@
 			"date": "2024/2025",
 			"organization": "Lycée Valadon (Limoges)",
 			"role": "BTS SIO (Services Informatiques aux Organisations) - 2ème année",
-			"description": "Major de promotion",
+			"description": "Diplôme obtenu, major de promotion",
 			"type": "formation"
 		},
 		{
 			"date": "Janvier/Février 2025",
 			"organization": "Condat Basket Club",
-			"role": "Stage de sept semaines",
-			"description": "Site vitrine + dashboard, NuxtJS/Vue/TypeScript/Prisma",
+			"role": "Stage de 2ème année de BTS (sept semaines)",
+			"description": "Site vitrine et interface d'administration (CRUD, anonymisation de la base, messagerie), NuxtJS/Vue/TypeScript/Prisma",
+			"type": "work"
+		},
+		{
+			"date": "Depuis Juillet 2025",
+			"organization": "Therasoft",
+			"role": "Alternant - Développeur full-stack",
+			"description": "Applications web pour le secteur médical (Angular, Express, C#), alternance poursuivie en cycle ingénieur",
 			"type": "work"
 		},
 		{
 			"date": "2025/2026",
 			"organization": "Beaupeyrat (Limoges)",
 			"role": "Bachelor C.D.W.M. (Concepteur Développeur Web et Mobile)",
+			"description": "En alternance chez Therasoft",
 			"type": "formation"
 		},
 		{
-			"date": "Depuis Septembre 2025",
-			"organization": "Therasoft",
-			"role": "Alternant - Développeur full-stack",
-			"description": "Alternance en parallèle du Bachelor C.D.W.M.",
-			"type": "work"
+			"date": "2026/2027",
+			"organization": "EFREI (Bordeaux)",
+			"role": "Cycle ingénieur - 1ère année, spécialité LSI (Logiciels et Systèmes d'Information)",
+			"description": "En alternance chez Therasoft",
+			"type": "formation"
 		}
 	],
 
