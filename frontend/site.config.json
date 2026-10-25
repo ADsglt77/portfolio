@@ -91,6 +91,7 @@
 	},
 
 	"nav": {
+		"menuLabel": "Menu",
 		"links": [
 			{ "href": "#about", "label": "ABOUT" },
 			{ "href": "#timeline", "label": "EXPERIENCE" },
@@ -98,6 +99,7 @@
 			{ "href": "#contact", "label": "CONTACT" }
 		],
 		"settings": {
+			"label": "Paramètres",
 			"soundLabel": "Son",
 			"animationsLabel": "Animations"
 		}

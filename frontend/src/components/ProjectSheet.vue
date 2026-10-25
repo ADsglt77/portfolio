@@ -2,12 +2,12 @@
 import { Icon } from "@iconify/vue";
 import { inject, nextTick, ref, watch } from "vue";
 import { config } from "../config";
-import { iconCancel, iconPlay } from "../data/icons";
+import { iconCancel } from "../data/icons";
 import type { Project } from "../data/projects";
 import { lenisKey, useAnimationsEnabled } from "../injectionKeys";
-import { formatTemplate } from "../lib/format";
 import Button from "./Button.vue";
 import ProjectLinks from "./ProjectLinks.vue";
+import ProjectMedia from "./ProjectMedia.vue";
 import ProjectTags from "./ProjectTags.vue";
 
 const props = defineProps<{
@@ -17,7 +17,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ close: [] }>();
 
-const { closeLabel, noMediaLabel, posterAltTemplate } = config.projects;
+const { closeLabel } = config.projects;
 const dialogRef = ref<HTMLDialogElement | null>(null);
 const getLenis = inject(lenisKey);
 const animationsEnabled = useAnimationsEnabled();
@@ -93,27 +93,7 @@ const onClosed = () => {
         <Icon :icon="iconCancel" :width="18" :height="18" :stroke-width="3" />
       </Button>
 
-      <div class="sheet-media">
-        <video
-          v-if="project.video"
-          :src="project.video"
-          :poster="project.poster"
-          controls
-          controlslist="nodownload noplaybackrate"
-          disablePictureInPicture
-          playsinline
-          preload="metadata"
-        ></video>
-        <img
-          v-else-if="project.poster"
-          :src="project.poster"
-          :alt="formatTemplate(posterAltTemplate, { title: project.title })"
-        />
-        <div v-else class="sheet-placeholder">
-          <Icon :icon="iconPlay" :width="48" :height="48" />
-          <span>{{ noMediaLabel }}</span>
-        </div>
-      </div>
+      <ProjectMedia :project="project" class="sheet-media" />
 
       <div class="sheet-body">
         <h3 id="project-sheet-title" class="sheet-title">{{ project.title }}</h3>
@@ -167,26 +147,6 @@ const onClosed = () => {
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: color-mix(in srgb, var(--text) 3%, transparent);
-}
-
-.sheet-media video,
-.sheet-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.sheet-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
 }
 
 .sheet-body {

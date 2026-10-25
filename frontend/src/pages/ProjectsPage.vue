@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ref, watch } from "vue";
 import Button from "../components/Button.vue";
 import ProjectLinks from "../components/ProjectLinks.vue";
+import ProjectMedia from "../components/ProjectMedia.vue";
 import ProjectSheet from "../components/ProjectSheet.vue";
 import ProjectTags from "../components/ProjectTags.vue";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
-import { iconExpand, iconPlay } from "../data/icons";
+import { iconExpand } from "../data/icons";
 import { type Project, projects } from "../data/projects";
 import { useAnimationsEnabled } from "../injectionKeys";
-import { formatTemplate } from "../lib/format";
 import { scrambleText } from "../lib/textScramble";
 
 const MAX_TECHNOLOGIES = 4;
-const { detailsLabel, noMediaLabel, posterAltTemplate } = config.projects;
-const posterAlt = (project: Project) =>
-	formatTemplate(posterAltTemplate, { title: project.title });
+const { detailsLabel } = config.projects;
 
 // With animations on, the section is a pinned "cinema": one project fills the screen at
 // a time and the scroll moves to the next one. With animations off, the projects are
@@ -163,23 +160,7 @@ const openSheet = (project: Project, event: MouseEvent) => {
         class="slide"
         :inert="(animationsEnabled && index !== active) || undefined"
       >
-        <div class="slide-media" aria-hidden="true">
-          <video
-            v-if="project.video"
-            :src="project.video"
-            :poster="project.poster"
-            muted
-            loop
-            playsinline
-            preload="none"
-            tabindex="-1"
-          ></video>
-          <img v-else-if="project.poster" :src="project.poster" :alt="posterAlt(project)" loading="lazy" />
-          <div v-else class="slide-placeholder">
-            <Icon :icon="iconPlay" :width="48" :height="48" />
-            <span>{{ noMediaLabel }}</span>
-          </div>
-        </div>
+        <ProjectMedia :project="project" preview class="slide-media" aria-hidden="true" />
         <div class="slide-shade" aria-hidden="true"></div>
 
         <div class="slide-content">
@@ -239,26 +220,6 @@ const openSheet = (project: Project, event: MouseEvent) => {
 .slide-media {
   position: absolute;
   inset: 0;
-}
-
-.slide-media video,
-.slide-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.slide-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
 }
 
 .slide-shade {

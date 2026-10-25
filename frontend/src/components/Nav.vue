@@ -11,15 +11,21 @@ import {
 	iconSoundHigh,
 	iconSoundOff,
 } from "../data/icons";
-import { audioKey, lenisKey, useAnimationsEnabled } from "../injectionKeys";
+import {
+	audioKey,
+	lenisKey,
+	useAnimationsEnabled,
+	useEntered,
+} from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
 import Button from "./Button.vue";
 
-const { links, settings } = config.nav;
+const { links, menuLabel, settings } = config.nav;
 
 const audioRef = inject(audioKey);
 const getLenisInstance = inject(lenisKey);
 const animationsEnabled = useAnimationsEnabled();
+const entered = useEntered();
 const showSettings = ref(false);
 const showMobileMenu = ref(false);
 const isMuted = ref(true);
@@ -108,7 +114,10 @@ const scrollToSection = (e: Event, href: string) => {
 </script>
 
 <template>
-  <nav ref="navRef" :class="{ 'over-hero': activeHref === '#home' }">
+  <nav
+    ref="navRef"
+    :class="{ visible: entered, 'over-hero': activeHref === '#home' }"
+  >
     <a
       v-for="link in links"
       :key="link.href"
@@ -127,7 +136,7 @@ const scrollToSection = (e: Event, href: string) => {
         borderRadius="50%"
         class="nav-hamburger"
         :aria-expanded="showMobileMenu"
-        aria-label="Menu"
+        :aria-label="menuLabel"
         @click="showMobileMenu = !showMobileMenu"
       >
         <Icon
@@ -137,8 +146,8 @@ const scrollToSection = (e: Event, href: string) => {
           :stroke-width="3"
         />
       </Button>
-      <Transition name="menu-fade">
-        <div v-show="showMobileMenu" class="mobile-menu-panel">
+      <Transition name="panel-fade">
+        <div v-show="showMobileMenu" class="nav-panel mobile-menu-panel">
           <a
             v-for="link in links"
             :key="link.href"
@@ -158,13 +167,13 @@ const scrollToSection = (e: Event, href: string) => {
         padding="0.6rem"
         borderRadius="50%"
         :aria-expanded="showSettings"
-        aria-label="Paramètres"
+        :aria-label="settings.label"
         @click="showSettings = !showSettings"
       >
         <Icon :icon="iconSettings" :width="16" :height="16" :stroke-width="3" />
       </Button>
-      <Transition name="settings-fade">
-        <div v-show="showSettings" class="settings-panel">
+      <Transition name="panel-fade">
+        <div v-show="showSettings" class="nav-panel settings-panel">
           <div class="settings-row">
             <span>{{ settings.soundLabel }}</span>
             <button
@@ -206,7 +215,17 @@ nav {
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-2xl);
+  z-index: 10;
+  opacity: 0;
   pointer-events: none;
+}
+
+/* fades in with the rest of the hero, then lets go of the nav: a fade held at its
+   end would stop the panels from blurring the page behind them */
+nav.visible {
+  opacity: 1;
+  animation-delay: 2s;
+  animation-fill-mode: backwards;
 }
 
 /* only the controls catch clicks, not the empty band between them */
@@ -243,17 +262,30 @@ nav.over-hero::before {
   position: relative;
 }
 
-.settings-panel {
+.nav-panel {
   position: absolute;
   top: calc(100% + var(--spacing-sm));
-  right: 0;
-  min-width: 10rem;
+  z-index: 10;
   padding: var(--spacing-sm);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   backdrop-filter: blur(8px);
-  z-index: 10;
+}
+
+.panel-fade-enter-active,
+.panel-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.panel-fade-enter-from,
+.panel-fade-leave-to {
+  opacity: 0;
+}
+
+.settings-panel {
+  right: 0;
+  min-width: 10rem;
 }
 
 .settings-row {
@@ -289,16 +321,6 @@ nav.over-hero::before {
   border-color: var(--glass-border-hover);
 }
 
-.settings-fade-enter-active,
-.settings-fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-
-.settings-fade-enter-from,
-.settings-fade-leave-to {
-  opacity: 0;
-}
-
 .nav-mobile {
   display: none;
   position: relative;
@@ -309,16 +331,8 @@ nav.over-hero::before {
 }
 
 .mobile-menu-panel {
-  position: absolute;
-  top: calc(100% + var(--spacing-sm));
   left: 0;
   min-width: 12rem;
-  padding: var(--spacing-sm);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  backdrop-filter: blur(8px);
-  z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -337,16 +351,6 @@ nav.over-hero::before {
 .mobile-menu-link:hover,
 .mobile-menu-link.is-active {
   background: var(--glass-hover);
-}
-
-.menu-fade-enter-active,
-.menu-fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-
-.menu-fade-enter-from,
-.menu-fade-leave-to {
-  opacity: 0;
 }
 
 @media (max-width: 900px) {

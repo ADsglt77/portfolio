@@ -97,8 +97,15 @@ export interface SiteConfig {
 		template: string;
 	};
 	nav: {
+		/** Accessible name of the mobile menu button. */
+		menuLabel: string;
 		links: Array<{ href: string; label: string }>;
-		settings: { soundLabel: string; animationsLabel: string };
+		settings: {
+			/** Accessible name of the settings button. */
+			label: string;
+			soundLabel: string;
+			animationsLabel: string;
+		};
 	};
 	social: SocialLink[];
 	techMap: Record<string, Technology>;

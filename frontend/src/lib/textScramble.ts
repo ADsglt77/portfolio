@@ -10,11 +10,17 @@ const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const getRandomChar = () =>
 	charset[Math.floor(Math.random() * charset.length)] ?? "A";
 
+// The latest scramble of an element wins: one still running on it stops.
+const latestRun = new WeakMap<HTMLElement, object>();
+
 export function scrambleText(
 	el: HTMLElement,
 	finalText: string,
 	options: ScrambleOptions = {},
 ): void {
+	const run = {};
+	latestRun.set(el, run);
+
 	if (
 		options.skipAnimation ||
 		window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -29,6 +35,7 @@ export function scrambleText(
 	let frame = 0;
 
 	const animate = () => {
+		if (latestRun.get(el) !== run) return;
 		if (frame >= totalFrames) {
 			el.textContent = finalText;
 			return;

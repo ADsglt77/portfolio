@@ -2,7 +2,6 @@
 import { Icon } from "@iconify/vue";
 import gsap from "gsap";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import Nav from "../components/Nav.vue";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
 import { iconFastArrowDown } from "../data/icons";
@@ -90,7 +89,6 @@ onUnmounted(() => {
     <div :class="{ 'overlay--fade': entered }" class="overlay" aria-hidden="true"></div>
     <div class="bg immersive-bg" aria-hidden="true"></div>
     <div ref="veilRef" class="hero-veil" aria-hidden="true"></div>
-    <div :class="{ visible: showElements }"><Nav /></div>
     <h1 ref="titleRef">{{ hero.displayName }}</h1>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
       <h5>{{ hero.scrollLabel }}</h5>
@@ -138,19 +136,6 @@ onUnmounted(() => {
   background: var(--bg);
   opacity: 0;
   pointer-events: none;
-}
-
-/* above every section that scrolls under the nav */
-.section.home > div:has(nav) {
-  z-index: 10;
-  opacity: 0;
-}
-
-/* once faded in, the fade lets go of the nav: held, it would stop the menu and
-   settings panels from blurring the page behind them */
-.section.home > div.visible:has(nav) {
-  opacity: 1;
-  animation-fill-mode: backwards;
 }
 
 h1 {

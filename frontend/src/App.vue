@@ -2,6 +2,7 @@
 import { computed, onUnmounted, provide, ref, watch, watchEffect } from "vue";
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
+import Nav from "./components/Nav.vue";
 import { useLenis } from "./composables/useLenis";
 import { useLoadingProgress } from "./composables/useLoadingProgress";
 import { config } from "./config";
@@ -124,6 +125,7 @@ onUnmounted(() => {
   </div>
 
   <main v-show="entered" class="site-content">
+    <Nav />
     <HomePage />
     <div class="gradient-overlay"></div>
     <AboutPage />
