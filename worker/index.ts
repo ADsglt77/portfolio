@@ -1,3 +1,5 @@
+import { contactEmail } from "./email";
+
 const TURNSTILE_VERIFY_URL =
 	"https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,15 +77,7 @@ async function handleContact(request: Request, env: Env): Promise<Response> {
 			from: { email: env.CONTACT_FROM_EMAIL, name: env.CONTACT_FROM_NAME },
 			to: env.CONTACT_TO_EMAIL,
 			replyTo: { email: form.email, name: form.name },
-			subject: `[Portfolio] ${form.subject}`,
-			text: [
-				"Nouveau message depuis le portfolio",
-				`Nom : ${form.name}`,
-				`Email : ${form.email}`,
-				`Sujet : ${form.subject}`,
-				"",
-				form.message,
-			].join("\n"),
+			...contactEmail(form),
 		});
 	} catch (error) {
 		console.error("Email sending failed", error);
