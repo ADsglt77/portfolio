@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
+import { glideTo } from "../composables/useLenis";
 import { config } from "../config";
 import {
 	iconCancel,
@@ -11,19 +12,13 @@ import {
 	iconSoundHigh,
 	iconSoundOff,
 } from "../data/icons";
-import {
-	audioKey,
-	lenisKey,
-	useAnimationsEnabled,
-	useEntered,
-} from "../injectionKeys";
+import { audioKey, useAnimationsEnabled, useEntered } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
 import Button from "./Button.vue";
 
 const { links, menuLabel, settings } = config.nav;
 
 const audioRef = inject(audioKey);
-const getLenisInstance = inject(lenisKey);
 const animationsEnabled = useAnimationsEnabled();
 const entered = useEntered();
 const showSettings = ref(false);
@@ -102,14 +97,8 @@ onUnmounted(() => {
 const scrollToSection = (e: Event, href: string) => {
 	e.preventDefault();
 	showMobileMenu.value = false;
-	const lenis = getLenisInstance?.();
 	const element = document.querySelector<HTMLElement>(href);
-	if (lenis && element) {
-		lenis.scrollTo(element, {
-			duration: 5,
-			easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
-		});
-	}
+	if (element) glideTo(element);
 };
 </script>
 

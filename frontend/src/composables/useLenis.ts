@@ -25,6 +25,14 @@ interface LenisOptions {
 	touchMultiplier?: number;
 }
 
+/** The site's long glide to a section, or to a scroll position. */
+export function glideTo(target: HTMLElement | number): void {
+	state.lenis?.scrollTo(target, {
+		duration: 5,
+		easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+	});
+}
+
 export function useLenis(options: LenisOptions = {}) {
 	const start = (): void => {
 		if (state.lenis) return;

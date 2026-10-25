@@ -253,6 +253,7 @@
 		"closeLabel": "Fermer",
 		"noMediaLabel": "Aucune vidéo disponible",
 		"posterAltTemplate": "Aperçu du projet {{title}}",
+		"techLinkTemplate": "{{tech}}, voir le projet {{title}}",
 		"ariaLabels": {
 			"readmePdf": "Lire le README PDF",
 			"website": "Visiter le site web",

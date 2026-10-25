@@ -118,6 +118,8 @@ export interface SiteConfig {
 		closeLabel: string;
 		noMediaLabel: string;
 		posterAltTemplate: string;
+		/** Accessible name of a banner technology leading to a project using it. */
+		techLinkTemplate: string;
 		ariaLabels: Required<ProjectLinks>;
 		items: ProjectItem[];
 	};

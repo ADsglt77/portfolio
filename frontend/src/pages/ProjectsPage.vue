@@ -7,6 +7,8 @@ import ProjectLinks from "../components/ProjectLinks.vue";
 import ProjectMedia from "../components/ProjectMedia.vue";
 import ProjectSheet from "../components/ProjectSheet.vue";
 import ProjectTags from "../components/ProjectTags.vue";
+import { glideTo } from "../composables/useLenis";
+import { useProjectToShow } from "../composables/useProjectToShow";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
 import { iconExpand } from "../data/icons";
@@ -26,6 +28,7 @@ const stageRef = ref<HTMLElement | null>(null);
 const slideRefs = ref<HTMLElement[]>([]);
 const active = ref(0);
 let stageVisible = false;
+let cinema: ScrollTrigger | undefined;
 
 const playActiveVideo = () => {
 	slideRefs.value.forEach((slide, i) => {
@@ -112,6 +115,7 @@ useScrollScene(() => {
 			)
 			.set(slides[i - 1] ?? [], { autoAlpha: 0 }, at + 0.7);
 	}
+	cinema = timeline.scrollTrigger;
 
 	// the section (not the pinned stage) spans the whole pinned run
 	ScrollTrigger.create({
@@ -127,12 +131,26 @@ useScrollScene(() => {
 
 	return () => {
 		// back to the stacked layout: every video stops on its poster again
+		cinema = undefined;
 		stageVisible = false;
 		for (const video of stageRef.value?.querySelectorAll("video") ?? []) {
 			video.pause();
 			video.load();
 		}
 	};
+});
+
+// Asked from another section, glide to a project: in the cinema it sits at its share
+// of the pinned run, stacked it is its own block.
+const projectToShow = useProjectToShow();
+watch(projectToShow, (index) => {
+	if (index === null) return;
+	projectToShow.value = null;
+	const target = cinema
+		? cinema.start +
+			(cinema.end - cinema.start) * (index / (projects.length - 1))
+		: slideRefs.value[index];
+	if (target !== undefined) glideTo(target);
 });
 
 // The detail sheet opens from where it was asked for.

@@ -3,13 +3,35 @@ import { Icon } from "@iconify/vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ref } from "vue";
+import { useProjectToShow } from "../composables/useProjectToShow";
 import { useScrollScene } from "../composables/useScrollScene";
+import { config } from "../config";
+import { projects } from "../data/projects";
 import { technologiesList } from "../data/technologies";
+import { formatTemplate } from "../lib/format";
+
+// A technology used by a project leads to the first project using it.
+const technologies = technologiesList.map((tech) => {
+	const project = projects.findIndex((p) => p.technologies.includes(tech));
+	const title = projects[project]?.title;
+	const linkLabel =
+		title &&
+		formatTemplate(config.projects.techLinkTemplate, {
+			tech: tech.label,
+			title,
+		});
+	return { ...tech, project, linkLabel };
+});
+
+const projectToShow = useProjectToShow();
+const showProject = (project: number) => {
+	if (project >= 0) projectToShow.value = project;
+};
 
 // Each row renders its list twice so the -50% translation loops seamlessly.
 const rows = [
-	{ direction: "left", items: technologiesList },
-	{ direction: "right", items: [...technologiesList].reverse() },
+	{ direction: "left", items: technologies },
+	{ direction: "right", items: [...technologies].reverse() },
 ].map((row) => ({ ...row, items: [...row.items, ...row.items] }));
 
 const sectionRef = ref<HTMLElement | null>(null);
@@ -50,15 +72,19 @@ useScrollScene(() => {
       :class="['tech-row', `tech-row--${row.direction}`]"
     >
       <div ref="trackRefs" class="tech-row-inner">
-        <div
+        <a
           v-for="(tech, index) in row.items"
           :key="index"
           class="tech-item"
+          :href="tech.linkLabel ? '#projects' : undefined"
+          :aria-label="tech.linkLabel"
           :aria-hidden="index >= row.items.length / 2 || undefined"
+          :tabindex="index >= row.items.length / 2 ? -1 : undefined"
+          @click.prevent="showProject(tech.project)"
         >
           <Icon :icon="tech.icon" :width="36" :height="36" />
           <h3>{{ tech.label }}</h3>
-        </div>
+        </a>
       </div>
     </div>
   </section>
