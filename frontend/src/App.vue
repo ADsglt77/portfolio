@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import {
-	computed,
-	onMounted,
-	onUnmounted,
-	provide,
-	ref,
-	watch,
-	watchEffect,
-} from "vue";
+import { computed, onUnmounted, provide, ref, watch, watchEffect } from "vue";
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
 import { useLenis } from "./composables/useLenis";
+import { useLoadingProgress } from "./composables/useLoadingProgress";
 import { config } from "./config";
 import {
 	animationsEnabledKey,
@@ -28,14 +21,14 @@ import TimelinePage from "./pages/TimelinePage.vue";
 
 const { hero } = config;
 
-const progress = ref(0);
-const loadingText = computed(() =>
-	formatTemplate(hero.loadingLabel, { progress: progress.value }),
-);
-const ready = ref(false);
 const entered = ref(false);
 const isButtonFading = ref(false);
 const audioRef = ref<HTMLAudioElement>();
+
+const { progress, ready } = useLoadingProgress({ image: hero.backgroundImage });
+const loadingText = computed(() =>
+	formatTemplate(hero.loadingLabel, { progress: progress.value }),
+);
 
 const STORAGE_ANIMATIONS = "portfolio-animations-enabled";
 // A saved choice wins; otherwise follow the system "reduce motion" setting.
@@ -77,26 +70,6 @@ provide(audioKey, audioRef);
 provide(enteredKey, entered);
 provide(lenisKey, getLenisInstance);
 provide(animationsEnabledKey, animationsEnabled);
-
-onMounted(() => {
-	const startTime = Date.now();
-	const duration = 1000;
-
-	const updateProgress = () => {
-		const elapsed = Date.now() - startTime;
-		const newProgress = Math.min((elapsed / duration) * 100, 100);
-
-		if (newProgress >= 100) {
-			progress.value = 100;
-			ready.value = true;
-		} else {
-			progress.value = Math.ceil(newProgress);
-			requestAnimationFrame(updateProgress);
-		}
-	};
-
-	requestAnimationFrame(updateProgress);
-});
 
 const handleEnter = () => {
 	isButtonFading.value = true;

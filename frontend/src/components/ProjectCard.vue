@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { config } from "../config";
 import type { ProjectLinks } from "../config/types";
 import { iconGithub, iconLink, iconPdf, iconPlay } from "../data/icons";
 import type { Project } from "../data/projects";
+import { useAnimationsEnabled } from "../injectionKeys";
 import { formatTemplate } from "../lib/format";
 
 const MAX_TECHNOLOGIES = 4;
@@ -27,6 +28,34 @@ const posterAlt = computed(() =>
 	formatTemplate(posterAltTemplate, { title: props.project.title }),
 );
 
+// The demo plays silently, in a loop, while the pointer is on the card and goes back to
+// its poster when it leaves. A video started from its own controls is left alone.
+const videoRef = ref<HTMLVideoElement | null>(null);
+const animationsEnabled = useAnimationsEnabled();
+const canHover = window.matchMedia(
+	"(hover: hover) and (pointer: fine)",
+).matches;
+let previewing = false;
+
+const startPreview = () => {
+	const video = videoRef.value;
+	if (!video || !canHover || !animationsEnabled.value || !video.paused) return;
+	previewing = true;
+	video.loop = true;
+	video.play().catch(() => {
+		previewing = false;
+	});
+};
+
+const stopPreview = () => {
+	const video = videoRef.value;
+	if (!video || !previewing) return;
+	previewing = false;
+	video.loop = false;
+	video.pause();
+	video.load();
+};
+
 const actions = computed(() =>
 	LINK_TYPES.flatMap(({ key, icon, external }) => {
 		const href = props.project.links[key];
@@ -36,10 +65,11 @@ const actions = computed(() =>
 </script>
 
 <template>
-  <article>
+  <article @mouseenter="startPreview" @mouseleave="stopPreview">
     <div class="project-media">
       <video
         v-if="project.video"
+        ref="videoRef"
         :src="project.video"
         :poster="project.poster"
         controls
