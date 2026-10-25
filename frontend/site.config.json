@@ -43,7 +43,7 @@
 		},
 		"image": {
 			"src": "/img/about.webp",
-			"alt": "About"
+			"alt": "Portrait d'Adrien Segalat"
 		}
 	},
 
@@ -51,7 +51,7 @@
 		"title": "Contactez moi",
 		"image": {
 			"src": "/img/contact.webp",
-			"alt": "Contact"
+			"alt": "Feu de camp au bord d'un lac dans la brume"
 		},
 		"form": {
 			"name": {

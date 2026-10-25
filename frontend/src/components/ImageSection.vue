@@ -69,7 +69,6 @@ img {
 	height: clamp(360px, 90vh, 760px);
 	object-fit: cover;
 	border-radius: var(--radius-lg);
-	border: 1px solid var(--glass-border);
 	grid-area: 1 / 1 / 7 / 3;
 	align-self: start;
 }
