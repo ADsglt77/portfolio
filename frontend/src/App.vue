@@ -74,7 +74,6 @@ provide(animationsEnabledKey, animationsEnabled);
 
 const handleEnter = () => {
 	isButtonFading.value = true;
-	audioRef.value?.play().catch(() => {});
 	setTimeout(() => {
 		entered.value = true;
 		startLenis();
@@ -96,7 +95,7 @@ onUnmounted(() => {
     ref="audioRef"
     :src="hero.ambientSound"
     loop
-    preload="auto"
+    preload="none"
     muted
   ></audio>
 

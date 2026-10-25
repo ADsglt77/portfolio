@@ -1,5 +1,5 @@
 // UI action icons (iconoir)
-export const iconPdf = "iconoir:file-pdf";
+export const iconPdf = "iconoir:page";
 export const iconLink = "iconoir:link";
 export const iconGithub = "iconoir:github";
 export const iconPlay = "iconoir:play";

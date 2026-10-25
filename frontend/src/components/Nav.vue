@@ -29,11 +29,13 @@ const soundIcon = computed(() =>
 	isMuted.value ? iconSoundOff : iconSoundHigh,
 );
 
+// The crackle only downloads the first time someone turns the sound on.
 const toggleMute = () => {
 	isMuted.value = !isMuted.value;
-	if (audioRef?.value) {
-		audioRef.value.muted = isMuted.value;
-	}
+	const audio = audioRef?.value;
+	if (!audio) return;
+	audio.muted = isMuted.value;
+	if (!isMuted.value) audio.play().catch(() => {});
 };
 
 const toggleAnimations = () => {
