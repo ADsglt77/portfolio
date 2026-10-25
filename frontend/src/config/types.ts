@@ -105,7 +105,10 @@ export interface SiteConfig {
 	technologiesBanner: string[];
 	timeline: TimelineItem[];
 	projects: {
-		seeAllLabel: string;
+		/** Button that opens a project's detail sheet. */
+		detailsLabel: string;
+		/** Accessible name of the sheet's close button. */
+		closeLabel: string;
 		noMediaLabel: string;
 		posterAltTemplate: string;
 		ariaLabels: Required<ProjectLinks>;

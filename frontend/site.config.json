@@ -247,7 +247,8 @@
 	],
 
 	"projects": {
-		"seeAllLabel": "Voir tous les projets",
+		"detailsLabel": "En savoir plus",
+		"closeLabel": "Fermer",
 		"noMediaLabel": "Aucune vidéo disponible",
 		"posterAltTemplate": "Aperçu du projet {{title}}",
 		"ariaLabels": {

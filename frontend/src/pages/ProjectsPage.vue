@@ -1,79 +1,330 @@
 <script setup lang="ts">
+import { Icon } from "@iconify/vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { computed, ref } from "vue";
+import { ref, watch } from "vue";
 import Button from "../components/Button.vue";
-import ProjectCard from "../components/ProjectCard.vue";
+import ProjectLinks from "../components/ProjectLinks.vue";
+import ProjectSheet from "../components/ProjectSheet.vue";
+import ProjectTags from "../components/ProjectTags.vue";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
-import { iconExpand } from "../data/icons";
-import { projects } from "../data/projects";
+import { iconExpand, iconPlay } from "../data/icons";
+import { type Project, projects } from "../data/projects";
+import { useAnimationsEnabled } from "../injectionKeys";
+import { formatTemplate } from "../lib/format";
+import { scrambleText } from "../lib/textScramble";
 
-const INITIAL_COUNT = 6;
+const MAX_TECHNOLOGIES = 4;
+const { detailsLabel, noMediaLabel, posterAltTemplate } = config.projects;
+const posterAlt = (project: Project) =>
+	formatTemplate(posterAltTemplate, { title: project.title });
 
-const showAll = ref(false);
-const visibleProjects = computed(() =>
-	showAll.value ? projects : projects.slice(0, INITIAL_COUNT),
-);
+// With animations on, the section is a pinned "cinema": one project fills the screen at
+// a time and the scroll moves to the next one. With animations off, the projects are
+// simply stacked.
+const animationsEnabled = useAnimationsEnabled();
+const sectionRef = ref<HTMLElement | null>(null);
+const stageRef = ref<HTMLElement | null>(null);
+const slideRefs = ref<HTMLElement[]>([]);
+const active = ref(0);
+let stageVisible = false;
 
-const containerRef = ref<HTMLElement | null>(null);
+const playActiveVideo = () => {
+	slideRefs.value.forEach((slide, i) => {
+		const video = slide.querySelector("video");
+		if (!video) return;
+		if (animationsEnabled.value && stageVisible && i === active.value) {
+			video.play().catch(() => {});
+		} else {
+			video.pause();
+		}
+	});
+};
+
+const revealTitle = (index: number) => {
+	const title =
+		slideRefs.value[index]?.querySelector<HTMLElement>(".slide-title");
+	const project = projects[index];
+	if (title && project) scrambleText(title, project.title);
+};
+
+watch(active, (index) => {
+	revealTitle(index);
+	playActiveVideo();
+});
 
 useScrollScene(() => {
-	const cards = [...(containerRef.value?.children ?? [])];
-	// the cards' own hover transition would fight the entrance, so it is held until they land
-	gsap.set(cards, { opacity: 0, y: 60, transition: "none" });
-	ScrollTrigger.batch(cards, {
-		start: "top 88%",
-		once: true,
-		onEnter: (batch) =>
-			gsap.to(batch, {
-				opacity: 1,
-				y: 0,
-				duration: 0.9,
-				stagger: 0.12,
-				ease: "power3.out",
-				clearProps: "transition,transform,opacity",
-			}),
+	const slides = slideRefs.value;
+	const count = slides.length;
+	if (!stageRef.value || count < 2) return;
+	const media = slides.map((slide) => slide.querySelector(".slide-media"));
+	const content = slides.map((slide) => slide.querySelector(".slide-content"));
+
+	// waiting projects start hidden, their picture slightly closer, their text lower
+	gsap.set(slides.slice(1), { autoAlpha: 0 });
+	gsap.set(media.slice(1), { scale: 1.12 });
+	gsap.set(content.slice(1), { autoAlpha: 0, y: 60 });
+	const timeline = gsap.timeline({
+		scrollTrigger: {
+			trigger: stageRef.value,
+			start: "top top",
+			end: () => `+=${(count - 1) * window.innerHeight}`,
+			pin: true,
+			scrub: true,
+			invalidateOnRefresh: true,
+			onUpdate: (self) => {
+				active.value = Math.round(self.progress * (count - 1));
+			},
+		},
 	});
+	// Moving to the next project: the current one plunges forward and fades its text,
+	// the next one settles in on top of it, then its text rises.
+	for (let i = 1; i < count; i++) {
+		const at = i - 1;
+		timeline
+			.to(
+				content[i - 1] ?? [],
+				{ autoAlpha: 0, y: -60, duration: 0.35, ease: "power1.in" },
+				at,
+			)
+			.to(media[i - 1] ?? [], { scale: 1.15, duration: 1, ease: "none" }, at)
+			.fromTo(
+				slides[i] ?? [],
+				{ autoAlpha: 0 },
+				{ autoAlpha: 1, duration: 0.45, ease: "none", immediateRender: false },
+				at + 0.25,
+			)
+			.fromTo(
+				media[i] ?? [],
+				{ scale: 1.12 },
+				{ scale: 1, duration: 1, ease: "none", immediateRender: false },
+				at,
+			)
+			.fromTo(
+				content[i] ?? [],
+				{ autoAlpha: 0, y: 60 },
+				{
+					autoAlpha: 1,
+					y: 0,
+					duration: 0.3,
+					ease: "power1.out",
+					immediateRender: false,
+				},
+				at + 0.65,
+			)
+			.set(slides[i - 1] ?? [], { autoAlpha: 0 }, at + 0.7);
+	}
+
+	// the section (not the pinned stage) spans the whole pinned run
+	ScrollTrigger.create({
+		trigger: sectionRef.value,
+		start: "top bottom",
+		end: "bottom top",
+		onToggle: (self) => {
+			stageVisible = self.isActive;
+			playActiveVideo();
+		},
+		onEnter: () => revealTitle(active.value),
+	});
+
+	return () => {
+		// back to the stacked layout: every video stops on its poster again
+		stageVisible = false;
+		for (const video of stageRef.value?.querySelectorAll("video") ?? []) {
+			video.pause();
+			video.load();
+		}
+	};
 });
+
+// The detail sheet opens from where it was asked for.
+const selected = ref<Project | null>(null);
+const origin = ref({ x: 0, y: 0 });
+const openSheet = (project: Project, event: MouseEvent) => {
+	const target = event.currentTarget as HTMLElement | null;
+	const rect = target?.getBoundingClientRect();
+	const fromKeyboard = event.clientX === 0 && event.clientY === 0;
+	origin.value =
+		fromKeyboard && rect
+			? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+			: { x: event.clientX, y: event.clientY };
+	selected.value = project;
+};
 </script>
 
 <template>
-  <section id="projects" class="section projects">
-    <div ref="containerRef" class="projects-container">
-      <ProjectCard v-for="project in visibleProjects" :key="project.id" :project="project" />
+  <section id="projects" ref="sectionRef" class="section projects">
+    <div ref="stageRef" class="projects-stage" :class="{ 'is-cinema': animationsEnabled }">
+      <article
+        v-for="(project, index) in projects"
+        :key="project.id"
+        ref="slideRefs"
+        class="slide"
+        :inert="(animationsEnabled && index !== active) || undefined"
+      >
+        <div class="slide-media" aria-hidden="true">
+          <video
+            v-if="project.video"
+            :src="project.video"
+            :poster="project.poster"
+            muted
+            loop
+            playsinline
+            preload="none"
+            tabindex="-1"
+          ></video>
+          <img v-else-if="project.poster" :src="project.poster" :alt="posterAlt(project)" loading="lazy" />
+          <div v-else class="slide-placeholder">
+            <Icon :icon="iconPlay" :width="48" :height="48" />
+            <span>{{ noMediaLabel }}</span>
+          </div>
+        </div>
+        <div class="slide-shade" aria-hidden="true"></div>
+
+        <div class="slide-content">
+          <h3 class="slide-title">{{ project.title }}</h3>
+          <p class="slide-description">{{ project.description }}</p>
+          <ProjectTags :technologies="project.technologies" :max="MAX_TECHNOLOGIES" />
+          <div class="slide-actions">
+            <Button :icon="iconExpand" :label="detailsLabel" @click="openSheet(project, $event)" />
+            <ProjectLinks :links="project.links" />
+          </div>
+        </div>
+      </article>
+
+      <p v-if="animationsEnabled" class="projects-count" aria-hidden="true">
+        {{ active + 1 }} / {{ projects.length }}
+      </p>
     </div>
-    <div v-if="visibleProjects.length < projects.length" class="projects-more">
-      <Button :icon="iconExpand" :label="config.projects.seeAllLabel" @click="showAll = true" />
-    </div>
+
+    <ProjectSheet :project="selected" :origin="origin" @close="selected = null" />
   </section>
 </template>
 
 <style scoped>
 .section.projects {
-  height: 100%;
-  padding: var(--spacing-3xl) var(--spacing-xl);
+  display: block;
+  height: auto;
   min-height: auto;
+  padding: 0;
 }
 
-.projects-container {
-  width: 100%;
-  max-width: 80vw;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: var(--spacing-3xl);
+.projects-stage {
+  position: relative;
 }
 
-.projects-more {
+.slide {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-3xl);
+  align-items: flex-end;
+  overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .projects-container {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-2xl);
+.projects-stage.is-cinema {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.projects-stage.is-cinema .slide {
+  position: absolute;
+  inset: 0;
+}
+
+.projects-stage.is-cinema .slide:not(:first-of-type) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.slide-media {
+  position: absolute;
+  inset: 0;
+}
+
+.slide-media video,
+.slide-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.slide-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.45) 45%,
+    var(--bg)
+  );
+}
+
+.slide-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 60rem;
+  padding: var(--spacing-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.slide-title {
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.slide-description {
+  max-width: 60ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.slide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.projects-count {
+  position: absolute;
+  top: var(--spacing-xl);
+  right: var(--spacing-3xl);
+  z-index: 2;
+  color: var(--text);
+  opacity: 0.75;
+}
+
+@media (max-width: 900px) {
+  .slide-content {
+    padding: var(--spacing-xl);
+  }
+
+  .projects-count {
+    right: var(--spacing-xl);
   }
 }
 </style>
