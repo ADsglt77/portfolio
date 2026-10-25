@@ -2,6 +2,10 @@
 	"name": "portfolio",
 	"main": "./worker/index.ts",
 	"compatibility_date": "2026-10-12",
+	// the Worker answers for the whole domain; its DNS record stays as it is
+	"routes": [
+		{ "pattern": "adrien-segalat.fr/*", "zone_name": "adrien-segalat.fr" }
+	],
 	"assets": {
 		"directory": "./frontend/dist",
 		"not_found_handling": "single-page-application",
