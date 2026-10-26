@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed, onUnmounted, provide, ref, watch, watchEffect } from "vue";
+import {
+	computed,
+	onMounted,
+	onUnmounted,
+	provide,
+	ref,
+	watch,
+	watchEffect,
+} from "vue";
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
 import Nav from "./components/Nav.vue";
@@ -22,7 +30,16 @@ import TimelinePage from "./pages/TimelinePage.vue";
 
 const { hero } = config;
 
-const entered = ref(false);
+const STORAGE_INTRO = "portfolio-intro-seen";
+const readIntroSeen = () => {
+	try {
+		return localStorage.getItem(STORAGE_INTRO) === "true";
+	} catch {
+		return false;
+	}
+};
+
+const entered = ref(readIntroSeen());
 const isButtonFading = ref(false);
 const audioRef = ref<HTMLAudioElement>();
 
@@ -77,8 +94,27 @@ const handleEnter = () => {
 	setTimeout(() => {
 		entered.value = true;
 		startLenis();
-	}, 1000);
+		try {
+			localStorage.setItem(STORAGE_INTRO, "true");
+		} catch {
+			/* storage unavailable */
+		}
+	}, 350);
 };
+
+const skipIntro = () => {
+	entered.value = true;
+	startLenis();
+	try {
+		localStorage.setItem(STORAGE_INTRO, "true");
+	} catch {
+		/* storage unavailable */
+	}
+};
+
+onMounted(() => {
+	if (entered.value) startLenis();
+});
 
 watchEffect(() => {
 	document.body.style.overflow = entered.value ? "" : "hidden";
@@ -120,6 +156,9 @@ onUnmounted(() => {
           @click="handleEnter"
         />
       </Transition>
+      <button type="button" class="skip-intro" @click="skipIntro">
+        {{ hero.skipIntroLabel }}
+      </button>
     </div>
   </div>
 
@@ -158,16 +197,40 @@ h1 {
   top: 15%;
   color: var(--muted);
   z-index: 100;
+  min-height: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease 0.6s;
+  transition: opacity 0.2s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.skip-intro {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--font-size-span);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.skip-intro:hover,
+.skip-intro:focus-visible {
+  color: var(--text);
 }
 
 .gradient-overlay {

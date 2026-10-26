@@ -29,7 +29,7 @@ export function scrambleText(
 		return;
 	}
 
-	const { duration = 1000, fps = 10 } = options;
+	const { duration = 500, fps = 15 } = options;
 	const frameTime = 1000 / fps;
 	const totalFrames = Math.ceil(duration / frameTime);
 	let frame = 0;

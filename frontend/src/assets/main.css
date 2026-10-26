@@ -155,7 +155,7 @@ span {
 
 /* Animations */
 .overlay--fade {
-	animation: fade-out 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	animation: fade-out 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fade-out {
@@ -168,8 +168,8 @@ span {
 }
 
 .visible {
-	animation: fade-in 0.5s ease-out forwards;
-	animation-delay: 1s;
+	animation: fade-in 0.45s ease-out forwards;
+	animation-delay: 0.2s;
 }
 
 @keyframes fade-in {
@@ -182,8 +182,8 @@ span {
 }
 
 .slide-up {
-	animation: slide-up 1.5s ease-out forwards;
-	animation-delay: 1s;
+	animation: slide-up 0.65s ease-out forwards;
+	animation-delay: 0.2s;
 }
 
 @keyframes slide-up {
@@ -198,8 +198,8 @@ span {
 }
 
 .slide-left {
-	animation: slide-left 1.5s ease-out forwards;
-	animation-delay: 1s;
+	animation: slide-left 0.65s ease-out forwards;
+	animation-delay: 0.2s;
 }
 
 @keyframes slide-left {
@@ -214,8 +214,8 @@ span {
 }
 
 .slide-right {
-	animation: slide-right 1.5s ease-out forwards;
-	animation-delay: 1s;
+	animation: slide-right 0.65s ease-out forwards;
+	animation-delay: 0.2s;
 }
 
 @keyframes slide-right {
@@ -257,7 +257,7 @@ span {
 }
 
 .button--fade {
-	animation: button-fade 1s ease-out forwards;
+	animation: button-fade 0.35s ease-out forwards;
 }
 
 @keyframes button-fade {
@@ -288,6 +288,7 @@ span {
 }
 
 html.animations-off .site-content .visible,
+html.animations-off .site-content .overlay--fade,
 html.animations-off .site-content .slide-up,
 html.animations-off .site-content .slide-left,
 html.animations-off .site-content .slide-right,

@@ -29,6 +29,7 @@
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
+		"skipIntroLabel": "PASSER L'INTRO",
 		"backgroundImage": "/img/background.webp",
 		"ambientSound": "/sound/Flickering-Flames.mp3"
 	},
@@ -48,7 +49,7 @@
 	},
 
 	"contact": {
-		"title": "Contactez moi",
+		"title": "Contactez-moi",
 		"image": {
 			"src": "/img/contact.webp",
 			"alt": "Feu de camp au bord d'un lac dans la brume"

@@ -10,14 +10,22 @@ import { useEntered } from "../injectionKeys";
 const { hero } = config;
 const entered = useEntered();
 const showElements = ref(false);
+let revealTimer: number | undefined;
 
-watch(entered, (val) => {
-	if (val) {
-		setTimeout(() => {
-			showElements.value = true;
-		}, 1000);
-	}
-});
+watch(
+	entered,
+	(val) => {
+		if (revealTimer !== undefined) window.clearTimeout(revealTimer);
+		if (val) {
+			revealTimer = window.setTimeout(() => {
+				showElements.value = true;
+			}, 150);
+		} else {
+			showElements.value = false;
+		}
+	},
+	{ immediate: true },
+);
 
 const sectionRef = ref<HTMLElement | null>(null);
 const titleRef = ref<HTMLElement | null>(null);
@@ -78,6 +86,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+	if (revealTimer !== undefined) window.clearTimeout(revealTimer);
 	if (timeIntervalId !== undefined) {
 		clearInterval(timeIntervalId);
 	}
