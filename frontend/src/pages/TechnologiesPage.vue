@@ -67,9 +67,10 @@ useScrollScene(() => {
 <template>
   <section id="tech" ref="sectionRef" class="section technologies">
     <div
-      v-for="row in rows"
+      v-for="(row, rowIndex) in rows"
       :key="row.direction"
       :class="['tech-row', `tech-row--${row.direction}`]"
+      :aria-hidden="rowIndex > 0 || undefined"
     >
       <div ref="trackRefs" class="tech-row-inner">
         <a
@@ -78,8 +79,8 @@ useScrollScene(() => {
           class="tech-item"
           :href="tech.linkLabel ? '#projects' : undefined"
           :aria-label="tech.linkLabel"
-          :aria-hidden="index >= row.items.length / 2 || undefined"
-          :tabindex="index >= row.items.length / 2 ? -1 : undefined"
+          :aria-hidden="rowIndex > 0 || index >= row.items.length / 2 || undefined"
+          :tabindex="rowIndex > 0 || index >= row.items.length / 2 ? -1 : undefined"
           @click.prevent="showProject(tech.project)"
         >
           <Icon :icon="tech.icon" :width="36" :height="36" />

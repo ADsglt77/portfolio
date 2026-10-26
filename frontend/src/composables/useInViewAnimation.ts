@@ -24,6 +24,7 @@ export function useInViewAnimation(
 
 	let observer: IntersectionObserver | null = null;
 	let played = false;
+	let applyId = 0;
 
 	const disconnect = () => {
 		observer?.disconnect();
@@ -31,8 +32,10 @@ export function useInViewAnimation(
 	};
 
 	const apply = async () => {
+		const currentApplyId = ++applyId;
 		if (!entered.value) return;
 		await nextTick();
+		if (currentApplyId !== applyId) return;
 		disconnect();
 
 		if (!animationsEnabled.value) {
@@ -62,5 +65,8 @@ export function useInViewAnimation(
 	};
 
 	watch([entered, animationsEnabled], apply, { immediate: true });
-	onUnmounted(disconnect);
+	onUnmounted(() => {
+		applyId++;
+		disconnect();
+	});
 }

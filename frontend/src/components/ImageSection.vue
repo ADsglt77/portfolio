@@ -20,7 +20,7 @@ const imageRef = ref<HTMLImageElement | null>(null);
 
 usePinnedTyping(sectionRef, props.title, displayedText, {
 	threshold: 0.3,
-	typingDuration: 2000,
+	typingDuration: 800,
 });
 
 // The picture drifts inside its frame while the section crosses the screen.
@@ -47,7 +47,9 @@ useScrollScene(() => {
 		<img ref="imageRef" :src="image.src" :alt="image.alt" loading="lazy" />
 		<div class="title" :style="{ gridArea: titleArea }">
 			<h2 class="heading-stroke" aria-hidden="true">{{ displayedText }}</h2>
-			<h2 class="heading">{{ displayedText }}</h2>
+			<h2 class="heading" :aria-label="title">
+				<span aria-hidden="true">{{ displayedText }}</span>
+			</h2>
 		</div>
 		<slot />
 	</section>
@@ -91,7 +93,15 @@ img {
 
 .heading {
 	color: var(--text);
+	-webkit-text-fill-color: var(--text);
 	z-index: 2;
+}
+
+:global(html.animations-off) .heading {
+	opacity: 1;
+	visibility: visible;
+	color: var(--text);
+	-webkit-text-fill-color: var(--text);
 }
 
 @media (max-width: 900px) {

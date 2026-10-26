@@ -28,9 +28,20 @@ interface LenisOptions {
 /** The site's long glide to a section, or to a scroll position. */
 export function glideTo(target: HTMLElement | number): void {
 	state.lenis?.scrollTo(target, {
-		duration: 5,
+		duration: 1.1,
 		easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
 	});
+}
+
+/** Repositions the page without an animated glide. */
+export function jumpTo(target: HTMLElement | number): void {
+	if (state.lenis) {
+		state.lenis.scrollTo(target, { immediate: true, force: true });
+		return;
+	}
+
+	const top = typeof target === "number" ? target : target.offsetTop;
+	window.scrollTo({ top, behavior: "auto" });
 }
 
 export function useLenis(options: LenisOptions = {}) {

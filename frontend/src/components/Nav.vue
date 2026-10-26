@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
-import { glideTo } from "../composables/useLenis";
+import {
+	computed,
+	inject,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	watch,
+} from "vue";
+import { glideTo, jumpTo } from "../composables/useLenis";
 import { config } from "../config";
 import {
 	iconCancel,
@@ -38,8 +46,47 @@ const toggleMute = () => {
 	if (!isMuted.value) audio.play().catch(() => {});
 };
 
-const toggleAnimations = () => {
+type ScrollAnchor = { id: string; progress: number };
+
+const getScrollAnchor = (): ScrollAnchor | null => {
+	const viewportCenter = window.innerHeight / 2;
+	const sections = document.querySelectorAll<HTMLElement>("main section[id]");
+	for (const section of sections) {
+		const rect = section.getBoundingClientRect();
+		if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
+			return {
+				id: section.id,
+				progress: Math.min(
+					1,
+					Math.max(0, (viewportCenter - rect.top) / Math.max(rect.height, 1)),
+				),
+			};
+		}
+	}
+	return null;
+};
+
+const nextFrame = () =>
+	new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+const toggleAnimations = async () => {
+	const anchor = getScrollAnchor();
 	animationsEnabled.value = !animationsEnabled.value;
+
+	await nextTick();
+	await nextFrame();
+	await nextFrame();
+
+	if (!anchor) return;
+	const section = document.getElementById(anchor.id);
+	if (!section) return;
+	const rect = section.getBoundingClientRect();
+	const top =
+		window.scrollY +
+		rect.top +
+		anchor.progress * rect.height -
+		window.innerHeight / 2;
+	jumpTo(Math.max(0, top));
 };
 
 const handleClickOutside = (e: MouseEvent) => {
@@ -115,11 +162,12 @@ const scrollToSection = (e: Event, href: string) => {
       :href="link.href"
       class="nav-link"
       :class="{ 'is-active': link.href === activeHref }"
+      :aria-label="link.label"
       :aria-current="link.href === activeHref ? 'location' : undefined"
       @click="scrollToSection($event, link.href)"
       @mouseenter="scramble($event.currentTarget as Element, link.label)"
     >
-      <span>{{ link.label }}</span>
+      <span aria-hidden="true">{{ link.label }}</span>
     </a>
     <div class="nav-mobile">
       <Button
@@ -215,7 +263,7 @@ nav {
    end would stop the panels from blurring the page behind them */
 nav.visible {
   opacity: 1;
-  animation-delay: 2s;
+  animation-delay: 0.25s;
   animation-fill-mode: backwards;
 }
 

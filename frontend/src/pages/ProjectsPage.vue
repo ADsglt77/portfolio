@@ -44,7 +44,7 @@ const playActiveVideo = () => {
 
 const revealTitle = (index: number) => {
 	const title =
-		slideRefs.value[index]?.querySelector<HTMLElement>(".slide-title");
+		slideRefs.value[index]?.querySelector<HTMLElement>(".slide-title-text");
 	const project = projects[index];
 	if (title && project) scrambleText(title, project.title);
 };
@@ -183,7 +183,9 @@ const openSheet = (project: Project, event: MouseEvent) => {
 
         <div class="slide-content">
           <p class="slide-count">{{ index + 1 }} / {{ projects.length }}</p>
-          <h3 class="slide-title">{{ project.title }}</h3>
+          <h3 class="slide-title" :aria-label="project.title">
+            <span class="slide-title-text" aria-hidden="true">{{ project.title }}</span>
+          </h3>
           <p class="slide-description">{{ project.description }}</p>
           <ProjectTags :technologies="project.technologies" :max="MAX_TECHNOLOGIES" />
           <div class="slide-actions">

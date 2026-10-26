@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed, ref } from "vue";
+import { computed, ref, useAttrs } from "vue";
 import { iconCheck, iconClose } from "../data/icons";
 import { useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
@@ -27,8 +27,16 @@ const props = withDefaults(defineProps<Props>(), {
 	error: false,
 });
 
+defineOptions({ inheritAttrs: false });
+
 const animationsEnabled = useAnimationsEnabled();
+const attrs = useAttrs();
 const labelRef = ref<HTMLElement>();
+
+const accessibleLabel = computed(() => {
+	const ariaLabel = attrs["aria-label"];
+	return typeof ariaLabel === "string" ? ariaLabel : props.label || undefined;
+});
 
 const currentIcon = computed(() => {
 	if (props.error) return iconClose;
@@ -47,10 +55,12 @@ const handleMouseEnter = () => {
 
 <template>
   <button
+    v-bind="attrs"
     :type="type"
     :class="{ 'btn--success': success, 'btn--error': error }"
     :style="{ padding, borderRadius }"
     :disabled="disabled"
+    :aria-label="accessibleLabel"
     @mouseenter="handleMouseEnter"
   >
     <Icon
@@ -62,7 +72,7 @@ const handleMouseEnter = () => {
       aria-hidden
     />
     <slot>
-      <span ref="labelRef" class="btn__label">{{ label }}</span>
+      <span ref="labelRef" class="btn__label" aria-hidden="true">{{ label }}</span>
     </slot>
   </button>
 </template>
