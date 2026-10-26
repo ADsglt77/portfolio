@@ -9,7 +9,7 @@ import siteConfig from "./site.config.json";
  * index.html, so crawlers and link previews see them without running JS.
  */
 function siteHead(): Plugin {
-	const { site, theme } = siteConfig;
+	const { hero, site, social, theme } = siteConfig;
 	const meta = (attrs: Record<string, string>): HtmlTagDescriptor => ({
 		tag: "meta",
 		attrs,
@@ -22,18 +22,52 @@ function siteHead(): Plugin {
 		`--font-title: "${theme.fonts.title}", sans-serif;`,
 		`--font-mono: "${theme.fonts.mono}", monospace;`,
 	].join(" ");
+	const imageUrl = new URL(site.image, site.url).href;
+	const structuredData = JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "Person",
+		name: site.name,
+		url: site.url,
+		image: imageUrl,
+		jobTitle: site.jobTitle,
+		description: site.description,
+		sameAs: social.map((link) => link.url),
+	});
 
 	const tags: HtmlTagDescriptor[] = [
 		{ tag: "title", children: site.title },
 		meta({ name: "description", content: site.description }),
+		meta({ name: "author", content: site.name }),
+		meta({ name: "keywords", content: site.keywords.join(", ") }),
+		meta({ name: "robots", content: "index, follow, max-image-preview:large" }),
 		meta({ name: "theme-color", content: site.themeColor }),
 		meta({ property: "og:type", content: "website" }),
+		meta({ property: "og:locale", content: site.locale }),
 		meta({ property: "og:site_name", content: site.name }),
 		meta({ property: "og:title", content: site.title }),
 		meta({ property: "og:description", content: site.description }),
 		meta({ property: "og:url", content: site.url }),
-		meta({ property: "og:image", content: new URL(site.image, site.url).href }),
+		meta({ property: "og:image", content: imageUrl }),
+		meta({ property: "og:image:alt", content: `Portfolio de ${site.name}` }),
 		meta({ name: "twitter:card", content: "summary_large_image" }),
+		meta({ name: "twitter:title", content: site.title }),
+		meta({ name: "twitter:description", content: site.description }),
+		meta({ name: "twitter:image", content: imageUrl }),
+		{ tag: "link", attrs: { rel: "canonical", href: site.url } },
+		{
+			tag: "link",
+			attrs: {
+				rel: "preload",
+				as: "image",
+				href: hero.backgroundImage,
+				fetchpriority: "high",
+			},
+		},
+		{
+			tag: "script",
+			attrs: { type: "application/ld+json" },
+			children: structuredData,
+		},
 		{ tag: "style", children: `:root { ${themeVars} }` },
 		{
 			tag: "link",

@@ -35,8 +35,8 @@ useTextReveal(paragraphRef, about.paragraph, {
 
 useFadeIn(buttonRef, {
 	threshold: 0.5,
-	duration: 1500,
-	delay: 300,
+	duration: 650,
+	delay: 120,
 	translateY: 0,
 });
 </script>
@@ -44,7 +44,8 @@ useFadeIn(buttonRef, {
 <template>
   <ImageSection id="about" :title="about.title" :image="about.image" title-area="1 / 2 / 3 / 5">
     <div class="subtitle">
-      <p ref="paragraphRef"></p>
+			<p class="sr-only">{{ about.paragraph }}</p>
+      <p ref="paragraphRef" aria-hidden="true"></p>
       <div class="actions">
         <div ref="buttonRef">
           <Button

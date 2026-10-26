@@ -41,15 +41,25 @@ useScrollScene(() => {
 	const animations = trackRefs.value.flatMap((track) => track.getAnimations());
 	let velocity = 0;
 	let rate = 1;
+	let visible = false;
+	for (const animation of animations) animation.pause();
 	ScrollTrigger.create({
 		trigger: sectionRef.value,
 		start: "top bottom",
 		end: "bottom top",
+		onToggle: (self) => {
+			visible = self.isActive;
+			for (const animation of animations) {
+				if (visible) animation.play();
+				else animation.pause();
+			}
+		},
 		onUpdate: (self) => {
 			velocity = self.getVelocity();
 		},
 	});
 	const tick = () => {
+		if (!visible) return;
 		velocity *= 0.9;
 		const target =
 			(velocity < -1 ? -1 : 1) * (1 + Math.min(Math.abs(velocity) / 300, 8));
@@ -125,6 +135,10 @@ useScrollScene(() => {
 
 .tech-row:has(.tech-item:hover) .tech-row-inner {
   animation-play-state: paused;
+}
+
+:global(html.animations-off) .tech-row-inner {
+	animation: none;
 }
 
 .tech-item {

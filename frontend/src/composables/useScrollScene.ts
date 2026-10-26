@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { nextTick, onUnmounted, watch } from "vue";
+import { nextTick, onUnmounted, type Ref, watch } from "vue";
 import { useAnimationsEnabled, useEntered } from "../injectionKeys";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -10,7 +10,10 @@ gsap.registerPlugin(ScrollTrigger);
  * (back to the page's own styles) when animations are turned off or on unmount.
  * `build` runs inside a gsap.context and may return a cleanup function.
  */
-export function useScrollScene(build: () => void | (() => void)) {
+export function useScrollScene(
+	build: () => void | (() => void),
+	dependencies: Ref<unknown>[] = [],
+) {
 	const entered = useEntered();
 	const animationsEnabled = useAnimationsEnabled();
 	let ctx: gsap.Context | null = null;
@@ -24,6 +27,8 @@ export function useScrollScene(build: () => void | (() => void)) {
 		ScrollTrigger.refresh();
 	};
 
-	watch([entered, animationsEnabled], apply, { immediate: true });
+	watch([entered, animationsEnabled, ...dependencies], apply, {
+		immediate: true,
+	});
 	onUnmounted(() => ctx?.revert());
 }

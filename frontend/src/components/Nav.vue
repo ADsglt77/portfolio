@@ -154,6 +154,7 @@ const scrollToSection = (e: Event, href: string) => {
 <template>
   <nav
     ref="navRef"
+    :aria-label="config.nav.label"
     :class="{ visible: entered, 'over-hero': activeHref === '#home' }"
   >
     <a
@@ -175,6 +176,7 @@ const scrollToSection = (e: Event, href: string) => {
         borderRadius="50%"
         class="nav-hamburger"
         :aria-expanded="showMobileMenu"
+        aria-controls="mobile-navigation"
         :aria-label="menuLabel"
         @click="showMobileMenu = !showMobileMenu"
       >
@@ -186,7 +188,7 @@ const scrollToSection = (e: Event, href: string) => {
         />
       </Button>
       <Transition name="panel-fade">
-        <div v-show="showMobileMenu" class="nav-panel mobile-menu-panel">
+        <div id="mobile-navigation" v-show="showMobileMenu" class="nav-panel mobile-menu-panel">
           <a
             v-for="link in links"
             :key="link.href"
@@ -206,13 +208,14 @@ const scrollToSection = (e: Event, href: string) => {
         padding="0.6rem"
         borderRadius="50%"
         :aria-expanded="showSettings"
+        aria-controls="navigation-settings"
         :aria-label="settings.label"
         @click="showSettings = !showSettings"
       >
         <Icon :icon="iconSettings" :width="16" :height="16" :stroke-width="3" />
       </Button>
       <Transition name="panel-fade">
-        <div v-show="showSettings" class="nav-panel settings-panel">
+        <div id="navigation-settings" v-show="showSettings" class="nav-panel settings-panel">
           <div class="settings-row">
             <span>{{ settings.soundLabel }}</span>
             <button
@@ -344,8 +347,8 @@ nav.over-hero::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   padding: 0;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);

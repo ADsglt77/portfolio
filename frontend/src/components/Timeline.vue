@@ -86,13 +86,13 @@ onUnmounted(() => {
 
 <template>
   <div class="timeline">
-    <div ref="containerRef" class="timeline-container">
+    <ol ref="containerRef" class="timeline-container">
       <div class="timeline-line">
         <div ref="lineFillRef" class="timeline-line-fill"></div>
       </div>
-      <div
+      <li
         v-for="(item, index) in items"
-        :key="index"
+		:key="`${item.date}-${item.organization}`"
         :class="['timeline-item', index % 2 === 0 ? 'timeline-item--left' : 'timeline-item--right']"
       >
         <div class="timeline-marker">
@@ -110,6 +110,7 @@ onUnmounted(() => {
             <Icon
               :icon="item.type === 'formation' ? iconFormation : iconWork"
               class="timeline-icon"
+							aria-hidden="true"
             />
             <h4>{{ item.organization }}</h4>
           </div>
@@ -120,16 +121,17 @@ onUnmounted(() => {
             <p>{{ item.description }}</p>
           </div>
         </div>
-      </div>
-    </div>
+      </li>
+    </ol>
   </div>
 </template>
 
 <style scoped>
 .timeline {
   width: 100%;
+	max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--spacing-3xl) var(--spacing-xl);
+	padding: 0;
 }
 
 .timeline-container {
@@ -156,7 +158,7 @@ onUnmounted(() => {
 
 .timeline-item {
   position: relative;
-  margin-bottom: var(--spacing-3xl);
+  margin-bottom: var(--spacing-2xl);
   display: flex;
   align-items: flex-start;
 }
@@ -217,12 +219,18 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   width: calc(50% - var(--spacing-3xl));
-  background: color-mix(in srgb, var(--text) 8%, transparent);
+	background: var(--surface);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   backdrop-filter: blur(10px);
   gap: var(--spacing-sm);
+	transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.timeline-content:hover {
+	background: var(--surface-strong);
+	border-color: var(--glass-border-hover);
 }
 
 .timeline-date {

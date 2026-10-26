@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import Button from "../components/Button.vue";
 import ImageSection from "../components/ImageSection.vue";
 import Input from "../components/Input.vue";
@@ -33,15 +33,19 @@ const FEEDBACK_DURATION = 3000;
 
 const { contact } = config;
 const { form } = contact;
+const linkedin = config.social.find((link) =>
+	link.url.includes("linkedin.com"),
+);
 
-const formRef = ref<HTMLElement | null>(null);
+const panelRef = ref<HTMLElement | null>(null);
+const formRef = ref<HTMLFormElement | null>(null);
 
-useCampfireSound(formRef);
+useCampfireSound(panelRef);
 
-useFadeIn(formRef, {
-	threshold: 0.5,
-	duration: 1500,
-	delay: 500,
+useFadeIn(panelRef, {
+	threshold: 0.1,
+	duration: 650,
+	delay: 60,
 	translateY: 30,
 });
 
@@ -96,6 +100,8 @@ const handleSubmit = async () => {
 
 	if (!validateForm()) {
 		showTemporaryState(isError);
+		await nextTick();
+		formRef.value?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
 		return;
 	}
 
@@ -128,49 +134,87 @@ const handleSubmit = async () => {
 
 <template>
   <ImageSection id="contact" :title="contact.title" :image="contact.image" title-area="1 / 2 / 2 / 5">
-    <form ref="formRef" novalidate @submit.prevent="handleSubmit">
-      <Input
-        v-for="field in FIELDS"
-        :id="field.key"
-        :key="field.key"
-        v-model="formData[field.key]"
-        :type="field.type"
-        :textarea="field.textarea"
-        :label="form[field.key].label"
-        :placeholder="form[field.key].placeholder"
-        :error="errors[field.key]"
-      />
-      <div class="actions">
-        <Button
-          type="submit"
-          :icon="iconSend"
-          :label="isSubmitting ? form.submittingLabel : form.submitLabel"
-          :disabled="isSubmitting"
-          :success="isSuccess"
-          :error="isError"
+    <div ref="panelRef" class="contact-panel">
+      <header class="contact-intro">
+        <p class="section-eyebrow">{{ contact.eyebrow }}</p>
+        <p>{{ contact.intro }}</p>
+        <p v-if="linkedin" class="contact-alternative">
+          {{ contact.alternativeLabel }}
+          <a :href="linkedin.url" target="_blank" rel="noopener noreferrer">
+            {{ contact.linkedinLabel }}
+          </a>
+        </p>
+      </header>
+      <form ref="formRef" novalidate @submit.prevent="handleSubmit">
+        <Input
+          v-for="field in FIELDS"
+          :id="field.key"
+          :key="field.key"
+          v-model="formData[field.key]"
+          :type="field.type"
+          :textarea="field.textarea"
+          :label="form[field.key].label"
+          :placeholder="form[field.key].placeholder"
+          :error="errors[field.key]"
         />
-        <div class="captcha-block">
-          <div ref="turnstileContainerRef" class="turnstile-widget" />
-          <p v-if="captchaLoadError" class="captcha-error">
-            {{ form.captcha.loadError }}
-          </p>
-          <p v-else-if="captchaError" class="captcha-error">
-            {{ captchaError }}
-          </p>
+        <div class="actions">
+          <Button
+            type="submit"
+            :icon="iconSend"
+            :label="isSubmitting ? form.submittingLabel : form.submitLabel"
+            :disabled="isSubmitting"
+            :success="isSuccess"
+            :error="isError"
+          />
+          <div class="captcha-block">
+            <div ref="turnstileContainerRef" class="turnstile-widget" />
+            <p v-if="captchaLoadError" class="captcha-error" role="alert">
+              {{ form.captcha.loadError }}
+            </p>
+            <p v-else-if="captchaError" class="captcha-error" role="alert">
+              {{ captchaError }}
+            </p>
+          </div>
         </div>
-      </div>
-    </form>
+        <p class="sr-only" aria-live="polite">
+          {{ isSuccess ? form.successMessage : isError ? form.errorMessage : "" }}
+        </p>
+      </form>
+    </div>
   </ImageSection>
 </template>
 
 <style scoped>
-form {
+.contact-panel {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-sm);
+	gap: var(--spacing-lg);
 	align-self: center;
 	grid-area: 2 / 3 / 7 / 5;
+}
+
+.contact-intro {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-sm);
+	max-width: 58ch;
+}
+
+.contact-intro > p:not(.section-eyebrow) {
+	color: var(--muted);
+}
+
+.contact-alternative a {
+	color: var(--text);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
 }
 
 form .actions {
@@ -195,7 +239,7 @@ form .actions button {
 }
 
 @media (max-width: 900px) {
-	form {
+	.contact-panel {
 		max-width: 100%;
 	}
 

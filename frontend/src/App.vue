@@ -67,6 +67,10 @@ watchEffect(() => {
 		"animations-off",
 		!animationsEnabled.value,
 	);
+	document.documentElement.classList.toggle(
+		"animations-on",
+		animationsEnabled.value,
+	);
 });
 // Only an explicit toggle is saved, so the system setting keeps applying until then.
 watch(animationsEnabled, (enabled) => {
@@ -135,8 +139,17 @@ onUnmounted(() => {
     muted
   ></audio>
 
-  <div v-show="!entered" class="loader" role="dialog" aria-modal="true">
+  <a v-if="entered" class="skip-link" href="#main-content">Aller au contenu</a>
+
+  <div
+    v-show="!entered"
+    class="loader"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="loader-title"
+  >
     <h1
+      id="loader-title"
       :style="{
         backgroundImage: `linear-gradient(to right, var(--text) 0%, var(--text) ${progress}%, color-mix(in srgb, var(--text) 10%, transparent) ${progress}%, color-mix(in srgb, var(--text) 10%, transparent) 100%)`,
       }"
@@ -162,7 +175,7 @@ onUnmounted(() => {
     </div>
   </div>
 
-  <main v-show="entered" class="site-content">
+  <main id="main-content" v-show="entered" class="site-content" tabindex="-1">
     <Nav />
     <HomePage />
     <div class="gradient-overlay"></div>
@@ -182,6 +195,23 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+  z-index: 1000;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  transform: translateY(-200%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 h1 {

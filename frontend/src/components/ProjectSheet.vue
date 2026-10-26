@@ -54,6 +54,7 @@ watch(
 		getLenis?.()?.stop();
 		document.documentElement.style.overflow = "hidden";
 		dialog.showModal();
+		dialog.querySelector<HTMLElement>(".sheet-close")?.focus();
 		reveal(true);
 	},
 );

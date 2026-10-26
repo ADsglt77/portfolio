@@ -5,6 +5,10 @@
 	--glass-hover: rgb(255, 255, 255, 0.2);
 	--glass-border: rgb(255, 255, 255, 0.3);
 	--glass-border-hover: rgb(255, 255, 255, 0.4);
+	--surface: color-mix(in srgb, var(--text) 7%, transparent);
+	--surface-strong: color-mix(in srgb, var(--text) 12%, transparent);
+	--content-max: 1200px;
+	--page-gutter: clamp(1.25rem, 4vw, 4rem);
 
 	/* Typography Sizes */
 	--font-size-h1: clamp(4rem, 16vw, 12rem); /* Hero title */
@@ -77,6 +81,33 @@ body {
 	font-family: var(--font-mono);
 	color: var(--text);
 	background: var(--bg);
+	line-height: 1.6;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: var(--text);
+	color: var(--bg);
+}
+
+.sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+.section-eyebrow {
+	color: var(--muted);
+	font-size: var(--font-size-span);
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
 }
 
 /* Sections */
@@ -296,4 +327,15 @@ html.animations-off .site-content .scroll-icon,
 html.animations-off .site-content .immersive-bg {
 	animation-duration: 0s;
 	animation-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html:not(.animations-on) *,
+	html:not(.animations-on) *::before,
+	html:not(.animations-on) *::after {
+		scroll-behavior: auto !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
 }

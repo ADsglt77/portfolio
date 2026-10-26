@@ -1,34 +1,52 @@
 <script setup lang="ts">
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import Button from "../components/Button.vue";
 import ProjectLinks from "../components/ProjectLinks.vue";
 import ProjectMedia from "../components/ProjectMedia.vue";
 import ProjectSheet from "../components/ProjectSheet.vue";
 import ProjectTags from "../components/ProjectTags.vue";
 import { glideTo } from "../composables/useLenis";
+import { useMediaQuery } from "../composables/useMediaQuery";
 import { useProjectToShow } from "../composables/useProjectToShow";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
-import { iconExpand } from "../data/icons";
+import { iconArrowLeft, iconArrowRight, iconExpand } from "../data/icons";
 import { type Project, projects } from "../data/projects";
 import { useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
+import { formatTemplate } from "../lib/format";
 
 const MAX_TECHNOLOGIES = 4;
-const { detailsLabel } = config.projects;
+const {
+	detailsLabel,
+	eyebrow,
+	title: sectionTitle,
+	navigationLabel,
+	previousLabel,
+	nextLabel,
+	swipeHint,
+	projectLabelTemplate,
+} = config.projects;
 
 // With animations on, the section is a pinned "cinema": one project fills the screen at
 // a time and the scroll moves to the next one. With animations off, the projects are
 // simply stacked.
 const animationsEnabled = useAnimationsEnabled();
+const isMobile = useMediaQuery("(max-width: 900px)");
+const cinemaEnabled = computed(
+	() => animationsEnabled.value && !isMobile.value,
+);
 const sectionRef = ref<HTMLElement | null>(null);
+const frameRef = ref<HTMLElement | null>(null);
 const stageRef = ref<HTMLElement | null>(null);
 const slideRefs = ref<HTMLElement[]>([]);
 const active = ref(0);
 let stageVisible = false;
 let cinema: ScrollTrigger | undefined;
+let stageObserver: IntersectionObserver | null = null;
+let scrollFrame = 0;
 
 const playActiveVideo = () => {
 	slideRefs.value.forEach((slide, i) => {
@@ -55,9 +73,10 @@ watch(active, (index) => {
 });
 
 useScrollScene(() => {
+	if (isMobile.value) return;
 	const slides = slideRefs.value;
 	const count = slides.length;
-	if (!stageRef.value || count < 2) return;
+	if (!frameRef.value || !stageRef.value || count < 2) return;
 	const media = slides.map((slide) => slide.querySelector(".slide-media"));
 	const content = slides.map((slide) => slide.querySelector(".slide-content"));
 
@@ -67,10 +86,10 @@ useScrollScene(() => {
 	gsap.set(content.slice(1), { autoAlpha: 0, y: 60 });
 	const timeline = gsap.timeline({
 		scrollTrigger: {
-			trigger: stageRef.value,
+			trigger: frameRef.value,
 			start: "top top",
 			end: () => `+=${(count - 1) * window.innerHeight}`,
-			pin: true,
+			pin: frameRef.value,
 			scrub: true,
 			invalidateOnRefresh: true,
 			onUpdate: (self) => {
@@ -118,17 +137,6 @@ useScrollScene(() => {
 	cinema = timeline.scrollTrigger;
 
 	// the section (not the pinned stage) spans the whole pinned run
-	ScrollTrigger.create({
-		trigger: sectionRef.value,
-		start: "top bottom",
-		end: "bottom top",
-		onToggle: (self) => {
-			stageVisible = self.isActive;
-			playActiveVideo();
-		},
-		onEnter: () => revealTitle(active.value),
-	});
-
 	return () => {
 		// back to the stacked layout: every video stops on its poster again
 		cinema = undefined;
@@ -138,7 +146,56 @@ useScrollScene(() => {
 			video.load();
 		}
 	};
+}, [isMobile]);
+
+onMounted(() => {
+	if (!frameRef.value) return;
+	stageObserver = new IntersectionObserver(
+		([entry]) => {
+			stageVisible = entry?.isIntersecting ?? false;
+			if (stageVisible) revealTitle(active.value);
+			playActiveVideo();
+		},
+		{ threshold: 0.25 },
+	);
+	stageObserver.observe(frameRef.value);
 });
+
+onUnmounted(() => {
+	stageObserver?.disconnect();
+	cancelAnimationFrame(scrollFrame);
+});
+
+const handleMobileScroll = () => {
+	if (!isMobile.value || !stageRef.value) return;
+	cancelAnimationFrame(scrollFrame);
+	scrollFrame = requestAnimationFrame(() => {
+		const width = stageRef.value?.clientWidth ?? 1;
+		active.value = Math.min(
+			projects.length - 1,
+			Math.max(0, Math.round((stageRef.value?.scrollLeft ?? 0) / width)),
+		);
+	});
+};
+
+const showProject = (index: number) => {
+	const safeIndex = Math.min(projects.length - 1, Math.max(0, index));
+	active.value = safeIndex;
+
+	if (isMobile.value && stageRef.value) {
+		stageRef.value.scrollTo({
+			left: safeIndex * stageRef.value.clientWidth,
+			behavior: animationsEnabled.value ? "smooth" : "auto",
+		});
+		return;
+	}
+
+	const target = cinema
+		? cinema.start +
+			(cinema.end - cinema.start) * (safeIndex / (projects.length - 1))
+		: slideRefs.value[safeIndex];
+	if (target !== undefined) glideTo(target);
+};
 
 // Asked from another section, glide to a project: in the cinema it sits at its share
 // of the pinned run, stacked it is its own block.
@@ -146,11 +203,7 @@ const projectToShow = useProjectToShow();
 watch(projectToShow, (index) => {
 	if (index === null) return;
 	projectToShow.value = null;
-	const target = cinema
-		? cinema.start +
-			(cinema.end - cinema.start) * (index / (projects.length - 1))
-		: slideRefs.value[index];
-	if (target !== undefined) glideTo(target);
+	showProject(index);
 });
 
 // The detail sheet opens from where it was asked for.
@@ -170,30 +223,82 @@ const openSheet = (project: Project, event: MouseEvent) => {
 
 <template>
   <section id="projects" ref="sectionRef" class="section projects">
-    <div ref="stageRef" class="projects-stage" :class="{ 'is-cinema': animationsEnabled }">
-      <article
-        v-for="(project, index) in projects"
-        :key="project.id"
-        ref="slideRefs"
-        class="slide"
-        :inert="(animationsEnabled && index !== active) || undefined"
+    <div ref="frameRef" class="projects-frame">
+      <header class="projects-heading">
+        <p class="section-eyebrow">{{ eyebrow }}</p>
+        <h2>{{ sectionTitle }}</h2>
+      </header>
+      <div
+        ref="stageRef"
+        class="projects-stage"
+        :class="{ 'is-cinema': cinemaEnabled, 'is-mobile': isMobile }"
+        @scroll.passive="handleMobileScroll"
       >
-        <ProjectMedia :project="project" preview class="slide-media" aria-hidden="true" />
-        <div class="slide-shade" aria-hidden="true"></div>
+        <article
+          v-for="(project, index) in projects"
+          :key="project.id"
+          ref="slideRefs"
+          class="slide"
+          :aria-label="project.title"
+          :inert="((cinemaEnabled || isMobile) && index !== active) || undefined"
+        >
+          <ProjectMedia :project="project" preview class="slide-media" aria-hidden="true" />
+          <div class="slide-shade" aria-hidden="true"></div>
 
-        <div class="slide-content">
-          <p class="slide-count">{{ index + 1 }} / {{ projects.length }}</p>
-          <h3 class="slide-title" :aria-label="project.title">
-            <span class="slide-title-text" aria-hidden="true">{{ project.title }}</span>
-          </h3>
-          <p class="slide-description">{{ project.description }}</p>
-          <ProjectTags :technologies="project.technologies" :max="MAX_TECHNOLOGIES" />
-          <div class="slide-actions">
-            <Button :icon="iconExpand" :label="detailsLabel" @click="openSheet(project, $event)" />
-            <ProjectLinks :links="project.links" />
+          <div class="slide-content">
+            <p class="slide-count">{{ index + 1 }} / {{ projects.length }}</p>
+            <h3 class="slide-title" :aria-label="project.title">
+              <span class="slide-title-text" aria-hidden="true">{{ project.title }}</span>
+            </h3>
+            <p class="slide-description">{{ project.description }}</p>
+            <ProjectTags :technologies="project.technologies" :max="MAX_TECHNOLOGIES" />
+            <div class="slide-actions">
+              <Button :icon="iconExpand" :label="detailsLabel" @click="openSheet(project, $event)" />
+              <ProjectLinks :links="project.links" />
+            </div>
           </div>
+        </article>
+      </div>
+
+      <nav v-if="cinemaEnabled || isMobile" class="project-navigation" :aria-label="navigationLabel">
+        <Button
+          class="project-arrow"
+          padding="0.65rem"
+          borderRadius="50%"
+          :icon="iconArrowLeft"
+          :aria-label="previousLabel"
+          :disabled="active === 0"
+          @click="showProject(active - 1)"
+        />
+        <div class="project-dots">
+          <button
+            v-for="(project, index) in projects"
+            :key="project.id"
+            type="button"
+            class="project-dot"
+            :class="{ 'is-active': index === active }"
+            :aria-label="formatTemplate(projectLabelTemplate, { title: project.title })"
+            :aria-current="index === active ? 'step' : undefined"
+            @click="showProject(index)"
+          >
+            <span aria-hidden="true"></span>
+          </button>
         </div>
-      </article>
+        <p class="project-status" aria-live="polite">
+          <span class="sr-only">{{ projects[active]?.title }}</span>
+          <span aria-hidden="true">{{ active + 1 }} / {{ projects.length }}</span>
+        </p>
+        <Button
+          class="project-arrow"
+          padding="0.65rem"
+          borderRadius="50%"
+          :icon="iconArrowRight"
+          :aria-label="nextLabel"
+          :disabled="active === projects.length - 1"
+          @click="showProject(active + 1)"
+        />
+      </nav>
+      <p v-if="isMobile" class="swipe-hint">{{ swipeHint }}</p>
     </div>
 
     <ProjectSheet :project="selected" :origin="origin" @close="selected = null" />
@@ -203,13 +308,32 @@ const openSheet = (project: Project, event: MouseEvent) => {
 <style scoped>
 .section.projects {
   display: block;
+	position: relative;
   height: auto;
   min-height: auto;
   padding: 0;
 }
 
+.projects-frame,
 .projects-stage {
   position: relative;
+}
+
+.projects-frame {
+	width: 100%;
+}
+
+.projects-heading {
+  position: absolute;
+  top: clamp(5.5rem, 10vh, 7rem);
+  left: var(--page-gutter);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.projects-heading h2 {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  text-transform: uppercase;
 }
 
 .slide {
@@ -291,9 +415,139 @@ const openSheet = (project: Project, event: MouseEvent) => {
   color: var(--muted);
 }
 
+.project-navigation {
+  position: absolute;
+  top: 50%;
+  right: var(--page-gutter);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  backdrop-filter: blur(12px);
+  transform: translateY(-50%);
+}
+
+.project-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.project-dot {
+  width: 44px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.project-dot span {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.project-dot.is-active span {
+  width: 20px;
+  background: var(--text);
+}
+
+.project-status {
+  min-width: 3.5rem;
+  color: var(--text);
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.swipe-hint {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .projects-stage.is-mobile {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+	.projects-frame {
+		height: 100dvh;
+		overflow: hidden;
+	}
+
+  .projects-stage.is-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .projects-stage.is-mobile .slide {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .projects-heading {
+    top: 5.5rem;
+  }
+
   .slide-content {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-xl) var(--page-gutter) 7rem;
+  }
+
+  .slide-title {
+    font-size: clamp(2rem, 11vw, 4rem);
+  }
+
+  .project-navigation {
+    position: absolute;
+    top: auto;
+    right: 50%;
+    bottom: var(--spacing-md);
+    flex-direction: row;
+    transform: translateX(50%);
+  }
+
+  .project-dots {
+    flex-direction: row;
+    gap: 0;
+  }
+
+  .project-dot {
+    width: 28px;
+    height: 44px;
+  }
+
+  .project-status {
+    display: none;
+  }
+
+  .swipe-hint {
+    position: absolute;
+    right: var(--page-gutter);
+    bottom: 5.25rem;
+    z-index: 4;
+    display: block;
+    color: var(--muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 }
 </style>

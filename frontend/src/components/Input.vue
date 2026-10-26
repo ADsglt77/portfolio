@@ -9,7 +9,7 @@ interface Props {
 	rows?: number;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
 	type: "text",
 	label: "",
 	placeholder: "",
@@ -19,6 +19,7 @@ withDefaults(defineProps<Props>(), {
 });
 
 const model = defineModel<string>({ required: true });
+const errorId = `${props.id}-error`;
 </script>
 
 <template>
@@ -34,6 +35,8 @@ const model = defineModel<string>({ required: true });
 			:placeholder="placeholder"
 			:rows="rows"
 			:class="{ 'input--error': error }"
+			:aria-invalid="Boolean(error)"
+			:aria-describedby="error ? errorId : undefined"
 		></textarea>
 		<input
 			v-else
@@ -43,8 +46,15 @@ const model = defineModel<string>({ required: true });
 			:type="type"
 			:placeholder="placeholder"
 			:class="{ 'input--error': error }"
+			:aria-invalid="Boolean(error)"
+			:aria-describedby="error ? errorId : undefined"
 		/>
-		<span class="input-error" :class="{ 'input-error--visible': error }">
+		<span
+			:id="errorId"
+			class="input-error"
+			:class="{ 'input-error--visible': error }"
+			role="alert"
+		>
 			{{ error || " " }}
 		</span>
 	</div>
@@ -73,8 +83,8 @@ textarea {
 
 input:focus,
 textarea:focus {
-	outline: none;
-	border-color: var(--glass-border-hover);
+	border-color: var(--text);
+	box-shadow: 0 0 0 1px var(--text);
 }
 
 input::placeholder,
@@ -88,6 +98,7 @@ textarea::placeholder {
 }
 
 .input-error {
+	min-height: 1.25rem;
 	color: var(--error);
 	opacity: 0;
 	transition: opacity 0.15s ease;

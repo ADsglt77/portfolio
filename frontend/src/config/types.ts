@@ -45,6 +45,9 @@ export interface SiteConfig {
 		name: string;
 		title: string;
 		description: string;
+		jobTitle: string;
+		locale: string;
+		keywords: string[];
 		lang: string;
 		themeColor: string;
 		url: string;
@@ -67,6 +70,10 @@ export interface SiteConfig {
 	};
 	hero: {
 		displayName: string;
+		eyebrow: string;
+		tagline: string;
+		primaryCta: { label: string; href: string };
+		secondaryCta: { label: string; href: string };
 		scrollLabel: string;
 		loadingLabel: string;
 		enterLabel: string;
@@ -82,6 +89,10 @@ export interface SiteConfig {
 	};
 	contact: {
 		title: string;
+		eyebrow: string;
+		intro: string;
+		alternativeLabel: string;
+		linkedinLabel: string;
 		image: { src: string; alt: string };
 		form: {
 			name: FieldLabels;
@@ -91,6 +102,8 @@ export interface SiteConfig {
 			captcha: { required: string; failed: string; loadError: string };
 			submitLabel: string;
 			submittingLabel: string;
+			successMessage: string;
+			errorMessage: string;
 		};
 	};
 	footer: {
@@ -98,6 +111,7 @@ export interface SiteConfig {
 		template: string;
 	};
 	nav: {
+		label: string;
 		/** Accessible name of the mobile menu button. */
 		menuLabel: string;
 		links: Array<{ href: string; label: string }>;
@@ -111,8 +125,23 @@ export interface SiteConfig {
 	social: SocialLink[];
 	techMap: Record<string, Technology>;
 	technologiesBanner: string[];
+	timelineSection: {
+		eyebrow: string;
+		title: string;
+		intro: string;
+		showAllLabel: string;
+		showLessLabel: string;
+		featuredCount: number;
+	};
 	timeline: TimelineItem[];
 	projects: {
+		eyebrow: string;
+		title: string;
+		navigationLabel: string;
+		previousLabel: string;
+		nextLabel: string;
+		swipeHint: string;
+		projectLabelTemplate: string;
 		/** Button that opens a project's detail sheet. */
 		detailsLabel: string;
 		/** Accessible name of the sheet's close button. */

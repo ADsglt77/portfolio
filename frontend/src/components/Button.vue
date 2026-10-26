@@ -80,6 +80,7 @@ const handleMouseEnter = () => {
 <style scoped>
 button {
   width: fit-content;
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -90,7 +91,7 @@ button {
   border: 1px solid var(--glass-border);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   &:hover {
     background: var(--glass-hover);
     border: 1px solid var(--glass-border-hover);

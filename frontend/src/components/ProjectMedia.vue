@@ -36,6 +36,7 @@ const videoAttrs = props.preview
       :src="project.poster"
       :alt="formatTemplate(posterAltTemplate, { title: project.title })"
       loading="lazy"
+			decoding="async"
     />
     <div v-else class="project-media-empty">
       <Icon :icon="iconPlay" :width="48" :height="48" />

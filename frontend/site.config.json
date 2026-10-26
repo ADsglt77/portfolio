@@ -1,8 +1,19 @@
 {
 	"site": {
 		"name": "Adrien Segalat",
-		"title": "Adrien Segalat — Portfolio",
-		"description": "Portfolio d'Adrien Segalat — Élève-ingénieur à l'EFREI et développeur full-stack",
+		"title": "Adrien Segalat — Développeur full-stack & élève-ingénieur",
+		"description": "Portfolio d'Adrien Segalat, développeur full-stack et élève-ingénieur à l'EFREI : parcours, compétences et réalisations web.",
+		"jobTitle": "Développeur full-stack et élève-ingénieur",
+		"locale": "fr_FR",
+		"keywords": [
+			"Adrien Segalat",
+			"développeur full-stack",
+			"ingénieur logiciel",
+			"Vue.js",
+			"Angular",
+			"TypeScript",
+			"portfolio développeur"
+		],
 		"lang": "fr",
 		"themeColor": "#151e16",
 		"url": "https://adrien-segalat.fr",
@@ -13,7 +24,7 @@
 		"colors": {
 			"bg": "#151e16",
 			"text": "#ecffee",
-			"muted": "#808080",
+			"muted": "#9aa59b",
 			"success": "#69a47e",
 			"error": "#da6a6a"
 		},
@@ -26,6 +37,10 @@
 
 	"hero": {
 		"displayName": "ADRIEN",
+		"eyebrow": "Développeur full-stack · Élève-ingénieur EFREI",
+		"tagline": "Je conçois des expériences web robustes, utiles et sensibles au moindre détail.",
+		"primaryCta": { "label": "Découvrir mon parcours", "href": "#about" },
+		"secondaryCta": { "label": "Me contacter", "href": "#contact" },
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
@@ -50,6 +65,10 @@
 
 	"contact": {
 		"title": "Contactez-moi",
+		"eyebrow": "Un projet en tête ?",
+		"intro": "Une opportunité, une collaboration ou simplement une idée à partager ? Écrivez-moi, je vous répondrai avec plaisir.",
+		"alternativeLabel": "Vous préférez un échange direct ?",
+		"linkedinLabel": "Discuter sur LinkedIn",
 		"image": {
 			"src": "/img/contact.webp",
 			"alt": "Feu de camp au bord d'un lac dans la brume"
@@ -82,7 +101,9 @@
 				"loadError": "Impossible de charger le captcha, vérifie ta connexion."
 			},
 			"submitLabel": "Envoyer",
-			"submittingLabel": "Envoi..."
+			"submittingLabel": "Envoi...",
+			"successMessage": "Message envoyé. Merci, je reviens vers vous rapidement.",
+			"errorMessage": "Le message n'a pas pu être envoyé. Vérifiez les champs indiqués."
 		}
 	},
 
@@ -92,6 +113,7 @@
 	},
 
 	"nav": {
+		"label": "Navigation principale",
 		"menuLabel": "Menu",
 		"links": [
 			{ "href": "#about", "label": "ABOUT" },
@@ -167,6 +189,15 @@
 		"github",
 		"flutter"
 	],
+
+	"timelineSection": {
+		"eyebrow": "Parcours",
+		"title": "Construire, apprendre, transmettre",
+		"intro": "Les étapes les plus récentes de mon parcours, entre formation d'ingénieur et développement d'applications métier.",
+		"showAllLabel": "Afficher tout le parcours",
+		"showLessLabel": "Revenir aux étapes clés",
+		"featuredCount": 5
+	},
 
 	"timeline": [
 		{
@@ -261,6 +292,13 @@
 	],
 
 	"projects": {
+		"eyebrow": "Sélection",
+		"title": "Projets",
+		"navigationLabel": "Navigation entre les projets",
+		"previousLabel": "Projet précédent",
+		"nextLabel": "Projet suivant",
+		"swipeHint": "Balayez horizontalement pour explorer",
+		"projectLabelTemplate": "Afficher le projet {{title}}",
 		"detailsLabel": "En savoir plus",
 		"closeLabel": "Fermer",
 		"noMediaLabel": "Aucune vidéo disponible",
