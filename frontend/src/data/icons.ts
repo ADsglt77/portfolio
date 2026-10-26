@@ -16,8 +16,6 @@ export const iconEye = "iconoir:eye";
 export const iconEyeOff = "iconoir:eye-off";
 export const iconFormation = "iconoir:graduation-cap";
 export const iconWork = "iconoir:community";
-export const iconArrowLeft = "iconoir:nav-arrow-left";
-export const iconArrowRight = "iconoir:nav-arrow-right";
 
 // Material Symbols
 export const iconCheck = "material-symbols:check-rounded";

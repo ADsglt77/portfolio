@@ -5,8 +5,6 @@
 	--glass-hover: rgb(255, 255, 255, 0.2);
 	--glass-border: rgb(255, 255, 255, 0.3);
 	--glass-border-hover: rgb(255, 255, 255, 0.4);
-	--surface: color-mix(in srgb, var(--text) 7%, transparent);
-	--surface-strong: color-mix(in srgb, var(--text) 12%, transparent);
 	--content-max: 1200px;
 	--page-gutter: clamp(1.25rem, 4vw, 4rem);
 
@@ -81,7 +79,6 @@ body {
 	font-family: var(--font-mono);
 	color: var(--text);
 	background: var(--bg);
-	line-height: 1.6;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 }
@@ -101,13 +98,6 @@ body {
 	clip: rect(0, 0, 0, 0) !important;
 	white-space: nowrap !important;
 	border: 0 !important;
-}
-
-.section-eyebrow {
-	color: var(--muted);
-	font-size: var(--font-size-span);
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
 }
 
 /* Sections */

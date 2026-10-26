@@ -108,8 +108,6 @@ img {
 	.section.image-section {
 		display: flex;
 		flex-direction: column;
-		height: auto;
-		min-height: 100dvh;
 		gap: var(--spacing-lg);
 	}
 

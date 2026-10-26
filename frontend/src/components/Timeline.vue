@@ -219,18 +219,12 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   width: calc(50% - var(--spacing-3xl));
-	background: var(--surface);
+	background: color-mix(in srgb, var(--text) 8%, transparent);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   backdrop-filter: blur(10px);
   gap: var(--spacing-sm);
-	transition: border-color 0.25s ease, background 0.25s ease;
-}
-
-.timeline-content:hover {
-	background: var(--surface-strong);
-	border-color: var(--glass-border-hover);
 }
 
 .timeline-date {

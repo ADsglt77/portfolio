@@ -37,10 +37,6 @@
 
 	"hero": {
 		"displayName": "ADRIEN",
-		"eyebrow": "Développeur full-stack · Élève-ingénieur EFREI",
-		"tagline": "Je conçois des expériences web robustes, utiles et sensibles au moindre détail.",
-		"primaryCta": { "label": "Découvrir mon parcours", "href": "#about" },
-		"secondaryCta": { "label": "Me contacter", "href": "#contact" },
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
@@ -65,10 +61,6 @@
 
 	"contact": {
 		"title": "Contactez-moi",
-		"eyebrow": "Un projet en tête ?",
-		"intro": "Une opportunité, une collaboration ou simplement une idée à partager ? Écrivez-moi, je vous répondrai avec plaisir.",
-		"alternativeLabel": "Vous préférez un échange direct ?",
-		"linkedinLabel": "Discuter sur LinkedIn",
 		"image": {
 			"src": "/img/contact.webp",
 			"alt": "Feu de camp au bord d'un lac dans la brume"
@@ -191,9 +183,7 @@
 	],
 
 	"timelineSection": {
-		"eyebrow": "Parcours",
-		"title": "Construire, apprendre, transmettre",
-		"intro": "Les étapes les plus récentes de mon parcours, entre formation d'ingénieur et développement d'applications métier.",
+		"title": "Parcours",
 		"showAllLabel": "Afficher tout le parcours",
 		"showLessLabel": "Revenir aux étapes clés",
 		"featuredCount": 5
@@ -292,12 +282,7 @@
 	],
 
 	"projects": {
-		"eyebrow": "Sélection",
-		"title": "Projets",
 		"navigationLabel": "Navigation entre les projets",
-		"previousLabel": "Projet précédent",
-		"nextLabel": "Projet suivant",
-		"swipeHint": "Balayez horizontalement pour explorer",
 		"projectLabelTemplate": "Afficher le projet {{title}}",
 		"detailsLabel": "En savoir plus",
 		"closeLabel": "Fermer",

@@ -12,23 +12,14 @@ import { useMediaQuery } from "../composables/useMediaQuery";
 import { useProjectToShow } from "../composables/useProjectToShow";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
-import { iconArrowLeft, iconArrowRight, iconExpand } from "../data/icons";
+import { iconExpand } from "../data/icons";
 import { type Project, projects } from "../data/projects";
 import { useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
 import { formatTemplate } from "../lib/format";
 
 const MAX_TECHNOLOGIES = 4;
-const {
-	detailsLabel,
-	eyebrow,
-	title: sectionTitle,
-	navigationLabel,
-	previousLabel,
-	nextLabel,
-	swipeHint,
-	projectLabelTemplate,
-} = config.projects;
+const { detailsLabel, navigationLabel, projectLabelTemplate } = config.projects;
 
 // With animations on, the section is a pinned "cinema": one project fills the screen at
 // a time and the scroll moves to the next one. With animations off, the projects are
@@ -38,7 +29,6 @@ const isMobile = useMediaQuery("(max-width: 900px)");
 const cinemaEnabled = computed(
 	() => animationsEnabled.value && !isMobile.value,
 );
-const sectionRef = ref<HTMLElement | null>(null);
 const frameRef = ref<HTMLElement | null>(null);
 const stageRef = ref<HTMLElement | null>(null);
 const slideRefs = ref<HTMLElement[]>([]);
@@ -222,12 +212,8 @@ const openSheet = (project: Project, event: MouseEvent) => {
 </script>
 
 <template>
-  <section id="projects" ref="sectionRef" class="section projects">
+  <section id="projects" class="section projects">
     <div ref="frameRef" class="projects-frame">
-      <header class="projects-heading">
-        <p class="section-eyebrow">{{ eyebrow }}</p>
-        <h2>{{ sectionTitle }}</h2>
-      </header>
       <div
         ref="stageRef"
         class="projects-stage"
@@ -260,16 +246,7 @@ const openSheet = (project: Project, event: MouseEvent) => {
         </article>
       </div>
 
-      <nav v-if="cinemaEnabled || isMobile" class="project-navigation" :aria-label="navigationLabel">
-        <Button
-          class="project-arrow"
-          padding="0.65rem"
-          borderRadius="50%"
-          :icon="iconArrowLeft"
-          :aria-label="previousLabel"
-          :disabled="active === 0"
-          @click="showProject(active - 1)"
-        />
+      <nav v-if="isMobile" class="project-pagination" :aria-label="navigationLabel">
         <div class="project-dots">
           <button
             v-for="(project, index) in projects"
@@ -284,21 +261,8 @@ const openSheet = (project: Project, event: MouseEvent) => {
             <span aria-hidden="true"></span>
           </button>
         </div>
-        <p class="project-status" aria-live="polite">
-          <span class="sr-only">{{ projects[active]?.title }}</span>
-          <span aria-hidden="true">{{ active + 1 }} / {{ projects.length }}</span>
-        </p>
-        <Button
-          class="project-arrow"
-          padding="0.65rem"
-          borderRadius="50%"
-          :icon="iconArrowRight"
-          :aria-label="nextLabel"
-          :disabled="active === projects.length - 1"
-          @click="showProject(active + 1)"
-        />
+        <span class="sr-only" aria-live="polite">{{ projects[active]?.title }}</span>
       </nav>
-      <p v-if="isMobile" class="swipe-hint">{{ swipeHint }}</p>
     </div>
 
     <ProjectSheet :project="selected" :origin="origin" @close="selected = null" />
@@ -321,19 +285,6 @@ const openSheet = (project: Project, event: MouseEvent) => {
 
 .projects-frame {
 	width: 100%;
-}
-
-.projects-heading {
-  position: absolute;
-  top: clamp(5.5rem, 10vh, 7rem);
-  left: var(--page-gutter);
-  z-index: 4;
-  pointer-events: none;
-}
-
-.projects-heading h2 {
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  text-transform: uppercase;
 }
 
 .slide {
@@ -415,33 +366,22 @@ const openSheet = (project: Project, event: MouseEvent) => {
   color: var(--muted);
 }
 
-.project-navigation {
+.project-pagination {
   position: absolute;
-  top: 50%;
-  right: var(--page-gutter);
+  right: 50%;
+  bottom: var(--spacing-md);
   z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg) 62%, transparent);
-  backdrop-filter: blur(12px);
-  transform: translateY(-50%);
+  transform: translateX(50%);
 }
 
 .project-dots {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
 }
 
 .project-dot {
-  width: 44px;
-  height: 30px;
+  width: 32px;
+  height: 44px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -459,19 +399,8 @@ const openSheet = (project: Project, event: MouseEvent) => {
 }
 
 .project-dot.is-active span {
-  width: 20px;
+  width: 18px;
   background: var(--text);
-}
-
-.project-status {
-  min-width: 3.5rem;
-  color: var(--text);
-  font-size: 0.7rem;
-  text-align: center;
-}
-
-.swipe-hint {
-  display: none;
 }
 
 @media (max-width: 900px) {
@@ -503,51 +432,13 @@ const openSheet = (project: Project, event: MouseEvent) => {
     scroll-snap-stop: always;
   }
 
-  .projects-heading {
-    top: 5.5rem;
-  }
-
   .slide-content {
-    padding: var(--spacing-xl) var(--page-gutter) 7rem;
+    padding: var(--spacing-xl) var(--page-gutter) 5rem;
   }
 
   .slide-title {
     font-size: clamp(2rem, 11vw, 4rem);
   }
 
-  .project-navigation {
-    position: absolute;
-    top: auto;
-    right: 50%;
-    bottom: var(--spacing-md);
-    flex-direction: row;
-    transform: translateX(50%);
-  }
-
-  .project-dots {
-    flex-direction: row;
-    gap: 0;
-  }
-
-  .project-dot {
-    width: 28px;
-    height: 44px;
-  }
-
-  .project-status {
-    display: none;
-  }
-
-  .swipe-hint {
-    position: absolute;
-    right: var(--page-gutter);
-    bottom: 5.25rem;
-    z-index: 4;
-    display: block;
-    color: var(--muted);
-    font-size: 0.65rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
 }
 </style>

@@ -2,7 +2,6 @@
 import { Icon } from "@iconify/vue";
 import gsap from "gsap";
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import { glideTo } from "../composables/useLenis";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
 import { iconFastArrowDown } from "../data/icons";
@@ -62,12 +61,6 @@ const currentDay = ref("");
 const currentTime = ref("");
 let timeIntervalId: number | undefined;
 
-const scrollTo = (event: Event, href: string) => {
-	event.preventDefault();
-	const target = document.querySelector<HTMLElement>(href);
-	if (target) glideTo(target);
-};
-
 onMounted(() => {
 	const updateTime = () => {
 		const now = new Date();
@@ -105,28 +98,9 @@ onUnmounted(() => {
       fetchpriority="high"
       decoding="async"
     />
+    <div class="bg-shade" aria-hidden="true"></div>
     <div ref="veilRef" class="hero-veil" aria-hidden="true"></div>
     <h1 ref="titleRef">{{ hero.displayName }}</h1>
-    <div :class="{ visible: showElements }" class="hero-copy">
-      <p class="hero-eyebrow">{{ hero.eyebrow }}</p>
-      <p class="hero-tagline">{{ hero.tagline }}</p>
-      <div class="hero-actions" aria-label="Actions principales">
-        <a
-          class="hero-cta hero-cta--primary"
-          :href="hero.primaryCta.href"
-          @click="scrollTo($event, hero.primaryCta.href)"
-        >
-          {{ hero.primaryCta.label }}
-        </a>
-        <a
-          class="hero-cta"
-          :href="hero.secondaryCta.href"
-          @click="scrollTo($event, hero.secondaryCta.href)"
-        >
-          {{ hero.secondaryCta.label }}
-        </a>
-      </div>
-    </div>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
       <h5>{{ hero.scrollLabel }}</h5>
       <Icon class="scroll-icon" :icon="iconFastArrowDown" :width="20" :height="20" />
@@ -166,6 +140,14 @@ onUnmounted(() => {
   scale: var(--hero-zoom, 1);
 }
 
+.bg-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
 .hero-veil {
   position: absolute;
   inset: 0;
@@ -178,84 +160,6 @@ h1 {
   color: var(--text);
   opacity: 1 !important;
   z-index: 100 !important;
-}
-
-.hero-copy {
-  position: absolute;
-  top: 63%;
-  left: 50%;
-  z-index: 2;
-  width: min(90vw, 52rem);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  text-align: center;
-  opacity: 0;
-  transform: translate(-50%, 30px);
-}
-
-.hero-copy.visible {
-  animation: hero-copy-in 0.65s ease-out 0.15s forwards;
-}
-
-@keyframes hero-copy-in {
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-:global(html.animations-off) .hero-copy.visible {
-  animation-duration: 0s;
-  animation-delay: 0s;
-}
-
-.hero-eyebrow {
-  color: var(--text);
-  font-size: var(--font-size-span);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.hero-tagline {
-  max-width: 55ch;
-  color: color-mix(in srgb, var(--text) 82%, transparent);
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
-}
-
-.hero-cta {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg) 0;
-  background: var(--glass-bg);
-  color: var(--text);
-  font-size: var(--font-size-span);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  backdrop-filter: blur(8px);
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.hero-cta:hover,
-.hero-cta:focus-visible {
-  background: var(--glass-hover);
-  border-color: var(--glass-border-hover);
-}
-
-.hero-cta--primary {
-  background: var(--text);
-  color: var(--bg);
 }
 
 .scroll {
@@ -292,24 +196,6 @@ h1 {
 }
 
 @media (max-width: 900px) {
-	.hero-copy {
-		top: auto;
-		bottom: 7.5rem;
-	}
-
-	.hero-tagline {
-		max-width: 34ch;
-	}
-
-	.hero-actions {
-		width: 100%;
-	}
-
-	.hero-cta {
-		justify-content: center;
-		flex: 1 1 10rem;
-	}
-
   .meta {
     bottom: var(--spacing-xl);
   }
