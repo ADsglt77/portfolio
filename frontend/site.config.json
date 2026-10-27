@@ -54,20 +54,6 @@
 		"title": "Élève-ingénieur et développeur full-stack",
 		"status": "Alternance en cours chez Therasoft depuis juillet 2025",
 		"paragraph": "Je conçois et fais évoluer des applications métier en accordant autant d'attention à leur fiabilité qu'à leur expérience utilisateur. Chez Therasoft, je travaille sur des produits pour le secteur médical avec Angular, Express en TypeScript et C#. Mon cycle ingénieur LSI à l'EFREI complète cette expérience terrain par une approche plus large de l'architecture logicielle et des systèmes d'information.",
-		"highlights": [
-			{
-				"label": "Formation",
-				"value": "Cycle ingénieur LSI · EFREI Bordeaux"
-			},
-			{
-				"label": "Entreprise",
-				"value": "Therasoft · applications métier médicales"
-			},
-			{
-				"label": "Approche",
-				"value": "Interfaces utiles, fiables et soignées"
-			}
-		],
 		"cv": {
 			"label": "Télécharger mon CV",
 			"path": "/CV-Adrien.pdf",
@@ -81,8 +67,6 @@
 
 	"contact": {
 		"title": "Contactez-moi",
-		"intro": "Je poursuis actuellement mon alternance chez Therasoft. Je reste disponible pour échanger autour du développement web, de l'ingénierie logicielle ou d'un futur projet.",
-		"emailLabel": "M'écrire directement",
 		"locationLabel": "Limoges · EFREI Bordeaux",
 		"image": {
 			"src": "/img/contact.webp",
@@ -149,14 +133,12 @@
 		{
 			"url": "https://www.linkedin.com/in/adrien-segalat",
 			"icon": "iconoir:linkedin",
-			"label": "Visiter mon profil LinkedIn",
-			"shortLabel": "LinkedIn"
+			"label": "Visiter mon profil LinkedIn"
 		},
 		{
 			"url": "https://github.com/ADsglt77",
 			"icon": "iconoir:github",
-			"label": "Visiter mon profil GitHub",
-			"shortLabel": "GitHub"
+			"label": "Visiter mon profil GitHub"
 		}
 	],
 

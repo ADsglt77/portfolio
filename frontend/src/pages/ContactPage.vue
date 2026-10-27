@@ -134,27 +134,15 @@ const handleSubmit = async () => {
 <template>
   <ImageSection id="contact" :title="contact.title" :image="contact.image" title-area="1 / 2 / 2 / 5">
     <form ref="formRef" novalidate @submit.prevent="handleSubmit">
-      <div class="contact-intro">
-        <p>{{ contact.intro }}</p>
-        <div class="contact-meta">
-          <a :href="contactEmailHref">
-            <span>{{ contact.emailLabel }}</span>
-            {{ config.site.email }}
-          </a>
-          <span>{{ contact.locationLabel }}</span>
-          <a
-            v-for="link in social"
-            :key="link.url"
-            :href="link.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            :aria-label="link.label"
-            class="contact-social"
-          >
-            <Icon :icon="link.icon" :width="16" :height="16" aria-hidden="true" />
-            {{ link.shortLabel }}
-          </a>
-        </div>
+      <div class="contact-details">
+        <a :href="contactEmailHref">
+          <Icon icon="iconoir:mail" :width="18" :height="18" aria-hidden="true" />
+          {{ config.site.email }}
+        </a>
+        <span>
+          <Icon icon="iconoir:map-pin" :width="18" :height="18" aria-hidden="true" />
+          {{ contact.locationLabel }}
+        </span>
       </div>
       <Input
         v-for="field in FIELDS"
@@ -169,14 +157,28 @@ const handleSubmit = async () => {
         :error="errors[field.key]"
       />
       <div class="actions">
-        <Button
-          type="submit"
-          :icon="iconSend"
-          :label="isSubmitting ? form.submittingLabel : form.submitLabel"
-          :disabled="isSubmitting"
-          :success="isSuccess"
-          :error="isError"
-        />
+        <div class="submit-group">
+          <Button
+            type="submit"
+            :icon="iconSend"
+            :label="isSubmitting ? form.submittingLabel : form.submitLabel"
+            :disabled="isSubmitting"
+            :success="isSuccess"
+            :error="isError"
+          />
+          <div class="contact-socials">
+            <a
+              v-for="link in social"
+              :key="link.url"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="link.label"
+            >
+              <Icon :icon="link.icon" :width="22" :height="22" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
         <div class="captcha-block">
           <div ref="turnstileContainerRef" class="turnstile-widget" />
           <p v-if="captchaLoadError" class="captcha-error" role="alert">
@@ -204,42 +206,24 @@ form {
 	grid-area: 2 / 3 / 7 / 5;
 }
 
-.contact-intro {
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-sm);
-	margin-bottom: var(--spacing-sm);
-}
-
-.contact-intro > p {
-	max-width: 62ch;
-	color: var(--muted);
-	font-size: var(--font-size-span);
-}
-
-.contact-meta {
+.contact-details {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--spacing-sm) var(--spacing-lg);
+	margin-bottom: var(--spacing-sm);
 	font-size: var(--font-size-span);
 }
 
-.contact-meta a {
+.contact-details a,
+.contact-details span {
 	display: flex;
-	flex-wrap: wrap;
+	align-items: center;
 	gap: var(--spacing-sm);
 	color: var(--text);
-	text-decoration: underline;
-	text-underline-offset: 4px;
-}
-
-.contact-meta .contact-social {
-	align-items: center;
 	text-decoration: none;
 }
 
-.contact-meta a span,
-.contact-meta > span {
+.contact-details span {
 	color: var(--muted);
 }
 
@@ -253,6 +237,31 @@ form .actions {
 form .actions button {
 	place-self: center;
 	height: fit-content;
+}
+
+.submit-group,
+.contact-socials {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+}
+
+.contact-socials a {
+	display: grid;
+	width: 44px;
+	height: 44px;
+	place-items: center;
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-full);
+	color: var(--muted);
+	text-decoration: none;
+	transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.contact-socials a:hover {
+	border-color: var(--glass-border-hover);
+	background: var(--glass-hover);
+	color: var(--text);
 }
 
 .captcha-block {
@@ -282,6 +291,10 @@ form .actions button {
 
 	form .actions button {
 		place-self: unset;
+	}
+
+	.submit-group {
+		justify-content: space-between;
 	}
 }
 </style>

@@ -53,12 +53,6 @@ useFadeIn(buttonRef, {
 			<p class="sr-only">{{ about.paragraph }}</p>
       <p ref="paragraphRef" class="about-copy-animated" aria-hidden="true"></p>
       <p class="about-copy-mobile" aria-hidden="true">{{ about.paragraph }}</p>
-      <dl class="about-highlights">
-        <div v-for="item in about.highlights" :key="item.label">
-          <dt>{{ item.label }}</dt>
-          <dd>{{ item.value }}</dd>
-        </div>
-      </dl>
       <div class="actions">
         <div ref="buttonRef">
           <Button
@@ -121,29 +115,6 @@ useFadeIn(buttonRef, {
 	display: none;
 }
 
-.about-highlights {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: var(--spacing-sm);
-}
-
-.about-highlights > div {
-	padding: var(--spacing-sm);
-	border-left: 1px solid var(--glass-border);
-}
-
-.about-highlights dt {
-	margin-bottom: var(--spacing-xs);
-	color: var(--muted);
-	font-size: var(--font-size-span);
-	text-transform: uppercase;
-}
-
-.about-highlights dd {
-	font-size: var(--font-size-span);
-	line-height: 1.5;
-}
-
 .subtitle .actions {
 	display: flex;
 	align-items: center;
@@ -189,10 +160,6 @@ useFadeIn(buttonRef, {
 	.subtitle .actions {
 		flex-wrap: wrap;
 		gap: var(--spacing-md);
-	}
-
-	.about-highlights {
-		grid-template-columns: 1fr;
 	}
 }
 </style>

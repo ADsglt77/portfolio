@@ -7,7 +7,6 @@ export interface SocialLink {
 	url: string;
 	icon: string;
 	label: string;
-	shortLabel: string;
 }
 
 export interface TimelineItem {
@@ -87,14 +86,11 @@ export interface SiteConfig {
 		title: string;
 		status: string;
 		paragraph: string;
-		highlights: Array<{ label: string; value: string }>;
 		cv: { label: string; path: string; filename: string };
 		image: { src: string; alt: string };
 	};
 	contact: {
 		title: string;
-		intro: string;
-		emailLabel: string;
 		locationLabel: string;
 		image: { src: string; alt: string };
 		form: {
