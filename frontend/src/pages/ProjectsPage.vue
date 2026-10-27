@@ -345,6 +345,10 @@ const openSheet = (project: Project, event: MouseEvent) => {
   text-transform: uppercase;
 }
 
+.slide-title-text {
+  font: inherit;
+}
+
 .slide-description {
   max-width: 60ch;
   display: -webkit-box;

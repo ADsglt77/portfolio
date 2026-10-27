@@ -172,7 +172,7 @@ const scrollToSection = (e: Event, href: string) => {
     </a>
     <div class="nav-mobile">
       <Button
-        padding="0.6rem"
+        padding="0"
         borderRadius="50%"
         class="nav-hamburger"
         :aria-expanded="showMobileMenu"
@@ -205,8 +205,9 @@ const scrollToSection = (e: Event, href: string) => {
     </div>
     <div class="nav-settings">
       <Button
-        padding="0.6rem"
+        padding="0"
         borderRadius="50%"
+        class="nav-settings-button"
         :aria-expanded="showSettings"
         aria-controls="navigation-settings"
         :aria-label="settings.label"
@@ -370,6 +371,15 @@ nav.over-hero::before {
 
 .nav-hamburger {
   flex-shrink: 0;
+}
+
+.nav-hamburger,
+.nav-settings-button {
+  width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  aspect-ratio: 1;
+  justify-content: center;
 }
 
 .mobile-menu-panel {

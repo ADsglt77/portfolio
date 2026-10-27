@@ -97,6 +97,10 @@ img {
 	z-index: 2;
 }
 
+.heading > span {
+	font: inherit;
+}
+
 :global(html.animations-off) .heading {
 	opacity: 1;
 	visibility: visible;

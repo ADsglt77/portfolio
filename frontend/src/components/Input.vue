@@ -83,8 +83,10 @@ textarea {
 
 input:focus,
 textarea:focus {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 	border-color: var(--text);
-	box-shadow: 0 0 0 1px var(--text);
+	box-shadow: none;
 }
 
 input::placeholder,
