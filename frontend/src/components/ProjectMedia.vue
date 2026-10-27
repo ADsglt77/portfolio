@@ -23,9 +23,19 @@ const videoAttrs = props.preview
 </script>
 
 <template>
-  <div class="project-media">
+  <div class="project-media" :class="{ 'project-media--preview': preview }">
+    <img
+      v-if="project.video && preview && project.poster"
+      class="media-backdrop"
+      :src="project.poster"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
     <video
       v-if="project.video"
+      class="media-video"
       :src="project.video"
       :poster="project.poster"
       playsinline
@@ -33,6 +43,7 @@ const videoAttrs = props.preview
     ></video>
     <img
       v-else-if="project.poster"
+      class="media-poster"
       :src="project.poster"
       :alt="formatTemplate(posterAltTemplate, { title: project.title })"
       loading="lazy"
@@ -46,11 +57,41 @@ const videoAttrs = props.preview
 </template>
 
 <style scoped>
-.project-media video,
-.project-media img {
+.project-media {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--text) 3%, var(--bg));
+}
+
+.media-video,
+.media-poster {
   width: 100%;
   height: 100%;
+}
+
+.media-video {
+  position: relative;
+  z-index: 1;
+  object-fit: contain;
+}
+
+.media-poster {
   object-fit: cover;
+}
+
+.media-backdrop {
+  position: absolute;
+  inset: -2rem;
+  width: calc(100% + 4rem);
+  height: calc(100% + 4rem);
+  object-fit: cover;
+  filter: blur(28px) brightness(0.55);
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+.project-media--preview .media-video {
+  padding: clamp(1rem, 4vw, 3rem);
 }
 
 .project-media-empty {

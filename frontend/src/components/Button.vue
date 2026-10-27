@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed, ref, useAttrs } from "vue";
+import { computed, ref, useAttrs, watch } from "vue";
 import { iconCheck, iconClose } from "../data/icons";
 import { useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
@@ -32,6 +32,18 @@ defineOptions({ inheritAttrs: false });
 const animationsEnabled = useAnimationsEnabled();
 const attrs = useAttrs();
 const labelRef = ref<HTMLElement>();
+
+// scrambleText mutates the rendered text directly. Keep it in sync when a
+// reactive label changes (for example the expanded timeline control).
+watch(
+	() => props.label,
+	(label) => {
+		if (labelRef.value) {
+			scrambleText(labelRef.value, label, { skipAnimation: true });
+		}
+	},
+	{ flush: "post" },
+);
 
 const accessibleLabel = computed(() => {
 	const ariaLabel = attrs["aria-label"];

@@ -37,6 +37,8 @@
 
 	"hero": {
 		"displayName": "ADRIEN",
+		"identityLabel": "Adrien Segalat — Développeur full-stack · Élève-ingénieur EFREI",
+		"stackLabel": "Angular · Vue / Nuxt · Express · C#",
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
@@ -284,6 +286,8 @@
 	"projects": {
 		"navigationLabel": "Navigation entre les projets",
 		"projectLabelTemplate": "Afficher le projet {{title}}",
+		"previousLabel": "Projet précédent",
+		"nextLabel": "Projet suivant",
 		"detailsLabel": "En savoir plus",
 		"closeLabel": "Fermer",
 		"noMediaLabel": "Aucune vidéo disponible",
@@ -298,7 +302,7 @@
 			{
 				"id": "condat",
 				"title": "Projet Basket Club",
-				"description": "Ce projet consiste à créer un site vitrine pour le Club de Basket de Condat. Il mettra en avant les valeurs du club, ses licenciés et ses produits. Avec ce site vitrine un Dashboard sera développé pour les gérants du club, il permettra la mise à jour du site facilement et rapidement. Pour cela j'utiliserai le Framework NuxtJS",
+				"description": "J'ai conçu pour le Condat Basket Club un site vitrine et une interface d'administration. Les responsables peuvent gérer les contenus du club depuis un dashboard développé avec Nuxt, Vue, TypeScript et Prisma.",
 				"technologies": [
 					"nuxt",
 					"vue",
@@ -317,7 +321,7 @@
 			{
 				"id": "therasoft",
 				"title": "Portail Médecin",
-				"description": "Application web type portail médecin en monorepo : frontend Angular 19 et API Express. Elle propose une interface pour les médecins, une API REST sécurisée (JWT, argon2), une base PostgreSQL gérée avec Prisma, et un déploiement via Docker Compose avec Nginx. Le frontend utilise Angular 19 et Lucide pour l'UI.",
+				"description": "J'ai développé un portail destiné aux médecins sous la forme d'un monorepo : interface Angular 19, API REST Express sécurisée avec JWT et Argon2, base PostgreSQL pilotée par Prisma et déploiement Docker Compose avec Nginx.",
 				"technologies": [
 					"angular",
 					"express",
@@ -336,7 +340,7 @@
 			{
 				"id": "bibliotheque",
 				"title": "Projet Bibliothèque",
-				"description": "Ce projet consiste à créer une application mobile pour une bibliothèque pouvant gérer des livres, des auteurs et des utilisateurs et les lier. Il a été développé en utilisant Android Studio avec Flutter et Dart pour répondre à la demande de la bibliothèque.",
+				"description": "J'ai développé avec Flutter et Dart une application mobile de gestion de bibliothèque. Elle permet d'administrer les livres, les auteurs et les utilisateurs, puis de gérer les relations entre ces données.",
 				"technologies": ["dart", "flutter", "android"],
 				"links": {
 					"github": "https://github.com/ADsglt77/bibliotheque"
@@ -347,7 +351,7 @@
 			{
 				"id": "jardinier",
 				"title": "Projet Jardinier",
-				"description": "Cet atelier professionnel a pour but de réaliser une application web, à l'aide du Framework PHP Symfony. Cette application reprend le contexte d'un site de jardinerie, qui doit permettre de pourvoir créer des devis avec un ou plusieurs taillages de haies dans le même devis.",
+				"description": "J'ai réalisé avec Symfony une application métier pour une entreprise de jardinage. Elle permet de créer des devis et de regrouper plusieurs prestations de taille de haies dans un même document.",
 				"technologies": ["php", "symfony", "css"],
 				"links": {
 					"github": "https://github.com/ADsglt77/jardinierV2"
@@ -358,7 +362,7 @@
 			{
 				"id": "resto",
 				"title": "Projet Resto",
-				"description": "Ce projet consiste à créer un site web pour un restaurant où l'on peut se connecter, liker des restaurants, mettre des commentaires et rechercher les restaurants selon certains critères.",
+				"description": "J'ai développé en PHP et MySQL une plateforme de découverte de restaurants. Les utilisateurs peuvent créer un compte, rechercher des établissements selon plusieurs critères, les enregistrer et publier des commentaires.",
 				"technologies": ["php", "mysql", "css"],
 				"links": {
 					"github": "https://github.com/ADsglt77/r3st0"

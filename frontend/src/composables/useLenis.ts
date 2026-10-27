@@ -26,8 +26,9 @@ interface LenisOptions {
 }
 
 /** The site's long glide to a section, or to a scroll position. */
-export function glideTo(target: HTMLElement | number): void {
+export function glideTo(target: HTMLElement | number, offset = 0): void {
 	state.lenis?.scrollTo(target, {
+		offset,
 		duration: 1.1,
 		easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
 	});

@@ -70,6 +70,8 @@ export interface SiteConfig {
 	};
 	hero: {
 		displayName: string;
+		identityLabel: string;
+		stackLabel: string;
 		scrollLabel: string;
 		loadingLabel: string;
 		enterLabel: string;
@@ -127,6 +129,8 @@ export interface SiteConfig {
 	projects: {
 		navigationLabel: string;
 		projectLabelTemplate: string;
+		previousLabel: string;
+		nextLabel: string;
 		/** Button that opens a project's detail sheet. */
 		detailsLabel: string;
 		/** Accessible name of the sheet's close button. */

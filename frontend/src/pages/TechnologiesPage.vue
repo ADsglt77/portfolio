@@ -83,19 +83,22 @@ useScrollScene(() => {
       :aria-hidden="rowIndex > 0 || undefined"
     >
       <div ref="trackRefs" class="tech-row-inner">
-        <a
-          v-for="(tech, index) in row.items"
-          :key="index"
-          class="tech-item"
-          :href="tech.linkLabel ? '#projects' : undefined"
-          :aria-label="tech.linkLabel"
-          :aria-hidden="rowIndex > 0 || index >= row.items.length / 2 || undefined"
-          :tabindex="rowIndex > 0 || index >= row.items.length / 2 ? -1 : undefined"
-          @click.prevent="showProject(tech.project)"
-        >
-          <Icon :icon="tech.icon" :width="36" :height="36" />
-          <h3>{{ tech.label }}</h3>
-        </a>
+        <template v-for="(tech, index) in row.items" :key="index">
+          <a
+            v-if="rowIndex === 0 && index < row.items.length / 2 && tech.linkLabel"
+            class="tech-item"
+            href="#projects"
+            :aria-label="tech.linkLabel"
+            @click.prevent="showProject(tech.project)"
+          >
+            <Icon :icon="tech.icon" :width="36" :height="36" />
+            <h3>{{ tech.label }}</h3>
+          </a>
+          <div v-else class="tech-item" aria-hidden="true">
+            <Icon :icon="tech.icon" :width="36" :height="36" />
+            <h3>{{ tech.label }}</h3>
+          </div>
+        </template>
       </div>
     </div>
   </section>

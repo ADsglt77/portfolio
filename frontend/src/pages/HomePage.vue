@@ -100,7 +100,13 @@ onUnmounted(() => {
     />
     <div class="bg-shade" aria-hidden="true"></div>
     <div ref="veilRef" class="hero-veil" aria-hidden="true"></div>
-    <h1 ref="titleRef">{{ hero.displayName }}</h1>
+    <div ref="titleRef" class="hero-identity">
+      <h1>{{ hero.displayName }}</h1>
+      <div :class="{ visible: showElements }" class="hero-positioning">
+        <p>{{ hero.identityLabel }}</p>
+        <span>{{ hero.stackLabel }}</span>
+      </div>
+    </div>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
       <h5>{{ hero.scrollLabel }}</h5>
       <Icon class="scroll-icon" :icon="iconFastArrowDown" :width="20" :height="20" />
@@ -156,10 +162,39 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
+.hero-identity {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
 h1 {
   color: var(--text);
   opacity: 1 !important;
-  z-index: 100 !important;
+}
+
+.hero-positioning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hero-positioning p {
+  font-size: clamp(0.75rem, 1.4vw, 1rem);
+}
+
+.hero-positioning span {
+  color: var(--muted);
+  font-size: clamp(0.65rem, 1.1vw, 0.8rem);
 }
 
 .scroll {
@@ -196,6 +231,15 @@ h1 {
 }
 
 @media (max-width: 900px) {
+  .hero-identity {
+    max-width: calc(100% - 2 * var(--spacing-xl));
+    gap: var(--spacing-sm);
+  }
+
+  .hero-positioning p {
+    max-width: 28rem;
+  }
+
   .meta {
     bottom: var(--spacing-xl);
   }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from "@iconify/vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
@@ -12,14 +13,20 @@ import { useMediaQuery } from "../composables/useMediaQuery";
 import { useProjectToShow } from "../composables/useProjectToShow";
 import { useScrollScene } from "../composables/useScrollScene";
 import { config } from "../config";
-import { iconExpand } from "../data/icons";
+import { iconExpand, iconNavArrowLeft, iconNavArrowRight } from "../data/icons";
 import { type Project, projects } from "../data/projects";
 import { useAnimationsEnabled } from "../injectionKeys";
 import { scrambleText } from "../lib/textScramble";
 import { formatTemplate } from "../lib/format";
 
 const MAX_TECHNOLOGIES = 4;
-const { detailsLabel, navigationLabel, projectLabelTemplate } = config.projects;
+const {
+	detailsLabel,
+	navigationLabel,
+	nextLabel,
+	previousLabel,
+	projectLabelTemplate,
+} = config.projects;
 
 // With animations on, the section is a pinned "cinema": one project fills the screen at
 // a time and the scroll moves to the next one. With animations off, the projects are
@@ -94,7 +101,7 @@ useScrollScene(() => {
 		timeline
 			.to(
 				content[i - 1] ?? [],
-				{ autoAlpha: 0, y: -60, duration: 0.35, ease: "power1.in" },
+				{ autoAlpha: 0, y: -40, duration: 0.4, ease: "power1.in" },
 				at,
 			)
 			.to(media[i - 1] ?? [], { scale: 1.15, duration: 1, ease: "none" }, at)
@@ -102,7 +109,7 @@ useScrollScene(() => {
 				slides[i] ?? [],
 				{ autoAlpha: 0 },
 				{ autoAlpha: 1, duration: 0.45, ease: "none", immediateRender: false },
-				at + 0.25,
+				at + 0.15,
 			)
 			.fromTo(
 				media[i] ?? [],
@@ -120,9 +127,9 @@ useScrollScene(() => {
 					ease: "power1.out",
 					immediateRender: false,
 				},
-				at + 0.65,
+				at + 0.35,
 			)
-			.set(slides[i - 1] ?? [], { autoAlpha: 0 }, at + 0.7);
+			.set(slides[i - 1] ?? [], { autoAlpha: 0 }, at + 0.75);
 	}
 	cinema = timeline.scrollTrigger;
 
@@ -226,6 +233,7 @@ const openSheet = (project: Project, event: MouseEvent) => {
           ref="slideRefs"
           class="slide"
           :aria-label="project.title"
+          :aria-hidden="(cinemaEnabled || isMobile) && index !== active ? 'true' : undefined"
           :inert="((cinemaEnabled || isMobile) && index !== active) || undefined"
         >
           <ProjectMedia :project="project" preview class="slide-media" aria-hidden="true" />
@@ -246,7 +254,16 @@ const openSheet = (project: Project, event: MouseEvent) => {
         </article>
       </div>
 
-      <nav v-if="isMobile" class="project-pagination" :aria-label="navigationLabel">
+      <nav class="project-pagination" :aria-label="navigationLabel">
+        <button
+          type="button"
+          class="project-nav-button"
+          :aria-label="previousLabel"
+          :disabled="active === 0"
+          @click="showProject(active - 1)"
+        >
+          <Icon :icon="iconNavArrowLeft" :width="18" :height="18" aria-hidden="true" />
+        </button>
         <div class="project-dots">
           <button
             v-for="(project, index) in projects"
@@ -261,6 +278,15 @@ const openSheet = (project: Project, event: MouseEvent) => {
             <span aria-hidden="true"></span>
           </button>
         </div>
+        <button
+          type="button"
+          class="project-nav-button"
+          :aria-label="nextLabel"
+          :disabled="active === projects.length - 1"
+          @click="showProject(active + 1)"
+        >
+          <Icon :icon="iconNavArrowRight" :width="18" :height="18" aria-hidden="true" />
+        </button>
         <span class="sr-only" aria-live="polite">{{ projects[active]?.title }}</span>
       </nav>
     </div>
@@ -372,10 +398,18 @@ const openSheet = (project: Project, event: MouseEvent) => {
 
 .project-pagination {
   position: absolute;
-  right: 50%;
-  bottom: var(--spacing-md);
+  left: 50%;
+  bottom: var(--spacing-lg);
   z-index: 5;
-  transform: translateX(50%);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 .project-dots {
@@ -407,6 +441,29 @@ const openSheet = (project: Project, event: MouseEvent) => {
   background: var(--text);
 }
 
+.project-nav-button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.project-nav-button:hover:not(:disabled) {
+  background: var(--glass-hover);
+}
+
+.project-nav-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 @media (max-width: 900px) {
   .projects-stage.is-mobile {
     width: 100%;
@@ -424,6 +481,10 @@ const openSheet = (project: Project, event: MouseEvent) => {
 		height: 100dvh;
 		overflow: hidden;
 	}
+
+  .project-pagination {
+    bottom: var(--spacing-sm);
+  }
 
   .projects-stage.is-mobile::-webkit-scrollbar {
     display: none;

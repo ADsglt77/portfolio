@@ -147,7 +147,8 @@ const scrollToSection = (e: Event, href: string) => {
 	e.preventDefault();
 	showMobileMenu.value = false;
 	const element = document.querySelector<HTMLElement>(href);
-	if (element) glideTo(element);
+	const offset = window.innerWidth <= 900 && href === "#timeline" ? -96 : 0;
+	if (element) glideTo(element, offset);
 };
 </script>
 
