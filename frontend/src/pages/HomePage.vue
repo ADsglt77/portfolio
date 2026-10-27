@@ -100,12 +100,10 @@ onUnmounted(() => {
     />
     <div class="bg-shade" aria-hidden="true"></div>
     <div ref="veilRef" class="hero-veil" aria-hidden="true"></div>
-    <div ref="titleRef" class="hero-identity">
-      <h1>{{ hero.displayName }}</h1>
-      <div :class="{ visible: showElements }" class="hero-positioning">
-        <p>{{ hero.identityLabel }}</p>
-        <span>{{ hero.stackLabel }}</span>
-      </div>
+    <h1 ref="titleRef">{{ hero.displayName }}</h1>
+    <div :class="{ visible: showElements }" class="hero-positioning">
+      <p>{{ hero.identityLabel }}</p>
+      <span>{{ hero.stackLabel }}</span>
     </div>
     <div :class="{ 'visible slide-up': showElements }" class="scroll">
       <h5>{{ hero.scrollLabel }}</h5>
@@ -162,22 +160,18 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-.hero-identity {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-md);
-  text-align: center;
-}
-
 h1 {
   color: var(--text);
   opacity: 1 !important;
+  z-index: 1;
 }
 
 .hero-positioning {
+  position: absolute;
+  top: calc(50% + clamp(4.5rem, 12vw, 9.5rem));
+  left: 50%;
+  width: calc(100% - 2 * var(--page-gutter));
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -231,11 +225,6 @@ h1 {
 }
 
 @media (max-width: 900px) {
-  .hero-identity {
-    max-width: calc(100% - 2 * var(--spacing-xl));
-    gap: var(--spacing-sm);
-  }
-
   .hero-positioning p {
     max-width: 28rem;
   }

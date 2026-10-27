@@ -151,13 +151,9 @@ onUnmounted(() => {
 
 <style scoped>
 .loader {
+  position: relative;
   height: 100vh;
   height: 100dvh;
-  display: grid;
-  grid-template-rows: auto 6rem;
-  place-items: center;
-  align-content: center;
-  gap: var(--spacing-xl);
 }
 
 .skip-link {
@@ -178,15 +174,23 @@ onUnmounted(() => {
 }
 
 h1 {
-  position: static;
+  position: absolute;
+  top: 50%;
+  left: 50%;
   z-index: 1;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .loading-status-container {
+  position: absolute;
+  top: calc(50% + clamp(4.5rem, 12vw, 9.5rem));
+  left: 50%;
   width: 100%;
+  transform: translateX(-50%);
   color: var(--muted);
   z-index: 100;
   height: 6rem;
