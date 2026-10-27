@@ -2,7 +2,7 @@
 	"site": {
 		"name": "Adrien Segalat",
 		"title": "Adrien Segalat — Développeur full-stack & élève-ingénieur",
-		"description": "Portfolio d'Adrien Segalat, développeur full-stack et élève-ingénieur à l'EFREI : parcours, compétences et réalisations web.",
+		"description": "Portfolio d'Adrien Segalat, développeur full-stack en alternance chez Therasoft et élève-ingénieur à l'EFREI : parcours, compétences et réalisations web.",
 		"jobTitle": "Développeur full-stack et élève-ingénieur",
 		"locale": "fr_FR",
 		"keywords": [
@@ -17,7 +17,11 @@
 		"lang": "fr",
 		"themeColor": "#151e16",
 		"url": "https://adrien-segalat.fr",
-		"image": "/og.jpg"
+		"image": "/og.jpg",
+		"email": "adrien.segalat@gmail.com",
+		"location": "Limoges, France",
+		"employer": "Therasoft",
+		"school": "EFREI"
 	},
 
 	"theme": {
@@ -39,8 +43,8 @@
 		"displayName": "ADRIEN",
 		"identityLabel": "Adrien Segalat — Développeur full-stack · Élève-ingénieur EFREI",
 		"stackLabel": "Angular · Vue / Nuxt · Express · C#",
-		"scrollLabel": "Scroll to explore",
-		"loadingLabel": "Loading... {{progress}}%",
+		"scrollLabel": "Faire défiler pour explorer",
+		"loadingLabel": "Chargement... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
 		"backgroundImage": "/img/background.webp",
 		"ambientSound": "/sound/Flickering-Flames.mp3"
@@ -48,7 +52,22 @@
 
 	"about": {
 		"title": "Élève-ingénieur et développeur full-stack",
-		"paragraph": "Élève-ingénieur à l'EFREI en spécialité Logiciels et Systèmes d'Information, je poursuis mon alternance chez Therasoft, où je développe des applications métier pour le secteur médical avec Angular, Express et C#. Passionné de développement web, de design et grand amateur de basket-ball, j'aime allier technique et esthétique dans mes projets.",
+		"status": "Alternance en cours chez Therasoft depuis juillet 2025",
+		"paragraph": "Je conçois et fais évoluer des applications métier en accordant autant d'attention à leur fiabilité qu'à leur expérience utilisateur. Chez Therasoft, je travaille sur des produits pour le secteur médical avec Angular, Express en TypeScript et C#. Mon cycle ingénieur LSI à l'EFREI complète cette expérience terrain par une approche plus large de l'architecture logicielle et des systèmes d'information.",
+		"highlights": [
+			{
+				"label": "Formation",
+				"value": "Cycle ingénieur LSI · EFREI Bordeaux"
+			},
+			{
+				"label": "Entreprise",
+				"value": "Therasoft · applications métier médicales"
+			},
+			{
+				"label": "Approche",
+				"value": "Interfaces utiles, fiables et soignées"
+			}
+		],
 		"cv": {
 			"label": "Télécharger mon CV",
 			"path": "/CV-Adrien.pdf",
@@ -62,6 +81,9 @@
 
 	"contact": {
 		"title": "Contactez-moi",
+		"intro": "Je poursuis actuellement mon alternance chez Therasoft. Je reste disponible pour échanger autour du développement web, de l'ingénierie logicielle ou d'un futur projet.",
+		"emailLabel": "M'écrire directement",
+		"locationLabel": "Limoges · EFREI Bordeaux",
 		"image": {
 			"src": "/img/contact.webp",
 			"alt": "Feu de camp au bord d'un lac dans la brume"
@@ -102,16 +124,18 @@
 
 	"footer": {
 		"name": "Adrien Segalat",
-		"template": "{{year}} {{name}}. Tous droits réservés."
+		"template": "{{year}} {{name}}. Tous droits réservés.",
+		"signature": "Conçu et développé avec attention par Adrien Segalat.",
+		"stack": "Vue 3 · TypeScript · GSAP · Cloudflare"
 	},
 
 	"nav": {
 		"label": "Navigation principale",
 		"menuLabel": "Menu",
 		"links": [
-			{ "href": "#about", "label": "ABOUT" },
-			{ "href": "#timeline", "label": "EXPERIENCE" },
-			{ "href": "#projects", "label": "PROJECTS" },
+			{ "href": "#about", "label": "À PROPOS" },
+			{ "href": "#timeline", "label": "PARCOURS" },
+			{ "href": "#projects", "label": "PROJETS" },
 			{ "href": "#contact", "label": "CONTACT" }
 		],
 		"settings": {
@@ -125,12 +149,14 @@
 		{
 			"url": "https://www.linkedin.com/in/adrien-segalat",
 			"icon": "iconoir:linkedin",
-			"label": "Visiter mon profil LinkedIn"
+			"label": "Visiter mon profil LinkedIn",
+			"shortLabel": "LinkedIn"
 		},
 		{
 			"url": "https://github.com/ADsglt77",
 			"icon": "iconoir:github",
-			"label": "Visiter mon profil GitHub"
+			"label": "Visiter mon profil GitHub",
+			"shortLabel": "GitHub"
 		}
 	],
 
@@ -184,65 +210,15 @@
 	],
 
 	"timelineSection": {
-		"title": "Parcours",
-		"showAllLabel": "Afficher tout le parcours",
-		"showLessLabel": "Revenir aux étapes clés",
-		"featuredCount": 5
+		"title": "Parcours"
 	},
 
 	"timeline": [
-		{
-			"date": "2020/2021",
-			"organization": "Lycée Turgot (Limoges)",
-			"role": "Seconde (option SI-CIT)",
-			"description": "Baccalauréat général",
-			"type": "formation"
-		},
-		{
-			"date": "Mars 2020",
-			"organization": "Police Nationale",
-			"role": "Stage de trois jours",
-			"type": "work"
-		},
-		{
-			"date": "2021/2022",
-			"organization": "Lycée Turgot (Limoges)",
-			"role": "Première (Maths/NSI/Physique-Chimie)",
-			"description": "Baccalauréat général",
-			"type": "formation"
-		},
-		{
-			"date": "Juin 2021",
-			"organization": "Flexocolor",
-			"role": "Stage d'une semaine",
-			"description": "Photogravure, découverte métier + journée avec gestionnaire informatique + responsable site web",
-			"type": "work"
-		},
-		{
-			"date": "2022/2023",
-			"organization": "Lycée Turgot (Limoges)",
-			"role": "Terminale (Maths/NSI)",
-			"description": "Baccalauréat général obtenu",
-			"type": "formation"
-		},
-		{
-			"date": "2023/2024",
-			"organization": "Lycée Valadon (Limoges)",
-			"role": "BTS SIO (Services Informatiques aux Organisations) - 1ère année",
-			"description": "Option \"Certification\"",
-			"type": "formation"
-		},
 		{
 			"date": "Mai/Juin 2024",
 			"organization": "Broussaud Textile",
 			"role": "Stage de 1ère année de BTS (cinq semaines)",
 			"description": "API GraphQL avec Shopify : migration d'une API REST vers GraphQL en Symfony/PHP, découverte du travail en entreprise",
-			"type": "work"
-		},
-		{
-			"date": "Depuis Mai 2024",
-			"organization": "Super U (Aixe-Sur-Vienne / Limoges)",
-			"role": "Job étudiant (Grande surface)",
 			"type": "work"
 		},
 		{

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from "@iconify/vue";
 import { nextTick, ref, watch } from "vue";
 import Button from "../components/Button.vue";
 import ImageSection from "../components/ImageSection.vue";
@@ -16,11 +17,12 @@ const FIELDS: Array<{
 	key: FieldKey;
 	type?: "text" | "email";
 	textarea?: boolean;
+	rows?: number;
 }> = [
 	{ key: "name" },
 	{ key: "email", type: "email" },
 	{ key: "subject" },
-	{ key: "message", textarea: true },
+	{ key: "message", textarea: true, rows: 4 },
 ];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EMPTY_FORM: Record<FieldKey, string> = {
@@ -31,8 +33,9 @@ const EMPTY_FORM: Record<FieldKey, string> = {
 };
 const FEEDBACK_DURATION = 3000;
 
-const { contact } = config;
+const { contact, social } = config;
 const { form } = contact;
+const contactEmailHref = `mailto:${config.site.email}`;
 
 const formRef = ref<HTMLFormElement | null>(null);
 
@@ -131,6 +134,28 @@ const handleSubmit = async () => {
 <template>
   <ImageSection id="contact" :title="contact.title" :image="contact.image" title-area="1 / 2 / 2 / 5">
     <form ref="formRef" novalidate @submit.prevent="handleSubmit">
+      <div class="contact-intro">
+        <p>{{ contact.intro }}</p>
+        <div class="contact-meta">
+          <a :href="contactEmailHref">
+            <span>{{ contact.emailLabel }}</span>
+            {{ config.site.email }}
+          </a>
+          <span>{{ contact.locationLabel }}</span>
+          <a
+            v-for="link in social"
+            :key="link.url"
+            :href="link.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            :aria-label="link.label"
+            class="contact-social"
+          >
+            <Icon :icon="link.icon" :width="16" :height="16" aria-hidden="true" />
+            {{ link.shortLabel }}
+          </a>
+        </div>
+      </div>
       <Input
         v-for="field in FIELDS"
         :id="field.key"
@@ -138,6 +163,7 @@ const handleSubmit = async () => {
         v-model="formData[field.key]"
         :type="field.type"
         :textarea="field.textarea"
+        :rows="field.rows"
         :label="form[field.key].label"
         :placeholder="form[field.key].placeholder"
         :error="errors[field.key]"
@@ -173,15 +199,55 @@ form {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-sm);
+	gap: 0;
 	align-self: center;
 	grid-area: 2 / 3 / 7 / 5;
+}
+
+.contact-intro {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-sm);
+	margin-bottom: var(--spacing-sm);
+}
+
+.contact-intro > p {
+	max-width: 62ch;
+	color: var(--muted);
+	font-size: var(--font-size-span);
+}
+
+.contact-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--spacing-sm) var(--spacing-lg);
+	font-size: var(--font-size-span);
+}
+
+.contact-meta a {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--spacing-sm);
+	color: var(--text);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.contact-meta .contact-social {
+	align-items: center;
+	text-decoration: none;
+}
+
+.contact-meta a span,
+.contact-meta > span {
+	color: var(--muted);
 }
 
 form .actions {
 	display: flex;
 	gap: var(--spacing-sm);
 	justify-content: space-between;
+	margin-top: var(--spacing-xs);
 }
 
 form .actions button {
@@ -197,6 +263,12 @@ form .actions button {
 .captcha-error {
 	color: var(--error);
 	font-size: var(--font-size-span);
+}
+
+@media (min-width: 901px) {
+	:global(#contact > img) {
+		height: clamp(360px, 82vh, 700px);
+	}
 }
 
 @media (max-width: 900px) {

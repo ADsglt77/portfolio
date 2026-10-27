@@ -31,6 +31,21 @@ function siteHead(): Plugin {
 		image: imageUrl,
 		jobTitle: site.jobTitle,
 		description: site.description,
+		email: `mailto:${site.email}`,
+		address: {
+			"@type": "PostalAddress",
+			addressLocality: site.location.replace(", France", ""),
+			addressCountry: "FR",
+		},
+		worksFor: {
+			"@type": "Organization",
+			name: site.employer,
+		},
+		affiliation: {
+			"@type": "CollegeOrUniversity",
+			name: site.school,
+		},
+		knowsLanguage: ["fr", "en", "es"],
 		sameAs: social.map((link) => link.url),
 	});
 
@@ -48,6 +63,7 @@ function siteHead(): Plugin {
 		meta({ property: "og:description", content: site.description }),
 		meta({ property: "og:url", content: site.url }),
 		meta({ property: "og:image", content: imageUrl }),
+		meta({ property: "og:image:type", content: "image/jpeg" }),
 		meta({ property: "og:image:alt", content: `Portfolio de ${site.name}` }),
 		meta({ name: "twitter:card", content: "summary_large_image" }),
 		meta({ name: "twitter:title", content: site.title }),

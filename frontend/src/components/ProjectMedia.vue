@@ -32,6 +32,7 @@ const videoAttrs = props.preview
       aria-hidden="true"
       loading="lazy"
       decoding="async"
+      fetchpriority="low"
     />
     <video
       v-if="project.video"
@@ -48,6 +49,7 @@ const videoAttrs = props.preview
       :alt="formatTemplate(posterAltTemplate, { title: project.title })"
       loading="lazy"
 			decoding="async"
+      fetchpriority="low"
     />
     <div v-else class="project-media-empty">
       <Icon :icon="iconPlay" :width="48" :height="48" />

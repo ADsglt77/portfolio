@@ -44,7 +44,14 @@ useScrollScene(() => {
 
 <template>
 	<section :id="id" ref="sectionRef" class="section image-section">
-		<img ref="imageRef" :src="image.src" :alt="image.alt" loading="lazy" decoding="async" />
+		<img
+			ref="imageRef"
+			:src="image.src"
+			:alt="image.alt"
+			loading="lazy"
+			decoding="async"
+			fetchpriority="low"
+		/>
 		<div class="title" :style="{ gridArea: titleArea }">
 			<h2 class="heading-stroke" aria-hidden="true">{{ displayedText }}</h2>
 			<h2 class="heading" :aria-label="title">

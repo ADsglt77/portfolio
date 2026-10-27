@@ -29,6 +29,7 @@ watch(
 
 const sectionRef = ref<HTMLElement | null>(null);
 const titleRef = ref<HTMLElement | null>(null);
+const positioningRef = ref<HTMLElement | null>(null);
 const veilRef = ref<HTMLElement | null>(null);
 
 // Leaving the hero, the forest zooms in, the name rises into the fog and the
@@ -50,7 +51,7 @@ useScrollScene(() => {
 			0,
 		)
 		.to(
-			titleRef.value,
+			[titleRef.value, positioningRef.value],
 			{ yPercent: -60, scale: 1.3, filter: "blur(10px)", ease: "none" },
 			0,
 		)
@@ -101,7 +102,7 @@ onUnmounted(() => {
     <div class="bg-shade" aria-hidden="true"></div>
     <div ref="veilRef" class="hero-veil" aria-hidden="true"></div>
     <h1 ref="titleRef">{{ hero.displayName }}</h1>
-    <div :class="{ visible: showElements }" class="hero-positioning">
+    <div ref="positioningRef" :class="{ visible: showElements }" class="hero-positioning">
       <p>{{ hero.identityLabel }}</p>
       <span>{{ hero.stackLabel }}</span>
     </div>

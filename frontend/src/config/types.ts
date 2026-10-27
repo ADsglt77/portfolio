@@ -7,6 +7,7 @@ export interface SocialLink {
 	url: string;
 	icon: string;
 	label: string;
+	shortLabel: string;
 }
 
 export interface TimelineItem {
@@ -53,6 +54,10 @@ export interface SiteConfig {
 		url: string;
 		/** Link preview image (og:image), relative to `url`. */
 		image: string;
+		email: string;
+		location: string;
+		employer: string;
+		school: string;
 	};
 	theme: {
 		colors: {
@@ -80,12 +85,17 @@ export interface SiteConfig {
 	};
 	about: {
 		title: string;
+		status: string;
 		paragraph: string;
+		highlights: Array<{ label: string; value: string }>;
 		cv: { label: string; path: string; filename: string };
 		image: { src: string; alt: string };
 	};
 	contact: {
 		title: string;
+		intro: string;
+		emailLabel: string;
+		locationLabel: string;
 		image: { src: string; alt: string };
 		form: {
 			name: FieldLabels;
@@ -102,6 +112,8 @@ export interface SiteConfig {
 	footer: {
 		name: string;
 		template: string;
+		signature: string;
+		stack: string;
 	};
 	nav: {
 		label: string;
@@ -120,9 +132,6 @@ export interface SiteConfig {
 	technologiesBanner: string[];
 	timelineSection: {
 		title: string;
-		showAllLabel: string;
-		showLessLabel: string;
-		featuredCount: number;
 	};
 	timeline: TimelineItem[];
 	projects: {
