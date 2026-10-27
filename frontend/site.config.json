@@ -42,7 +42,6 @@
 		"scrollLabel": "Scroll to explore",
 		"loadingLabel": "Loading... {{progress}}%",
 		"enterLabel": "ENTER WEBSITE",
-		"skipIntroLabel": "PASSER L'INTRO",
 		"backgroundImage": "/img/background.webp",
 		"ambientSound": "/sound/Flickering-Flames.mp3"
 	},

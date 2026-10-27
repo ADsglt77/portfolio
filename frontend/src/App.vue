@@ -84,11 +84,6 @@ const handleEnter = () => {
 	}, 350);
 };
 
-const skipIntro = () => {
-	entered.value = true;
-	startLenis();
-};
-
 watchEffect(() => {
 	document.body.style.overflow = entered.value ? "" : "hidden";
 });
@@ -138,9 +133,6 @@ onUnmounted(() => {
           @click="handleEnter"
         />
       </Transition>
-      <button type="button" class="skip-intro" @click="skipIntro">
-        {{ hero.skipIntroLabel }}
-      </button>
     </div>
   </div>
 
@@ -160,10 +152,12 @@ onUnmounted(() => {
 <style scoped>
 .loader {
   height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 6rem;
+  place-items: center;
+  align-content: center;
+  gap: var(--spacing-xl);
 }
 
 .skip-link {
@@ -184,7 +178,7 @@ onUnmounted(() => {
 }
 
 h1 {
-  position: absolute;
+  position: static;
   z-index: 1;
   background-clip: text;
   -webkit-background-clip: text;
@@ -192,15 +186,14 @@ h1 {
 }
 
 .loading-status-container {
-  position: relative;
-  top: 15%;
+  width: 100%;
   color: var(--muted);
   z-index: 100;
-  min-height: 6rem;
+  height: 6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
+  justify-content: flex-start;
 }
 
 .fade-enter-active,
@@ -211,25 +204,6 @@ h1 {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-.skip-intro {
-  padding: 0;
-  border: 0;
-  border-bottom: 1px solid currentColor;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: var(--font-size-span);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.skip-intro:hover,
-.skip-intro:focus-visible {
-  color: var(--text);
 }
 
 .gradient-overlay {

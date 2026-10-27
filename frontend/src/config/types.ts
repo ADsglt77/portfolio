@@ -75,7 +75,6 @@ export interface SiteConfig {
 		scrollLabel: string;
 		loadingLabel: string;
 		enterLabel: string;
-		skipIntroLabel: string;
 		backgroundImage: string;
 		ambientSound: string;
 	};
