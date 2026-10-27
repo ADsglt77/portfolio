@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-	computed,
-	onMounted,
-	onUnmounted,
-	provide,
-	ref,
-	watch,
-	watchEffect,
-} from "vue";
+import { computed, onUnmounted, provide, ref, watch, watchEffect } from "vue";
 import Button from "./components/Button.vue";
 import Footer from "./components/Footer.vue";
 import Nav from "./components/Nav.vue";
@@ -30,16 +22,7 @@ import TimelinePage from "./pages/TimelinePage.vue";
 
 const { hero } = config;
 
-const STORAGE_INTRO = "portfolio-intro-seen";
-const readIntroSeen = () => {
-	try {
-		return localStorage.getItem(STORAGE_INTRO) === "true";
-	} catch {
-		return false;
-	}
-};
-
-const entered = ref(readIntroSeen());
+const entered = ref(false);
 const isButtonFading = ref(false);
 const audioRef = ref<HTMLAudioElement>();
 
@@ -98,27 +81,13 @@ const handleEnter = () => {
 	setTimeout(() => {
 		entered.value = true;
 		startLenis();
-		try {
-			localStorage.setItem(STORAGE_INTRO, "true");
-		} catch {
-			/* storage unavailable */
-		}
 	}, 350);
 };
 
 const skipIntro = () => {
 	entered.value = true;
 	startLenis();
-	try {
-		localStorage.setItem(STORAGE_INTRO, "true");
-	} catch {
-		/* storage unavailable */
-	}
 };
-
-onMounted(() => {
-	if (entered.value) startLenis();
-});
 
 watchEffect(() => {
 	document.body.style.overflow = entered.value ? "" : "hidden";

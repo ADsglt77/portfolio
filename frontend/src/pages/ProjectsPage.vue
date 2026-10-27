@@ -404,12 +404,7 @@ const openSheet = (project: Project, event: MouseEvent) => {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  backdrop-filter: blur(10px);
+  gap: var(--spacing-sm);
 }
 
 .project-dots {
@@ -429,27 +424,30 @@ const openSheet = (project: Project, event: MouseEvent) => {
 }
 
 .project-dot span {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: var(--radius-full);
   background: var(--muted);
-  transition: width 0.25s ease, background 0.25s ease;
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 
 .project-dot.is-active span {
-  width: 18px;
   background: var(--text);
+  transform: scale(1.35);
 }
 
 .project-nav-button {
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  flex: 0 0 44px;
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
-  background: transparent;
+  background: color-mix(in srgb, var(--bg) 45%, transparent);
   color: var(--text);
   cursor: pointer;
   transition: background 0.2s ease, opacity 0.2s ease;
@@ -457,6 +455,7 @@ const openSheet = (project: Project, event: MouseEvent) => {
 
 .project-nav-button:hover:not(:disabled) {
   background: var(--glass-hover);
+  border-color: var(--glass-border-hover);
 }
 
 .project-nav-button:disabled {
